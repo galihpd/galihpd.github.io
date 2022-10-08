@@ -10,11 +10,49 @@
 <style>
     body {
       padding-bottom: 10px; } 
-    .card {
-      display:inline-block;
-      margin-bottom: 20px;
-      margin-top:20px; 
-      margin-right:20px;}
+    
+    @media (max-width: 1920px) {  
+      .card {
+        display:inline-block;
+        margin-bottom: 20px;
+        margin-top: 10px; 
+        width: 18rem; 
+        margin-right: 10px;}}
+
+    @media (min-width: 601px) and (max-width:767px) {  
+      .card {
+        display:inline-block;
+        margin-top: 10px; 
+        margin-bottom: 20px; 
+        width: 100%; }}
+
+    @media (max-width: 600px) {  
+      .card {
+        display:inline-block;
+        margin-top: 10px; 
+        margin-bottom: 20px; 
+        width: 100%; }}
+    
+    //card atas
+    @media (max-width: 1920px) {  
+      .atas {
+        display:inline-block;
+        margin-bottom: 20px; 
+        width: 18rem; 
+        margin-right: 10px;}}
+
+    @media (min-width: 601px) and (max-width:767px) {  
+      .atas {
+        display:inline-block;
+        margin-bottom: 20px; 
+        width: 50%; }}
+
+    @media (max-width: 600px) {  
+      .atas {
+        display:inline-block;
+        margin-bottom: 20px; 
+        width: 45%; }}
+
 </style>
 
     <title>Galih Prakoso</title>
@@ -26,11 +64,11 @@
     <div class="container">
       <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">  
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="index.html" class="nav-link px-2 link-secondary">Home</a></li>
-          <li><a href="galeri.html" class="nav-link px-2 link-dark">Galeri</a></li>
+          <li><a href="index.html" class="nav-link px-2 link-dark">Home</a></li>
+          <li><a href="3d.html" class="nav-link px-2 link-dark">Galeri</a></li>
           <li><a href="tools.html" class="nav-link px-2 link-dark">Tools</a></li>
-          <li><a href="#" class="nav-link px-2 link-dark">Saya</a></li>
-          <li><a href="#" class="nav-link px-2 link-dark">Resource</a></li>
+          <li><a href="saya.html" class="nav-link px-2 link-secondary">Saya</a></li>
+          <li><a href="resource.html" class="nav-link px-2 link-dark">Resource</a></li>
         </ul>
       </header>
     </div>
@@ -47,27 +85,27 @@
         <h5>Pendidikan</h5>
         <p col-sm-6>Saya merasa hutang budi sama Negara. 12 taun saya sekolah disubsidi sama pemerintah</p>
        
-        <div class="card" style="width: 14rem; margin-top:5px;">
-            <div class="card-header">SDN Depok Baru 6</div>
+        <div class="card atas">
+            <div class="card-header">SD Negeri Depok Baru 6</div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">2009 - 2015</li>
             </ul></div>
 
-        <div class="card" style="width: 14rem; margin-top:5px;">
-            <div class="card-header">SMPN 20 Depok</div>
+        <div class="card atas">
+            <div class="card-header">SMP Negeri 20 Depok</div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">2015 - 2018</li>
             </ul>
         </div>
 
-        <div class="card" style="width: 14rem; margin-top:5px;">
-            <div class="card-header">SMKN 3 Depok</div>
+        <div class="card atas">
+            <div class="card-header">SMK Negeri 3 Depok</div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">2018 - 2021</li>
             </ul>
         </div>
        
-        <div class="card" style="width: 14rem; margin-top:5px;">
+        <div class="card atas">
             <div class="card-header">Politeknik Negeri Jakarta</div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">2021 - Sekarang</li>
@@ -76,7 +114,7 @@
 
         </div></br></br>
         <h5>Pengalaman - pengalaman kerja</h5>
-        <div class="card" style="width: 18rem;">
+        <div class="card">
             <img src="content/etc/laptop.jpg" class="card-img-top" alt="...">
             <div class="card-body">
               <p class="card-text"><small class="text-muted">2017 - Kapanpun</small></p>
@@ -89,7 +127,7 @@
             </ul>
         </div>
 
-        <div class="card" style="width: 18rem;">
+        <div class="card">
             <img src="content/etc/umy.png" class="card-img-top" alt="...">
             <div class="card-body">
               <p class="card-text"><small class="text-muted">Juli - Agustus 2019</small></p>
@@ -102,7 +140,7 @@
             </ul>
         </div>
         
-        <div class="card" style="width: 18rem;">
+        <div class="card">
             <img src="content/etc/ugm.png" class="card-img-top" alt="...">
             <div class="card-body">
               <p class="card-text"><small class="text-muted">September - November 2019</small></p>
@@ -115,7 +153,7 @@
             </ul>
         </div>
 
-        <div class="card" style="width: 18rem;">
+        <div class="card">
             <img src="content/etc/gema.png" class="card-img-top" alt="...">
             <div class="card-body">
               <p class="card-text"><small class="text-muted">November 2021 - Sekarang</small></p>
@@ -128,7 +166,7 @@
             </ul>
         </div>
 
-        <div class="card" style="width: 18rem;">
+        <div class="card">
             <img src="content/etc/himatik.png" class="card-img-top" alt="...">
             <div class="card-body">
               <p class="card-text"><small class="text-muted">Februari 2022 - September 2022</small></p>
@@ -141,12 +179,12 @@
             </ul>
         </div>
 
-        <div class="card" style="width: 18rem;">
+        <div class="card">
             <img src="content/etc/apgm.png" class="card-img-top" alt="...">
             <div class="card-body">
               <p class="card-text"><small class="text-muted">Juli 2022 - Sekarang</small></p>
               <h5 class="card-title">Aliansi Pemberdayaan Generasi Muda Indonesia</h5>
-              <p class="card-text">Berbekal pengalaman dari Himatik. Saya memberanikan diri untuk bergabung dengan APGM. Walau saya di hire sebagai staff marketing, saya lebih suka disebut graphic designer karena setiap hari saya mendesain feeds Instagram APGM</p>
+              <p class="card-text">Berbekal pengalaman dari Himatik. Saya memberanikan diri untuk bergabung dengan APGM. Walau saya di hire sebagai staff marketing, saya lebih suka disebut graphic designer karena setiap hari saya mendesain feeds IG APGM</p>
             </div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">Freelance</li>
@@ -154,7 +192,7 @@
             </ul>
         </div>
 
-        <div class="card" style="width: 18rem;">
+        <div class="card">
             <img src="content/etc/himatik.png" class="card-img-top" alt="...">
             <div class="card-body">
               <p class="card-text"><small class="text-muted">2021 - 2022</small></p>
