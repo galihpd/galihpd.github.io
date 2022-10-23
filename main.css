@@ -1,0 +1,102 @@
+body {
+    padding-bottom: 10px;
+  }
+
+  .ling{
+    color:#000;
+  }
+
+  .card-title{
+    margin-left: 0px;
+  }
+
+  .judul{
+    margin-left: 10px;
+  }
+
+  .badge {
+    background-color: rgb(200, 225, 216) !important; 
+    color:black;
+    padding:5px;
+    margin-bottom: 10px;
+    margin-right: 5px;}
+  
+[data-theme="dark"] {
+   background-color: rgb(33, 30, 30) !important;
+   color: antiquewhite;}
+
+[data-theme="dark"] .card {
+    background-color: rgb(41, 41, 41)!important;
+    color:antiquewhite!important;
+    border:0px solid !important;}
+
+[data-theme="dark"] .ling{
+    color:aquamarine;}
+
+[data-theme="dark"] .badge {
+background-color: #eee !important; 
+color:#222;
+padding:5px;
+margin-bottom: 10px;
+margin-right: 5px;}
+
+[data-theme="dark"] .bg-light {
+background-color: #222 !important; }
+
+[data-theme="dark"] .pala {
+  background-color: rgb(41, 41, 41);
+  padding:auto;
+  border-radius: 0px 0px 20px 20px;
+}
+    
+.pala {
+  background-color: rgb(227, 255, 245);
+  padding:auto;
+  border-radius: 0px 0px 20px 20px;
+}
+
+    @media (max-width: 1920px) {  
+    .card {
+      display:inline-block;
+      margin-bottom: 20px; 
+      width: 18rem; 
+      margin-right: 10px;}
+      
+      h5,.tombol{
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: 0px;
+      }}
+
+  @media (min-width: 601px) and (max-width:767px) {  
+    .card {
+      display:inline-block;
+      margin-bottom: 20px; 
+      width: 100%; }
+    
+      h5,.tombol{
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: 0px;
+      }}
+
+
+  @media (max-width: 600px) {  
+    .card {
+      display:inline-block;
+      margin-bottom: 20px; 
+      width: 100%; }}
+  
+  /* video diawal */
+  @media (max-width: 1920px) {  
+    .videomain {
+      width:535px;
+      display:inline;
+      border-radius: 10px;
+    }}
+  
+    @media (max-width: 601px){  
+    .videomain {
+      width:320px;
+      border-radius: 10px;
+    }}
