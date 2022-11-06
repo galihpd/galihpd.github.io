@@ -1,5 +1,4 @@
 body {
-    padding-bottom: 10px;
   }
 
   .ling{
@@ -20,13 +19,23 @@ body {
     padding:5px;
     margin-bottom: 10px;
     margin-right: 5px;}
+
+    .utama{
+      background-color: rgb(227, 255, 245);
+      padding-top: 30px;
+      border-radius: 30px 30px 0px 0px;
+      margin-bottom: 0px;
+      padding-bottom: 20px;
+      width: auto;
+    }
+
   
 [data-theme="dark"] {
    background-color: rgb(33, 30, 30) !important;
    color: antiquewhite;}
 
 [data-theme="dark"] .card {
-    background-color: rgb(41, 41, 41)!important;
+    background-color: rgb(52, 51, 51)!important;
     color:antiquewhite!important;
     border:0px solid !important;}
 
@@ -40,8 +49,14 @@ padding:5px;
 margin-bottom: 10px;
 margin-right: 5px;}
 
-[data-theme="dark"] .bg-light {
-background-color: #222 !important; }
+[data-theme="dark"]   .utama{
+  background-color: rgb(41, 41, 41);
+  padding-top: 30px;
+  border-radius: 30px 30px 0px 0px;
+  margin-bottom: 0px;
+  padding-bottom: 20px;
+  width: auto;
+}
 
 [data-theme="dark"] .pala {
   background-color: rgb(41, 41, 41);
@@ -59,8 +74,8 @@ background-color: #222 !important; }
     .card {
       display:inline-block;
       margin-bottom: 20px; 
-      width: 18rem; 
-      margin-right: 10px;}
+      width: 17.5rem; 
+      margin-right: 10.5px;}
       
       h5,.tombol{
         margin-top: auto;
