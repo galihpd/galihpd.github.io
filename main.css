@@ -98,6 +98,9 @@ margin-right: 5px;}
 
 
   @media (max-width: 600px) {  
+    body{
+      overflow-x: hidden;
+    }
     .card {
       display:inline-block;
       margin-bottom: 20px; 
