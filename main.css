@@ -114,8 +114,11 @@ margin-right: 5px;}
       border-radius: 10px;
     }}
   
-    @media (max-width: 601px){  
+   @media (max-width: 601px){  
     .videomain {
-      width:320px;
+      width:350px;
       border-radius: 10px;
+      margin-top: -50px;
+      margin-bottom: 10px;
     }}
+
