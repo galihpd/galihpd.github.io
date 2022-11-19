@@ -25,8 +25,7 @@ html, body {
 
     .utama{
       background-color: rgb(227, 255, 245);
-      padding-top: 30px;
-      padding-bottom: 20px;
+
     }
 
     .exp{
@@ -45,10 +44,7 @@ html, body {
     }
 
     .tblmain{
-      padding-left: 15px;
-      padding-right: 15px;
       margin-right: 5px;
-      margin-left: 5px;
     }
   
 [data-theme="dark"] {
@@ -73,8 +69,8 @@ margin-right: 5px;}
 
 [data-theme="dark"]   .utama{
   background: rgb(41,41,41);
-  padding-top: 30px;
-  padding-bottom: 20px;
+  padding-top: 85px;
+  padding-bottom: 70px;
 }
 
 [data-theme="dark"] .pala {
@@ -91,7 +87,7 @@ margin-right: 5px;}
     .card {
       display:inline-block;
       margin-bottom: 20px; 
-      width: 17.5rem; 
+      width: 19rem; 
       margin-right: 10.5px;}
       
       h5,.tombol{
@@ -130,7 +126,6 @@ margin-right: 5px;}
     .videomain {
       width:80%;
       border-radius: 10px;
-      margin:auto;
     }}
   
     @media (max-width: 601px){  
@@ -140,6 +135,4 @@ margin-right: 5px;}
     .videomain {
       width:100%;
       border-radius: 10px;
-      margin-top: -50px;
-      margin-bottom: 10px;
     }}
