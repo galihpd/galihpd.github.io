@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JSON Database Query</title>
+</head>
+<body>
+  <h1>JSON Database Query</h1>
+
+  <form id="queryForm">
+    <label for="salaryInput">Minimum Salary:</label>
+    <input type="number" id="salaryInput" name="salaryInput" min="0">
+
+    <button type="submit">Query</button>
+  </form>
+
+  <table id="resultTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Department</th>
+        <th>Salary</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <script>
+    // Assuming the JSON data is stored in a variable called 'jsonData'
+    var jsonData = `{
+      "employees": [
+        {
+          "id": 1,
+          "name": "John Doe",
+          "department": "Engineering",
+          "salary": 50000
+        },
+        {
+          "id": 2,
+          "name": "Jane Smith",
+          "department": "Marketing",
+          "salary": 60000
+        },
+        {
+          "id": 3,
+          "name": "Alice Johnson",
+          "department": "Human Resources",
+          "salary": 55000
+        }
+      ]
+    }`;
+
+    // Parse the JSON data
+    var data = JSON.parse(jsonData);
+
+    var form = document.getElementById("queryForm");
+    var salaryInput = document.getElementById("salaryInput");
+    var resultTableBody = document.querySelector("#resultTable tbody");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      // Clear previous results
+      resultTableBody.innerHTML = "";
+
+      // Get the minimum salary value from the input field
+      var minSalary = parseFloat(salaryInput.value);
+
+      // Perform the query
+      var queryResult = data.employees.filter(function(employee) {
+        return employee.salary > minSalary;
+      });
+
+      // Add rows to the table
+      queryResult.forEach(function(employee) {
+        var row = document.createElement("tr");
+
+        Object.values(employee).forEach(function(value) {
+          var cell = document.createElement("td");
+          cell.textContent = value;
+          row.appendChild(cell);
+        });
+
+        resultTableBody.appendChild(row);
+      });
+    });
+  </script>
+</body>
+</html>
