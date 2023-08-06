@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON Data Display</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+    <div class=" p-20">
+    <div>
+        <strong><label for="timezoneSelect">Zona Waktu: </label></strong>
+        <select id="timezoneSelect">
+            <option value="Asia/Jakarta">Jakarta</option>
+            <option value="Asia/Makassar">Makassar</option>
+            <option value="Asia/Jayapura">Jayapura</option>
+            <!-- Add more timezone options as needed -->
+        </select>
+    </div>
+
+    <div id="jsonDisplay">
+        
+        </br><p class="text-2xl"><b>Waktu</p></b>
+        <p><strong>Date:</strong> <span id="date"></span></p>
+        <p><strong>Time:</strong> <span id="time"></span></p>
+        <p><strong>Hari:</strong> <span id="dayOfWeek"></span></p>
+        
+        </br><p class="text-2xl"><b>Jadwal Sholat</p></b>
+        <p><strong>Subuh:</strong> <span id="subuh"></span></p>
+        <p><strong>Dzuhur:</strong> <span id="dzuhur"></span></p>
+        <p><strong>Ashar:</strong> <span id="ashar"></span></p>
+        <p><strong>Maghrib:</strong> <span id="maghrib"></span></p>
+        <p><strong>Isya:</strong> <span id="isya"></span></p>
+        
+        </br>
+        <!-- Inside the <div id="jsonDisplay"> -->
+        <p><strong>Subuh Countdown:</strong> <span id="subuhCountdown"></span></p>
+        <p><strong>Dzuhur Countdown:</strong> <span id="dzuhurCountdown"></span></p>
+        <p><strong>Ashar Countdown:</strong> <span id="asharCountdown"></span></p>
+        <p><strong>Maghrib Countdown:</strong> <span id="maghribCountdown"></span></p>
+        <p><strong>Isya Countdown:</strong> <span id="isyaCountdown"></span></p>
+
+    </div>
+    <p class="pt-10">Aljadwal Parser v1</p>
+     <p class="pb-2">Powered by:</p>
+     <b><a href="https://api.myquran.com">MyQuran API</s></a></b></br>
+     <b><a href="https://timeapi.io">Time API</s></a></b>
+</div>
+
+    <script src="jadwal.js"></script>
+</body>
+</html>
