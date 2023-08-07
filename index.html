@@ -1,147 +1,211 @@
-<!DOCTYPE html>
-<html data-theme="night" class="bg poppins text-white">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.2.1/dist/full.css" rel="stylesheet" type="text/css" />
-    <link href="style.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
+  <!DOCTYPE html>
+  <html class="bg-gradient-to-tr from-slate-800 via-neutral-800 to-gray-900 poppins text-white">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+      <link href="https://cdn.jsdelivr.net/npm/daisyui@3.2.1/dist/full.css" rel="stylesheet" type="text/css" />
+      <link href="css/style.css" rel="stylesheet" type="text/css" />
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="js/index.js"></script>
 
-</head>
-<body>
+  </head>
+  <body>
+          <nav class="sticky top-4 z-50 px-4 font-bold">
+            <div class="mx-auto max-w-lg px-50 sm:px-6 backdrop-blur-3xl bg-gray-700/50 rounded-3xl m-5 lg:px-6">
+              <div class="relative flex h-12 items-center justify-between">
+                <div class="absolute inset-y-0 left-3 flex items-center sm:hidden">
+                  <!-- Mobile menu button-->
+                  <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="absolute -inset-0.5"></span>
+                    <span class="sr-only">Open main menu</span>
+                    <!--
+                      Icon when menu is closed.
+          
+                      Menu open: "hidden", Menu closed: "block"
+                    -->
+                    <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                    <!--
+                      Icon when menu is open.
+          
+                      Menu open: "block", Menu closed: "hidden"
+                    -->
+                    <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                  <div class="flex flex-shrink-0 items-center">
+                    <a href="index.html"> <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#FFF"><path d="M4 7v10M1 7h22M4 10h16M20 7v10" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+                  </div>
+                  <div class="hidden sm:ml-6 sm:block">
+                    <div class="flex space-x-4">
+                      <a href="https://galihpd.github.io/3d" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Galeri</a>
+                      <a href="https://galihpd.github.io/resource" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Blog</a>
+                      <a href="https://galihpd.github.io/aljadwal" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Projects</a>
+                      <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Aljadwal</a>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                  <a class="badge badge-info py-4 rounded-full font-bold text-white" href="https://galihpd.github.io/doc/CV%20Galih%20Prakoso.pdf" > <!-- Adjust the font size as needed -->
+                    CV
+                    <svg width="18px" height="18px" stroke-width="1.4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
+                      <path d="M6 20h12M12 4v12m0 0l3.5-3.5M12 16l-3.5-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                  </a>
+                </div>
+                  
+                </div>
+              </div>
+            </div>
+          
+            <!-- Mobile menu, show/hide based on menu state. -->
+            <div class="sm:hidden backdrop-blur-3xl rounded-xl" id="mobile-menu">
+              <div class="space-y-1 px-2 pb-3 pt-2">
+                <a href="#" class="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium" aria-current="page">Dashboard</a>
+                <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Team</a>
+                <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Projects</a>
+                <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Calendar</a>
+              </div>
+            </div>
+          </nav>
+          
+
+      <div class="hero mb-3">
+        <div class="hero-content text-center">
+          <div class="max-w">
+                <h1 class="lg:text-9xl text-6xl mt-5 font-bold pb-2">Galih </br">Prakoso</h1>
+              
+            <p class="pt-2 pb-6">A 3D Generalist and Computer Enthusiast.</p>
+            
+            <div class="indicator">
+              <span class="indicator-item badge badge-primary">Email</span>
+            <b class="px-2 py-1  border rounded-lg">galihpr@aol.com</b>
+            </div>
+
+          </div>
+        </div>
+      </div>  
+
+      <div style="display: flex; justify-content: center;" class="pb-5">
+        <div class="stats stats-vertical lg:stats-horizontal bg-gradient-to-l from-emerald-900 via-slate-700 to-gray-700 shadow-lg text-white">
     
-    <div class="navbar bg" data-theme="night">
-        <div class="flex-1">
-          <a class="btn btn-ghost normal-case text-xl"> <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#FFF"><path d="M4 7v10M1 7h22M4 10h16M20 7v10" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
-        </div>
-        <div class="flex-none">
-          <ul class="menu menu-horizontal px-1">
-            <li><a href="https://galihpd.github.io/3d.html">Galeri</a></li>
-            <li><a href="https://galihpd.github.io/resource.html">Blog</a></li>
-            <li><a href="https://galihpd.github.io/aljadwal">Aljadwal</a></li>
-            <li><a class="btn-primary button"href="https://galihpd.github.io/doc/CV%20Galih%20Prakoso.pdf">CV Download</a></li>
-          </ul>
-        </div>
-    </div>
-
-    <div class="hero mb-5">
-      <div class="hero-content text-center">
-        <div class="max-w">
-              <h1 class="text-6xl mt-5 font-bold">Galih </br">Prakoso</h1>
-          <p class="pt-6">A 3D Generalist and Computer Enthusiast.</p>
+          <div class="stat place-items-center">
+            <div class="stat-title">Project Involved</div>
+            <div class="stat-value">10+</div>
+            <div class="stat-desc">From 2021 to 2023</div>
+          </div>
+          
+          <div class="stat place-items-center">
+            <div class="stat-title">Experience</div>
+            <div class="stat-value">2 Years+</div>
+            <div class="stat-desc">From 2019</div>
+          </div>
+          
+          <div class="stat place-items-center">
+            <div class="stat-title">Current Status</div>
+            <div class="stat-value">CS Student</div>
+            <div class="stat-desc">Currently Study at State Polytechnic Of Jakarta.</div>
+          </div>
+          
         </div>
       </div>
-    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
-    <script src="font.js"></script>
-
-    <div style="display: flex; justify-content: center;" class="bg pb-10">
-      <div class="stats stats-vertical lg:stats-horizontal lbg shadow-lg shadow-lg">
-  
-        <div class="stat place-items-center">
-          <div class="stat-title">Project Involved</div>
-          <div class="stat-value">10+</div>
-          <div class="stat-desc">From 2021 to 2023</div>
+      <div class="collapse sm:px-10 px-4 pb-10 md:px-40 lg:px-50">
+        <input type="checkbox" class="peer" /> 
+        <div class="collapse-title text-center hover:animate-pulse text-xl font-bold peer-checked:bg-secondary peer-checked:text-secondary-content">
+          <span class="badge badge-primary mr-2">Click</span>Tentang Saya
         </div>
         
-        <div class="stat place-items-center">
-          <div class="stat-title">Experience</div>
-          <div class="stat-value">2 Years+</div>
-          <div class="stat-desc">From 2019</div>
-        </div>
-        
-        <div class="stat place-items-center">
-          <div class="stat-title">Current Status</div>
-          <div class="stat-value">CS Student</div>
-          <div class="stat-desc">Currently Study at State Polytechnic Of Jakarta.</div>
-        </div>
-        
+        <div class="collapse-content"> 
+          <p class="text-justify leading-loose">
+            Saat ini saya sedang berusaha lulus dari program studi Teknik Multimedia Digital (vokasi). Paham desain grafis, Koding, 3D dikit - dikit, 
+            Keamanan komputer dasar, Jaringan && apa aja deh pokoknya yang mau ngobrol bisa hubungi saya di galihpr@aol.com.
+            Saya bisa menginstal jaringan komputer terutama yang pake UTP, Bisa koding tapi konsol seperti shell bash dan C++, 
+            Bisa desain juga terutama desain feeds untuk postingan sosial media seperti Instagram dan twitter, Bisa motret juga yang penting kamera 
+            nya bisa full manual dan masih terus belajar 3D modelling yang hasilnya bisa diliat di sini. 
+            Kira-kira pengalaman diatas semua saya dapetin 4 tahun lalu, ketika saya mulai masuk sekolah menengah atas
+        </p>      
+        <div class="text-center pt-4 pb-2 font-bold"> Tech Stack Saya</div>
+        <div class="flex flex-wrap justify-center">
+        <div class="badge badge- h-8 lbg my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Blender_logo_no_text.svg">Blender 3D
       </div>
-    </div>
-
-    <div class="collapse sm:px-10 px-4 pb-10 md:px-40 lg:px-50 bg" data-theme="night">
-      <input type="checkbox" class="peer" /> 
-      <div class="collapse-title text-center hover:animate-pulse text-xl font-bold peer-checked:bg-secondary peer-checked:text-secondary-content">
-        <span class="badge badge-primary mr-2">Click</span>Tentang Saya
-      </div>
-      
-      <div class="collapse-content"> 
-        <p class="text-justify leading-loose">
-          Saat ini saya sedang berusaha lulus dari program studi Teknik Multimedia Digital (vokasi). Paham desain grafis, Koding, 3D dikit - dikit, 
-          Keamanan komputer dasar, Jaringan && apa aja deh pokoknya yang mau ngobrol bisa hubungi saya di galihpr@aol.com.
-          Saya bisa menginstal jaringan komputer terutama yang pake UTP, Bisa koding tapi konsol seperti shell bash dan C++, 
-          Bisa desain juga terutama desain feeds untuk postingan sosial media seperti Instagram dan twitter, Bisa motret juga yang penting kamera 
-          nya bisa full manual dan masih terus belajar 3D modelling yang hasilnya bisa diliat di sini. 
-          Kira-kira pengalaman diatas semua saya dapetin 4 tahun lalu, ketika saya mulai masuk sekolah menengah atas
-      </p>      
-      <div class="text-center pt-4 pb-2 font-bold"> Tech Stack Saya</div>
-      <div class="flex flex-wrap justify-center">
       <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
-       <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Blender_logo_no_text.svg">Blender 3D
-     </div>
-     <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
-       <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/a/af/Adobe_Photoshop_CC_icon.svg">Adobe Photoshop
-     </div>
-     <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
-       <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Adobe_After_Effects_CC_icon.svg">Adobe After Effect
-     </div>
-     <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
-      <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Icons8_flat_linux.svg">Linux Bash
-     </div>
-     <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
-      <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/9/95/Tailwind_CSS_logo.svg">
-     </div>
-     <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
-      <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Bootstrap_logo.svg"> Bootstrap
-     </div>
-     </div>
-     </div>
-
-      <div class="flex flex-wrap justify-center">
-        <div class="mockup-code mx-4 my-4">
-          <pre data-prefix="$"><code>Current Project</code></pre> 
-          <pre data-prefix=">" class="text-secondary"><code>Pwnisher Boss Challenge</code></pre> 
-          <pre data-prefix=">" class="text-warning"><code><a href="https://galihpd.github.io/aljadwal">Aljadwal Pray Schedule</a></code></pre>  
-          <pre data-prefix=">" class="text-secondary"><code>HIMATIK PNJ Compro</code></pre>
-          <pre data-prefix=">" class="text-secondary pb-2"><code>Client Project 3D Model</code></pre>  
-          <pre data-prefix="$"><code>Recent Done Project</code></pre> 
-          <pre data-prefix=">" class="text-secondary"><code>Client Project Merch</code></pre>  
-          <pre data-prefix=">" class="text-warning"><code><a href="https://galihpr.itch.io/seaside-wave">Seaside Wave PC Game</a></code></pre>  
-        </div>
-
-        <div class="mockup-code my-4">
-          <div class=" bg-base-200"><iframe width="280" height="200" src="https://www.youtube-nocookie.com/embed/NqYSw1gKtqM?si=gYwVhFztRnz7j5uO" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
-        </div>
-        
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/a/af/Adobe_Photoshop_CC_icon.svg">Adobe Photoshop
+      </div>
+      <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Adobe_After_Effects_CC_icon.svg">Adobe After Effect
+      </div>
+      <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Icons8_flat_linux.svg">Linux Bash
+      </div>
+      <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/9/95/Tailwind_CSS_logo.svg">
+      </div>
+      <div class="badge badge-info h-8 lbg my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Bootstrap_logo.svg"> Bootstrap
+      </div>
+      </div>
       </div>
 
-      </div> 
-  
-    <footer class="footer p-10 bgb text-neutral-content" data-theme="night">
-      <div>
-        <span class="footer-title">Services</span> 
-        <a class="link link-hover">Branding</a>
-        <a class="link link-hover">Design</a>
-        <a class="link link-hover">Marketing</a>
-        <a class="link link-hover">Advertisement</a>
-      </div> 
-      <div>
-        <span class="footer-title">Company</span> 
-        <a class="link link-hover">About us</a>
-        <a class="link link-hover">Contact</a>
-        <a class="link link-hover">Jobs</a>
-        <a class="link link-hover">Press kit</a>
-      </div> 
-      <div>
-        <span class="footer-title">Legal</span> 
-        <a class="link link-hover">Terms of use</a>
-        <a class="link link-hover">Privacy policy</a>
-        <a class="link link-hover">Cookie policy</a>
-      </div>
-    </footer>
+        <div class="flex flex-wrap justify-center">
+          <div class="mockup-code mx-2 my-4">
+            <pre data-prefix="$"><code>Current Project</code></pre> 
+            <pre data-prefix=">" class="text-secondary"><code>Pwnisher Boss Challenge</code></pre> 
+            <pre data-prefix=">" class="text-warning"><code><a href="https://galihpd.github.io/aljadwal">Aljadwal Pray Schedule</a></code></pre>  
+            <pre data-prefix=">" class="text-secondary"><code>HIMATIK PNJ Compro</code></pre>
+            <pre data-prefix=">" class="text-secondary pb-2"><code>Client Project 3D Model</code></pre>  
+            <pre data-prefix="$"><code>Recent Done Project</code></pre> 
+            <pre data-prefix=">" class="text-secondary"><code>Client Project Merch</code></pre>  
+            <pre data-prefix=">" class="text-warning"><code><a href="https://galihpr.itch.io/seaside-wave">Seaside Wave PC Game</a></code></pre>  
+          </div>
 
-</body>
-</html>
+          <div class="mockup-code mx-2 my-4">
+            <div class=" bg-base-200"><iframe width="280" height="200" src="https://www.youtube-nocookie.com/embed/NqYSw1gKtqM?si=gYwVhFztRnz7j5uO" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+          </div>
+          
+          <div class="mockup-code mx-2 my-4">
+            <div class=" bg-base-200"><iframe width="280" height="200" src="https://www.youtube.com/embed/7Ld3dRVbQb8?si=Xu3kd1tf7rxBsLzA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+          </div>
+
+          <div class="mockup-code mx-2 my-4">
+            <div class=" bg-base-200"><iframe width="280" height="200" src="https://www.youtube.com/embed/k4Xi4gVAHz8?si=dUEA4QN56q2ywdqc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+          </div>
+          
+        </div>
+
+
+        </div> 
+    
+      <footer class="footer p-10 bgb text-neutral-content" data-theme="night">
+        <div>
+          <span class="footer-title">Services</span> 
+          <a class="link link-hover">Branding</a>
+          <a class="link link-hover">Design</a>
+          <a class="link link-hover">Marketing</a>
+          <a class="link link-hover">Advertisement</a>
+        </div> 
+        <div>
+          <span class="footer-title">Company</span> 
+          <a class="link link-hover">About us</a>
+          <a class="link link-hover">Contact</a>
+          <a class="link link-hover">Jobs</a>
+          <a class="link link-hover">Press kit</a>
+        </div> 
+        <div>
+          <span class="footer-title">Legal</span> 
+          <a class="link link-hover">Terms of use</a>
+          <a class="link link-hover">Privacy policy</a>
+          <a class="link link-hover">Cookie policy</a>
+        </div>
+      </footer>
+
+  </body>
+  </html>
