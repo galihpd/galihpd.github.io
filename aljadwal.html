@@ -4,15 +4,17 @@
     <title>Aljadwal Parser Beta</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
-    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="poppins font-white">
 
-    <div class=" p-10">
+
+    <div class="p-10">
+    <img src="media/aljadwal.svg" class="w-40 pb-3">
     <div>
-        <strong><label for="timezoneSelect">Zona Waktu: </label></strong>
-        <select id="timezoneSelect">
+        <strong><label for="timezoneSelect" class="label-text label">Zona Waktu:</label></strong>
+        <select id="timezoneSelect" class="select select-sm select-bordered">
             <option value="Asia/Jakarta">Jakarta</option>
             <option value="Asia/Makassar">Makassar</option>
             <option value="Asia/Jayapura">Jayapura</option>
@@ -50,8 +52,5 @@
 </div>
 
     <script src="js/jadwal.js"></script>
-    <div class="container p-10">
-    <div class="powr-comments pt-5" id="2a534c61_1691307639"></div><script src="https://www.powr.io/powr.js?platform=html"></script>
-    </div>
 </body>
 </html>
