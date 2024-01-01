@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Borel&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@800&display=swap');
 
 .poppins{
     font-family: 'Inter Tight', sans-serif;
@@ -12,4 +13,8 @@
 
 .lbg{
     background-color: #1d283a;
+}
+
+.font-main{
+    font-family: 'Rethink Sans', sans-serif;
 }
