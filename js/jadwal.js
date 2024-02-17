@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
             else if(selectedTimezone=="Asia/Makassar"){ id=2622; }
             else if(selectedTimezone=="Asia/Jayapura"){ id=3329; }
 
-            const apiSholat = `https://api.codetabs.com/v1/proxy?quest=https://api.myquran.com/v1/sholat/jadwal/${id}/${data.year}/${data.month}/${data.day}`;
+            const apiSholat = `https://api.codetabs.com/v1/proxy?quest=https://api.myquran.com/v2/sholat/jadwal/${id}/${data.year}/${data.month}/${data.day}`;
 
             fetch(apiSholat)
             .then(response => response.json())
