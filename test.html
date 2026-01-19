@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galih Prakoso | Generalist 3D Artist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/controls/OrbitControls.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --brand-red: #ff0000;
+            --tile-bg: #111111;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .inter-bold {
+            font-weight: 900;
+            letter-spacing: -0.06em;
+            text-transform: uppercase;
+            line-height: 0.85;
+            font-style: normal;
+        }
+
+        .hero-text {
+            font-size: clamp(3.5rem, 12vw, 10rem);
+        }
+
+        .mono { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: clamp(11px, 2vw, 14px); 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em; 
+            font-weight: 700;
+        }
+
+        .metro-tile {
+            background-color: var(--tile-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        @media (min-width: 1024px) {
+            .metro-tile:hover {
+                border-color: var(--brand-red);
+                background-color: #1a1a1a;
+            }
+        }
+
+        .metro-tile.active-red {
+            background-color: var(--brand-red);
+            border-color: var(--brand-red);
+        }
+
+        .accent-line { border-left: 6px solid var(--brand-red); }
+        
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            min-height: 350px;
+        }
+
+        .main-content {
+            padding-bottom: 80px;
+        }
+        @media (min-width: 768px) {
+            .main-content {
+                padding-bottom: 40px;
+                margin-left: 96px;
+            }
+        }
+
+        .project-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #222;
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+        }
+        .metro-tile:hover .project-img {
+            filter: grayscale(0%);
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--brand-red); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Mobile Top Header -->
+    <header class="md:hidden w-full bg-black border-b border-white/10 p-5 flex justify-between items-center sticky top-0 z-[60]">
+        <div class="text-xl font-black">GP</div>
+        <div class="text-xs font-black mono text-red-600">3D_SPECIALIST</div>
+    </header>
+
+    <!-- Sidebar / Nav -->
+    <nav class="fixed bottom-0 left-0 w-full h-16 bg-black border-t border-white/10 z-50 flex md:flex-col md:h-full md:w-24 md:border-t-0 md:border-r md:top-0 items-center justify-around md:justify-between md:py-12">
+        <div class="hidden md:flex flex-col items-center space-y-16">
+            <div class="text-2xl font-black">GP</div>
+            <div class="rotate-90 origin-center whitespace-nowrap text-sm font-black mono text-white tracking-widest">EST_2022</div>
+        </div>
+        
+        <div class="flex md:flex-col space-x-8 md:space-x-0 md:space-y-12 text-2xl">
+            <a href="#" class="text-white hover:text-brand-red"><i class="fa-solid fa-house"></i></a>
+            <a href="#work" class="text-white hover:text-brand-red"><i class="fa-solid fa-cube"></i></a>
+            <a href="#stack" class="text-white hover:text-brand-red"><i class="fa-solid fa-layer-group"></i></a>
+            <a href="#terminal" class="text-white hover:text-brand-red"><i class="fa-solid fa-terminal"></i></a>
+        </div>
+
+        <div class="hidden md:block text-[10px] mono text-gray-600">GALIH_V3</div>
+    </nav>
+
+    <main class="main-content p-5 md:p-16">
+        <!-- Header Info -->
+        <nav class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-24 gap-6">
+            <div class="mono text-white leading-relaxed text-sm md:text-base">
+                <p class="text-red-600 font-black">GENERALIST 3D ARTIST</p>
+                <p>GALIH PRAKOSO DAMAR AJI</p>
+                <p>DEPOK, INDONESIA</p>
+            </div>
+            <div class="w-full md:w-auto text-left md:text-right border-t md:border-t-0 border-white/10 pt-4 md:pt-0">
+                <p class="text-4xl md:text-6xl font-black inter-bold tracking-tighter" id="clock">00:00:00</p>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+            <div class="lg:col-span-2 metro-tile p-8 md:p-14 flex flex-col justify-end min-h-[350px] md:min-h-[500px]">
+                <h1 class="hero-text inter-bold">
+                    Real<br><span class="text-red-600">Time</span>
+                </h1>
+                <p class="mt-8 md:mt-12 text-white font-bold uppercase text-base md:text-xl leading-tight max-w-md">
+                    Pengalaman 3+ tahun dalam pembuatan aset 3D untuk game, digitalisasi museum, dan skenario real-time interaktif.
+                </p>
+            </div>
+
+            <div class="lg:col-span-2 metro-tile bg-black overflow-hidden h-[350px] md:h-auto">
+                <div class="absolute top-4 left-4 z-10 mono text-[10px] bg-red-600 px-3 py-1 font-black">INTERACTIVE_RENDER</div>
+                <div id="canvas-container"></div>
+            </div>
+        </div>
+
+        <!-- Tech Stack Section -->
+        <section id="stack" class="mb-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <div class="metro-tile p-6 flex flex-col items-center justify-center text-center">
+                    <i class="fa-solid fa-cube text-4xl mb-4 text-red-600"></i>
+                    <span class="mono text-xs">Blender 3D<br>v2.8 - v4.5</span>
+                </div>
+                <div class="metro-tile p-6 flex flex-col items-center justify-center text-center">
+                    <i class="fa-solid fa-brush text-4xl mb-4 text-red-600"></i>
+                    <span class="mono text-xs">Substance Painter<br>PBR Texturing</span>
+                </div>
+                <div class="metro-tile p-6 flex flex-col items-center justify-center text-center">
+                    <i class="fa-brands fa-unity text-4xl mb-4 text-red-600"></i>
+                    <span class="mono text-xs">Unity Engine<br>Asset Mgmt</span>
+                </div>
+                <div class="metro-tile p-6 flex flex-col items-center justify-center text-center">
+                    <i class="fa-solid fa-code text-4xl mb-4 text-red-600"></i>
+                    <span class="mono text-xs">C# & Unity<br>Development</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Selected Projects (With Images) -->
+        <section id="work" class="mt-20 md:mt-32">
+            <div class="flex justify-between items-end mb-12">
+                <h2 class="text-5xl md:text-7xl inter-bold tracking-tighter">Selected<br>Projects</h2>
+                <span class="mono text-red-600 hidden md:block">Case_Studies_24/25</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Project 1 -->
+                <div class="metro-tile overflow-hidden group">
+                    <img src="" alt="Museum Satria Mandala" class="project-img">
+                    <div class="p-8 accent-line">
+                        <span class="text-[10px] mono text-red-600 font-black">2025 // MUSEUM S. MANDALA</span>
+                        <h4 class="text-2xl inter-bold mt-4">Interactive 3D Map</h4>
+                        <p class="text-xs mono mt-2 text-gray-500">Peta interaktif museum skala besar.</p>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="metro-tile overflow-hidden group">
+                    <img src="" alt="Museum Balanga" class="project-img">
+                    <div class="p-8 accent-line">
+                        <span class="text-[10px] mono text-red-600 font-black">2024 // MUSEUM BALANGA</span>
+                        <h4 class="text-2xl inter-bold mt-4">Immersive Room VR</h4>
+                        <p class="text-xs mono mt-2 text-gray-500">Digitalisasi artefak & lingkungan VR.</p>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="metro-tile overflow-hidden group">
+                    <img src="" alt="Keychron Assets" class="project-img">
+                    <div class="p-8 accent-line">
+                        <span class="text-[10px] mono text-red-600 font-black">2023 // SUNGAME_STUDIO</span>
+                        <h4 class="text-2xl inter-bold mt-4">Keychron Assets</h4>
+                        <p class="text-xs mono mt-2 text-gray-500">High-fidelity 3D mechanical keyboard assets.</p>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="metro-tile overflow-hidden group">
+                    <div class="p-8 accent-line">
+                        <span class="text-[10px] mono text-red-600 font-black">2024 // MUSEUM MANDIRI</span>
+                        <h4 class="text-2xl inter-bold mt-4">Projection Blending</h4>
+                        <p class="text-xs mono mt-2 text-gray-500">Visual mapping untuk instalasi fisik.</p>
+                    </div>
+                </div>
+
+                <!-- Project 5 -->
+                <div class="metro-tile overflow-hidden group">
+                    <div class="p-8 accent-line">
+                        <span class="text-[10px] mono text-red-600 font-black">2024 // POLANTAS</span>
+                        <h4 class="text-2xl inter-bold mt-4">Driving Simulation</h4>
+                        <p class="text-xs mono mt-2 text-gray-500">Aset 3D untuk kebutuhan simulasi berkendara.</p>
+                    </div>
+                </div>
+
+                <!-- Project 6 -->
+                <a href="mailto:galihpr@aol.com" class="metro-tile active-red p-8 flex flex-col justify-between group">
+                    <span class="mono text-white text-xs">Collaboration</span>
+                    <div>
+                        <h3 class="text-4xl inter-bold">START A<br>PROJECT</h3>
+                        <i class="fa-solid fa-arrow-right text-3xl mt-6 group-hover:translate-x-4 transition-transform"></i>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Experience & Terminal -->
+        <div id="terminal" class="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
+            <div class="lg:col-span-2 metro-tile p-8 md:p-10">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl md:text-3xl inter-bold tracking-tighter">Consult Assistant</h2>
+                    <span class="w-3 h-3 bg-red-600 animate-pulse"></span>
+                </div>
+                <input id="ai-prompt" type="text" placeholder="TANYA TENTANG PIPELINE 3D SAYA..." class="w-full bg-white/5 border border-white/20 p-4 md:p-6 focus:outline-none focus:border-red-600 mono text-xs md:text-sm text-white font-black">
+                <div id="ai-response-container" class="mt-6 hidden border-t border-white/10 pt-6">
+                    <p id="ai-response-text" class="text-xs md:text-sm mono text-gray-400 leading-relaxed uppercase"></p>
+                </div>
+                <button id="ai-generate-btn" class="mt-6 w-full text-sm font-black mono bg-white text-black px-6 py-4 md:py-5 hover:bg-red-600 hover:text-white transition-all">
+                    SEND_QUERY
+                </button>
+            </div>
+
+            <div class="metro-tile p-8 flex flex-col justify-between">
+                <span class="mono text-white text-xs">Education</span>
+                <div>
+                    <h4 class="text-xl inter-bold">SMKN 3 DEPOK</h4>
+                    <p class="text-[10px] mono text-red-600 mt-2 font-black">TKJ_GRADUATE</p>
+                </div>
+            </div>
+
+            <div class="metro-tile p-8 flex flex-col justify-between">
+                <span class="mono text-white text-xs">Volunteer</span>
+                <div>
+                    <h4 class="text-xl inter-bold">HIMATIK PNJ</h4>
+                    <p class="text-[10px] mono text-red-600 mt-2 font-black">CONTENT_VISUAL</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-24 md:mt-32 pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="mono text-gray-500 text-[10px] md:text-xs text-center md:text-left">
+                © 2026 GALIH PRAKOSO DAMAR AJI<br>
+                BASED IN DEPOK, INDONESIA
+            </div>
+            <div class="flex space-x-8 md:space-x-12 mono text-xs">
+                <a href="https://linkedin.com/in/s.id/galihcv" class="hover:text-red-600">LINKEDIN</a>
+                <a href="#" class="hover:text-red-600">ARTSTATION</a>
+                <a href="mailto:galihpr@aol.com" class="hover:text-red-600">EMAIL</a>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-GB', { hour12: false });
+            document.getElementById('clock').innerText = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const apiKey = "";
+        const aiBtn = document.getElementById('ai-generate-btn');
+        const aiInput = document.getElementById('ai-prompt');
+        const aiResponseContainer = document.getElementById('ai-response-container');
+        const aiResponseText = document.getElementById('ai-response-text');
+
+        async function callAI(query) {
+            const system = "Anda adalah asisten portfolio Galih Prakoso, seorang Generalist 3D Artist. Jawab pertanyaan tentang pengalaman Galih (Museum Satria Mandala, Balanga, Mandiri) dan skill teknisnya (Blender, Substance, Unity) secara profesional dan to-the-point.";
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: query }] }],
+                        systemInstruction: { parts: [{ text: system }] }
+                    })
+                });
+                const data = await res.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch (e) { return "ERROR: CONNECTION_FAILED"; }
+        }
+
+        aiBtn.addEventListener('click', async () => {
+            const val = aiInput.value;
+            if(!val) return;
+            aiBtn.innerText = "QUERYING...";
+            const resp = await callAI(val);
+            aiResponseText.innerText = resp;
+            aiResponseContainer.classList.remove('hidden');
+            aiBtn.innerText = "SEND_QUERY";
+        });
+
+        let scene, camera, renderer, mesh;
+        function init3D() {
+            const container = document.getElementById('canvas-container');
+            if (!container) return;
+            
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(50, container.offsetWidth / container.offsetHeight, 0.1, 1000);
+            camera.position.z = 6;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            const geo = new THREE.TorusKnotGeometry(1.2, 0.4, 120, 20);
+            const mat = new THREE.MeshStandardMaterial({ 
+                color: 0xff0000, 
+                wireframe: true,
+                emissive: 0xff0000,
+                emissiveIntensity: 0.1
+            });
+            mesh = new THREE.Mesh(geo, mat);
+            scene.add(mesh);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableZoom = false;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 4;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        window.onload = init3D;
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('canvas-container');
+            if (!container || !camera || !renderer) return;
+            camera.aspect = container.offsetWidth / container.offsetHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+        });
+    </script>
+</body>
+</html>
