@@ -1,92 +1,86 @@
 document.addEventListener("DOMContentLoaded", function () {
-    
     const timezoneSelect = document.getElementById("timezoneSelect");
-    const dateElement = document.getElementById("date");
-    const timeElement = document.getElementById("time");
-    const dayOfWeekElement = document.getElementById("dayOfWeek");
+    let jadwalSholat = {}; // Simpan jadwal di memori
 
-    function fetchData() {
+    function updateClock() {
+        const now = new Date();
+        const tz = timezoneSelect.value;
+        
+        // Format waktu sesuai timezone
+        const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: tz };
+        const optionsDate = { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: tz };
+        const optionsDay = { weekday: 'long', timeZone: tz };
+
+        document.getElementById("time").textContent = new Intl.DateTimeFormat('en-GB', optionsTime).format(now);
+        document.getElementById("date").textContent = new Intl.DateTimeFormat('en-GB', optionsDate).format(now);
+        document.getElementById("dayOfWeek").textContent = translateDayOfWeek(new Intl.DateTimeFormat('en-US', optionsDay).format(now));
+
+        // Update semua countdown
+        if (jadwalSholat.subuh) {
+            updateAllCountdowns(now, tz);
+        }
+    }
+
+    async function fetchData() {
         const selectedTimezone = timezoneSelect.value;
-        const apiTanggal = `https://api.codetabs.com/v1/proxy?quest=https://timeapi.io/api/Time/current/zone?timeZone=${selectedTimezone}`;
-        var id;
+        let cityId = 1301; // Default Jakarta
+        
+        if(selectedTimezone === "Asia/Makassar") cityId = 2622;
+        if(selectedTimezone === "Asia/Jayapura") cityId = 3329;
 
-        fetch(apiTanggal)
-        .then(response => response.json())
-        .then(data => {
-            dateElement.textContent = data.day + "/" + data.month + "/" + data.year;
-            timeElement.textContent = formatTimeUnit(data.hour) + ":" + formatTimeUnit(data.minute) + ":" + formatTimeUnit(data.seconds);
-            dayOfWeekElement.textContent = translateDayOfWeek(data.dayOfWeek);
+        // Ambil waktu sekarang untuk parameter API
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
 
-            if(selectedTimezone=="Asia/Jakarta"){ id=1301; }
-            else if(selectedTimezone=="Asia/Makassar"){ id=2622; }
-            else if(selectedTimezone=="Asia/Jayapura"){ id=3329; }
+        const apiSholat = `https://api.myquran.com/v2/sholat/jadwal/${cityId}/${year}/${month}/${day}`;
 
-            const apiSholat = `https://api.codetabs.com/v1/proxy?quest=https://api.myquran.com/v2/sholat/jadwal/${id}/${data.year}/${data.month}/${data.day}`;
+        try {
+            const response = await fetch(apiSholat);
+            const resData = await response.json();
+            const jadwal = resData.data.jadwal;
 
-            fetch(apiSholat)
-            .then(response => response.json())
-            .then(data2 => {
-                subuh.textContent = data2.data.jadwal.subuh;
-                dzuhur.textContent = data2.data.jadwal.dzuhur;
-                ashar.textContent = data2.data.jadwal.ashar;
-                maghrib.textContent = data2.data.jadwal.maghrib;
-                isya.textContent = data2.data.jadwal.isya;
-
-                const prayerTimes = {
-                    subuh: data2.data.jadwal.subuh,
-                    dzuhur: data2.data.jadwal.dzuhur,
-                    ashar: data2.data.jadwal.ashar,
-                    maghrib: data2.data.jadwal.maghrib,
-                    isya: data2.data.jadwal.isya,
-                };
-
-                const currentTime = new Date(data.year, data.month - 1, data.day, data.hour, data.minute, data.seconds);
-
-                Object.keys(prayerTimes).forEach(prayer => {
-                    const prayerTime = new Date(`${data.year}-${data.month}-${data.day} ${prayerTimes[prayer]}`);
-                    const countdownElement = document.getElementById(`${prayer}Countdown`);
-
-                    countdownElement.textContent = calculateTimeRemaining(prayerTime);
-                });
+            // Update UI Jadwal
+            const prayerKeys = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+            prayerKeys.forEach(key => {
+                document.getElementById(key).textContent = jadwal[key];
+                jadwalSholat[key] = jadwal[key]; // Simpan ke variabel global
             });
+        } catch (error) {
+            console.error("Gagal ambil jadwal:", error);
+        }
+    }
+
+    function updateAllCountdowns(now, tz) {
+        const prayerKeys = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+        const dateStr = now.toLocaleDateString('en-CA', { timeZone: tz }); // YYYY-MM-DD
+
+        prayerKeys.forEach(key => {
+            const timeString = jadwalSholat[key];
+            const target = new Date(`${dateStr}T${timeString}:00`);
+            
+            // Handle jika waktu sholat sudah lewat, bisa ditambah logika buat besok (opsional)
+            const diff = target - now;
+            document.getElementById(`${key}Countdown`).textContent = formatCountdown(diff);
         });
     }
 
-    function formatTimeUnit(unit) {
-        return unit < 10 ? "0" + unit : unit;
+    function formatCountdown(ms) {
+        if (ms <= 0) return "Adzan!";
+        const seconds = Math.floor(ms / 1000) % 60;
+        const minutes = Math.floor(ms / (1000 * 60)) % 60;
+        const hours = Math.floor(ms / (1000 * 60 * 60));
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
-    function translateDayOfWeek(dayOfWeek) {
-        const translations = {
-            "Sunday": "Minggu",
-            "Monday": "Senin",
-            "Tuesday": "Selasa",
-            "Wednesday": "Rabu",
-            "Thursday": "Kamis",
-            "Friday": "Jumat",
-            "Saturday": "Sabtu"
-        };
-        return translations[dayOfWeek] || dayOfWeek;
+    function translateDayOfWeek(day) {
+        const map = { "Sunday": "Minggu", "Monday": "Senin", "Tuesday": "Selasa", "Wednesday": "Rabu", "Thursday": "Kamis", "Friday": "Jumat", "Saturday": "Sabtu" };
+        return map[day] || day;
     }
 
-    function calculateTimeRemaining(targetTime) {
-        const currentTime = new Date();
-        const difference = targetTime - currentTime;
-
-        if (difference <= 0) {
-            return "Sudah Adzan!";
-        }
-
-        const seconds = Math.floor(difference / 1000) % 60;
-        const minutes = Math.floor(difference / (1000 * 60)) % 60;
-        const hours = Math.floor(difference / (1000 * 60 * 60));
-
-        return `${formatTimeUnit(hours)}:${formatTimeUnit(minutes)}:${formatTimeUnit(seconds)}`;
-    }
-
-    fetchData();
-    const refreshInterval = 1000;
-    setInterval(fetchData, refreshInterval);
-
-    timezoneSelect.addEventListener("change", fetchData);
+    // Jalankan
+    fetchData(); 
+    setInterval(updateClock, 1000); // Update tampilan jam tiap detik tanpa fetch
+    timezoneSelect.addEventListener("change", fetchData); // Fetch ulang hanya jika zona ganti
 });

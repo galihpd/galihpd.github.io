@@ -1,56 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <title>Aljadwal Parser Beta</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
-    <link href="css/style.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body { background-color: #1a1a1a; color: white; font-family: 'Poppins', sans-serif; }
+    </style>
 </head>
-<body class="poppins font-white">
+<body class="p-5 md:p-10">
+    <div class="max-w-2xl mx-auto">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+                <h1 id="time" class="text-5xl font-bold mt-2">00:00:00</h1>
+                <p class="text-lg opacity-80"><span id="dayOfWeek">Hari</span>, <span id="date">00/00/0000</span></p>
+            </div>
+            <div class="form-control w-full max-w-xs">
+                <label class="label"><span class="label-text text-white font-semibold">Zona Waktu:</span></label>
+                <select id="timezoneSelect" class="select select-bordered bg-gray-800 text-white">
+                    <option value="Asia/Jakarta">Jakarta (WIB)</option>
+                    <option value="Asia/Makassar">Makassar (WITA)</option>
+                    <option value="Asia/Jayapura">Jayapura (WIT)</option>
+                </select>
+            </div>
+        </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="jsonDisplay">
+            <script>
+                const prayers = ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'];
+                prayers.forEach(p => {
+                    const id = p.toLowerCase();
+                    document.write(`
+                        <div class="glass-card p-4 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <p class="text-sm opacity-60">${p}</p>
+                                <p class="text-2xl font-bold" id="${id}">--:--</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs opacity-60 font-mono">Mendatang</p>
+                                <p class="text-lg font-mono text-secondary" id="${id}Countdown">00:00:00</p>
+                            </div>
+                        </div>
+                    `);
+                });
+            </script>
+        </div>
 
-    <div class="p-10">
-    <img src="media/aljadwal.svg" class="w-40 pb-3">
-    <div>
-        <strong><label for="timezoneSelect" class="label-text label">Zona Waktu:</label></strong>
-        <select id="timezoneSelect" class="select select-sm select-bordered">
-            <option value="Asia/Jakarta">Jakarta</option>
-            <option value="Asia/Makassar">Makassar</option>
-            <option value="Asia/Jayapura">Jayapura</option>
-            <!-- Add more timezone options as needed -->
-        </select>
+        <footer class="mt-10 opacity-50 text-sm">
+            <p>Aljadwal Parser v1.1 - Optimized</p>
+            <p>Powered by: MyQuran API & Time API</p>
+        </footer>
     </div>
-
-    <div id="jsonDisplay">
-        
-        </br><p class="text-2xl"><b>Waktu</p></b>
-        <p><strong>Date:</strong> <span id="date"></span></p>
-        <p><strong>Time:</strong> <span id="time"></span></p>
-        <p><strong>Hari:</strong> <span id="dayOfWeek"></span></p>
-        
-        </br><p class="text-2xl"><b>Jadwal Sholat</p></b>
-        <p><strong>Subuh:</strong> <span id="subuh"></span></p>
-        <p><strong>Dzuhur:</strong> <span id="dzuhur"></span></p>
-        <p><strong>Ashar:</strong> <span id="ashar"></span></p>
-        <p><strong>Maghrib:</strong> <span id="maghrib"></span></p>
-        <p><strong>Isya:</strong> <span id="isya"></span></p>
-        
-        </br>
-        <!-- Inside the <div id="jsonDisplay"> -->
-        <p><strong>Subuh Countdown:</strong> <span id="subuhCountdown"></span></p>
-        <p><strong>Dzuhur Countdown:</strong> <span id="dzuhurCountdown"></span></p>
-        <p><strong>Ashar Countdown:</strong> <span id="asharCountdown"></span></p>
-        <p><strong>Maghrib Countdown:</strong> <span id="maghribCountdown"></span></p>
-        <p><strong>Isya Countdown:</strong> <span id="isyaCountdown"></span></p>
-
-    </div>
-    <p class="pt-10">Aljadwal Parser v1</p>
-     <p class="pb-2">Powered by:</p>
-     <b><a href="https://api.myquran.com">MyQuran API</s></a></b></br>
-     <b><a href="https://timeapi.io">Time API</s></a></b>
-</div>
-
     <script src="js/jadwal.js"></script>
 </body>
 </html>
