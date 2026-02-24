@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // 1. Fetch Harian
         try {
-            const res = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${selectedCityId}/${y}/${m}/${d}`);
+            const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=https://api.myquran.com/v2/sholat/jadwal/${selectedCityId}/${y}/${m}/${d}`);
             const data = await res.json();
             if(data.status && data.data.jadwal) {
                 ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'].forEach(k => {
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // 2. Fetch Bulanan
         try {
             monthlyTableBody.innerHTML = "<tr><td colspan='6' class='text-center'>Memuat...</td></tr>";
-            const resB = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${selectedCityId}/${y}/${m}`);
+            const resB = await fetch(`https://api.codetabs.com/v1/proxy?quest=https://api.myquran.com/v2/sholat/jadwal/${selectedCityId}/${y}/${m}`);
             const dataB = await resB.json();
             if(dataB.status && dataB.data.jadwal) {
                 monthlyTableBody.innerHTML = "";
