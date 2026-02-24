@@ -1,63 +1,195 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <title>Aljadwal Parser Beta</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aljadwal Parser v1.4 - Premium UI</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        body { background-color: #0f172a; color: white; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+        
+        /* Glassmorphism Styling */
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
-        body { background-color: #1a1a1a; color: white; font-family: 'Poppins', sans-serif; }
+        .glass-card:hover { 
+            background: rgba(255, 255, 255, 0.08); 
+            transform: translateY(-5px); 
+        }
+
+        /* Custom Scrollbar for Dropdown */
+        #cityDropdown::-webkit-scrollbar { width: 6px; }
+        #cityDropdown::-webkit-scrollbar-track { background: transparent; }
+        #cityDropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        /* Print Settings */
+        @media print {
+            body { background: white !important; color: black !important; padding: 0 !important; }
+            .no-print, header, #jsonDisplay, .form-control, button, footer { display: none !important; }
+            .print-area { 
+                background: transparent !important; 
+                border: none !important; 
+                color: black !important; 
+                width: 100% !important; 
+                display: block !important; 
+                box-shadow: none !important;
+            }
+            table { color: black !important; width: 100% !important; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd !important; padding: 8px !important; color: black !important; text-align: center; }
+            .print-title { display: block !important; text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px; color: black; }
+        }
+        .print-title { display: none; }
     </style>
 </head>
-<body class="p-5 md:p-10">
-    <div class="max-w-2xl mx-auto">
+<body class="p-5 md:p-10 bg-slate-900">
+    <div class="max-w-5xl mx-auto">
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-            <div>
-                <h1 id="time" class="text-5xl font-bold mt-2">00:00:00</h1>
-                <p class="text-lg opacity-80"><span id="dayOfWeek">Hari</span>, <span id="date">00/00/0000</span></p>
+        <header class="no-print">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-10">
+                <div class="text-center md:text-left">
+                    <h1 id="time" class="text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">00:00:00</h1>
+                    <p class="text-lg opacity-60 font-medium mt-1">
+                        <span id="dayNameDisplay">Hari</span>, <span id="fullDateDisplay">Memuat...</span>
+                    </p>
+                </div>
+                <div class="mt-5 md:mt-0 text-right hidden md:block">
+                    <div class="badge badge-secondary badge-outline p-4 font-bold tracking-widest">ALJADWAL PARSER</div>
+                </div>
             </div>
-            <div class="form-control w-full max-w-xs">
-                <label class="label"><span class="label-text text-white font-semibold">Zona Waktu:</span></label>
-                <select id="timezoneSelect" class="select select-bordered bg-gray-800 text-white">
-                    <option value="Asia/Jakarta">Jakarta (WIB)</option>
-                    <option value="Asia/Makassar">Makassar (WITA)</option>
-                    <option value="Asia/Jayapura">Jayapura (WIT)</option>
-                </select>
-            </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="jsonDisplay">
-            <script>
-                const prayers = ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'];
-                prayers.forEach(p => {
-                    const id = p.toLowerCase();
-                    document.write(`
-                        <div class="glass-card p-4 rounded-2xl flex justify-between items-center">
-                            <div>
-                                <p class="text-sm opacity-60">${p}</p>
-                                <p class="text-2xl font-bold" id="${id}">--:--</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs opacity-60 font-mono">Mendatang</p>
-                                <p class="text-lg font-mono text-secondary" id="${id}Countdown">00:00:00</p>
-                            </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10 bg-white/5 p-6 rounded-3xl border border-white/10 shadow-2xl">
+                <div class="form-control">
+                    <label class="label"><span class="label-text text-slate-400 font-bold text-xs uppercase">Tanggal</span></label>
+                    <select id="daySelect" class="select select-bordered bg-slate-800"></select>
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text text-slate-400 font-bold text-xs uppercase">Bulan</span></label>
+                    <select id="monthSelect" class="select select-bordered bg-slate-800">
+                        <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                        <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                        <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                        <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text text-slate-400 font-bold text-xs uppercase">Tahun</span></label>
+                    <select id="yearSelect" class="select select-bordered bg-slate-800"></select>
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text text-slate-400 font-bold text-xs uppercase">Zona Waktu</span></label>
+                    <select id="timezoneSelect" class="select select-bordered bg-slate-800">
+                        <option value="Asia/Jakarta">WIB</option>
+                        <option value="Asia/Makassar">WITA</option>
+                        <option value="Asia/Jayapura">WIT</option>
+                    </select>
+                </div>
+                
+                <div class="form-control col-span-2 md:col-span-1 relative">
+                    <label class="label"><span class="label-text text-slate-400 font-bold text-xs uppercase">Kota</span></label>
+                    <div class="relative group">
+                        <input type="text" id="citySearch" 
+                               class="input input-bordered w-full bg-slate-800 font-bold focus:ring-2 focus:ring-primary" 
+                               placeholder="Pilih/Cari Kota..." autocomplete="off">
+                        
+                        <div id="cityDropdown" 
+                             class="absolute z-[999] w-full mt-1 max-h-60 overflow-y-auto bg-slate-800 border border-white/10 rounded-xl shadow-2xl hidden">
                         </div>
-                    `);
-                });
-            </script>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 no-print" id="jsonDisplay">
+            <div class="glass-card p-6 rounded-[2rem] text-center relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl"></div>
+                <p class="text-4xl mb-2">🌆</p>
+                <p class="text-[10px] font-bold tracking-widest uppercase opacity-50 mb-1">Subuh</p>
+                <h3 class="text-3xl font-black mb-3" id="subuh">--:--</h3>
+                <div class="bg-blue-500/20 py-1 px-3 rounded-full inline-block">
+                    <p class="text-[11px] font-mono font-bold text-blue-300" id="subuhCountdown">00:00:00</p>
+                </div>
+            </div>
+            <div class="glass-card p-6 rounded-[2rem] text-center relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-yellow-500/10 rounded-full blur-2xl"></div>
+                <p class="text-4xl mb-2">☀️</p>
+                <p class="text-[10px] font-bold tracking-widest uppercase opacity-50 mb-1">Dzuhur</p>
+                <h3 class="text-3xl font-black mb-3" id="dzuhur">--:--</h3>
+                <div class="bg-yellow-500/20 py-1 px-3 rounded-full inline-block">
+                    <p class="text-[11px] font-mono font-bold text-yellow-300" id="dzuhurCountdown">00:00:00</p>
+                </div>
+            </div>
+            <div class="glass-card p-6 rounded-[2rem] text-center relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-orange-500/10 rounded-full blur-2xl"></div>
+                <p class="text-4xl mb-2">⛅</p>
+                <p class="text-[10px] font-bold tracking-widest uppercase opacity-50 mb-1">Ashar</p>
+                <h3 class="text-3xl font-black mb-3" id="ashar">--:--</h3>
+                <div class="bg-orange-500/20 py-1 px-3 rounded-full inline-block">
+                    <p class="text-[11px] font-mono font-bold text-orange-300" id="asharCountdown">00:00:00</p>
+                </div>
+            </div>
+            <div class="glass-card p-6 rounded-[2rem] text-center relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-red-500/10 rounded-full blur-2xl"></div>
+                <p class="text-4xl mb-2">🌇</p>
+                <p class="text-[10px] font-bold tracking-widest uppercase opacity-50 mb-1">Maghrib</p>
+                <h3 class="text-3xl font-black mb-3" id="maghrib">--:--</h3>
+                <div class="bg-red-500/20 py-1 px-3 rounded-full inline-block">
+                    <p class="text-[11px] font-mono font-bold text-red-300" id="maghribCountdown">00:00:00</p>
+                </div>
+            </div>
+            <div class="glass-card p-6 rounded-[2rem] text-center relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl"></div>
+                <p class="text-4xl mb-2">🌙</p>
+                <p class="text-[10px] font-bold tracking-widest uppercase opacity-50 mb-1">Isya</p>
+                <h3 class="text-3xl font-black mb-3" id="isya">--:--</h3>
+                <div class="bg-purple-500/20 py-1 px-3 rounded-full inline-block">
+                    <p class="text-[11px] font-mono font-bold text-purple-300" id="isyaCountdown">00:00:00</p>
+                </div>
+            </div>
         </div>
 
-        <footer class="mt-10 opacity-50 text-sm">
-            <p>Aljadwal Parser v1.1 - Optimized</p>
-            <p>Powered by: MyQuran API & Time API</p>
+        <div class="mt-16 flex justify-between items-end no-print">
+            <div>
+                <h2 class="text-3xl font-black">Jadwal Bulanan</h2>
+                <p class="text-slate-400">Pilih kota dan bulan untuk melihat jadwal lengkap.</p>
+            </div>
+            <button onclick="window.print()" class="btn btn-secondary btn-md rounded-2xl shadow-lg shadow-secondary/20">
+                Print PDF / Cetak
+            </button>
+        </div>
+
+        <div class="print-title">
+            <h2 id="printHeaderTitle" class="text-center font-bold text-xl uppercase tracking-widest">Jadwal Sholat</h2>
+        </div>
+
+        <div class="mt-6 overflow-x-auto glass-card rounded-[2rem] p-4 print-area border border-white/5 shadow-2xl">
+            <table class="table table-zebra w-full text-white">
+                <thead class="text-secondary border-b border-white/10 uppercase tracking-widest text-[10px]">
+                    <tr>
+                        <th class="bg-transparent">Tanggal & Hari</th>
+                        <th class="bg-transparent text-center">Subuh</th>
+                        <th class="bg-transparent text-center">Dzuhur</th>
+                        <th class="bg-transparent text-center">Ashar</th>
+                        <th class="bg-transparent text-center">Maghrib</th>
+                        <th class="bg-transparent text-center">Isya</th>
+                    </tr>
+                </thead>
+                <tbody id="monthlyTableBody" class="font-medium text-slate-200">
+                    </tbody>
+            </table>
+        </div>
+
+        <footer class="mt-20 pb-10 text-center opacity-30 text-xs no-print">
+            <p>Aljadwal Parser v1.4 | Premium Dashboard Edition</p>
+            <p>© 2026 Fasilitator Path Artist</p>
         </footer>
     </div>
+
     <script src="js/jadwal.js"></script>
 </body>
 </html>
