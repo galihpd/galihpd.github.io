@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PegForge — Pegboard 3D Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;--surf:#fff;--surf2:#f7f8fa;
+  --brd:#e2e6ec;--brd2:#c8d0dc;
+  --acc:#e85d26;--blue:#2563eb;--green:#16a34a;
+  --txt:#1a2030;--txt2:#4a5568;--muted:#9aa5b4;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05);
+}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+header{
+  background:var(--surf);border-bottom:1px solid var(--brd);
+  padding:12px 22px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);position:relative;z-index:10
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{
+  width:32px;height:32px;background:var(--acc);border-radius:7px;
+  display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
+  gap:3px;padding:5px
+}
+.logo-icon span{background:rgba(255,255,255,.9);border-radius:2px;display:block}
+.logo-icon span:nth-child(even){background:rgba(255,255,255,.3)}
+.logo h1{font-size:15px;font-weight:700}
+.logo h1 em{color:var(--acc);font-style:normal}
+.logo p{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.hdr-hint{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--surf2);border:1px solid var(--brd);padding:4px 10px;border-radius:6px}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:280px 1fr;flex:1;min-height:calc(100vh - 55px)}
+
+/* SIDEBAR */
+.sidebar{background:var(--surf);border-right:1px solid var(--brd);padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--surf2);border:1px solid var(--brd);border-radius:10px;padding:12px}
+.sec{font-family:var(--mono);font-size:9px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+
+/* CONTROLS */
+.ctrl{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.ctrl:last-child{margin-bottom:0}
+.clabel{font-size:11.5px;font-weight:500;color:var(--txt2);flex:1}
+.clabel small{display:block;font-family:var(--mono);font-size:8.5px;color:var(--muted);margin-top:1px}
+.numinp{display:flex;align-items:center;background:var(--surf);border:1.5px solid var(--brd2);border-radius:6px;overflow:hidden}
+.nbtn{width:24px;height:24px;background:transparent;border:none;color:var(--blue);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s}
+.nbtn:hover{background:#eff6ff}
+.nval{width:30px;text-align:center;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--txt);background:transparent;border:none;outline:none}
+input[type=range]{-webkit-appearance:none;width:90px;height:3px;background:var(--brd2);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;background:var(--blue);border-radius:50%;box-shadow:0 1px 3px rgba(37,99,235,.35)}
+.rval{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--blue);min-width:38px;text-align:right}
+.togrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.togrow:last-child{margin-bottom:0}
+.toglabel{font-size:11.5px;font-weight:500;color:var(--txt2)}
+.tog{position:relative;width:32px;height:17px}
+.tog input{opacity:0;width:0;height:0}
+.ts{position:absolute;inset:0;background:var(--brd2);border-radius:17px;cursor:pointer;transition:.2s}
+.ts::before{content:'';position:absolute;width:11px;height:11px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tog input:checked+.ts{background:var(--blue)}
+.tog input:checked+.ts::before{transform:translateX(15px)}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.scard{background:var(--surf);border:1.5px solid var(--brd);border-radius:7px;padding:8px;text-align:center}
+.sv{font-family:var(--mono);font-size:15px;font-weight:700}
+.sl{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* BTN */
+.btnprim{width:100%;padding:11px;background:var(--acc);border:none;border-radius:8px;color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;box-shadow:0 2px 8px rgba(232,93,38,.28)}
+.btnprim:hover{background:#cf4d1a;transform:translateY(-1px);box-shadow:0 4px 14px rgba(232,93,38,.32)}
+.btnprim:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btndl{width:100%;padding:10px;background:transparent;border:1.5px solid var(--green);border-radius:8px;color:var(--green);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;display:none}
+.btndl:hover{background:#f0fdf4}
+.btndl.show{display:block}
+.pgwrap{display:none}
+.pgwrap.show{display:block}
+.pgbg{height:3px;background:var(--brd);border-radius:2px;margin-bottom:5px}
+.pgbar{height:100%;background:var(--acc);border-radius:2px;width:0%;transition:width .25s}
+.pgtxt{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center}
+.divider{height:1px;background:var(--brd)}
+
+/* JOINT PILL */
+.jpills{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.jpill{font-size:9.5px;font-family:var(--mono);padding:3px 8px;border-radius:4px;font-weight:500}
+.jpill.m{background:#fff3e0;color:#c44d00;border:1px solid #ffc999}
+.jpill.f{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+
+/* VIEWPORT */
+.viewport{position:relative;overflow:hidden;background:#2a3240}
+#canvas3d{width:100%;height:100%;display:block}
+.vptop{position:absolute;top:0;left:0;right:0;padding:12px 16px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none}
+.vpbadge{background:rgba(20,28,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:5px 11px;font-family:var(--mono);font-size:10px;color:#a0b8cc;box-shadow:var(--sh)}
+.vpbadge span{color:#ff8c5a;font-weight:500}
+.vpbtns{pointer-events:all;display:flex;gap:5px;flex-direction:column}
+.vpbtn{background:rgba(20,28,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:5px 10px;font-family:var(--mono);font-size:10px;color:#8aa8c0;cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
+.vpbtn:hover{border-color:rgba(255,255,255,.4);color:#fff;background:rgba(40,55,75,.9)}
+
+/* TOAST */
+.colorpicks{display:flex;flex-wrap:wrap;gap:7px}
+.cpick{width:28px;height:28px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0}
+.cpick:hover{transform:scale(1.15)}
+.cpick.active{border-color:var(--txt);box-shadow:0 0 0 2px var(--surf2),0 0 0 4px var(--brd2)}
+.toast{position:fixed;bottom:18px;right:18px;background:#fff;border:1.5px solid var(--green);border-radius:8px;padding:9px 15px;font-family:var(--mono);font-size:11px;color:var(--green);box-shadow:var(--sh);transform:translateY(60px);opacity:0;transition:all .25s;z-index:100}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:680px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidebar{max-height:50vh}
+  .viewport{min-height:300px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+    </div>
+    <div>
+      <h1>Peg<em>Forge</em></h1>
+      <p>// Pegboard 3D Generator</p>
+    </div>
+  </div>
+  <div class="hdr-hint">drag orbit · scroll zoom · right-drag pan</div>
+</header>
+
+<div class="app">
+<div class="sidebar">
+
+  <div class="card">
+    <div class="sec">Panel Size</div>
+    <div class="ctrl">
+      <div class="clabel">Lebar panel<small>total width (mm)</small></div>
+      <input type="range" id="panelW" min="25" max="400" value="100" step="25" oninput="onPanelDim(this,'panelW','vpw')">
+      <span class="rval" id="vpw">100mm</span>
+    </div>
+    <div class="ctrl">
+      <div class="clabel">Tinggi panel<small>total height (mm)</small></div>
+      <input type="range" id="panelH" min="25" max="400" value="100" step="25" oninput="onPanelDim(this,'panelH','vph')">
+      <span class="rval" id="vph">100mm</span>
+    </div>
+    <div class="ctrl">
+      <div class="clabel">Tile size<small>per tile (mm)</small></div>
+      <input type="range" id="tileSize" min="25" max="100" value="25" step="25" oninput="onR(this,'vt','mm')">
+      <span class="rval" id="vt">25mm</span>
+    </div>
+    <div class="ctrl">
+      <div class="clabel">Ketebalan<small>board thickness</small></div>
+      <input type="range" id="thickness" min="4" max="14" value="7" step="1" oninput="onR(this,'vk','mm')">
+      <span class="rval" id="vk">7mm</span>
+    </div>
+    <div style="margin-top:6px;padding:7px 10px;background:var(--surf);border:1px solid var(--brd);border-radius:7px;font-family:var(--mono);font-size:10px;color:var(--txt2);display:flex;justify-content:space-between;align-items:center">
+      <span style="color:var(--muted)">Grid tiles</span>
+      <span id="tileCount" style="color:var(--blue);font-weight:600">4 × 4</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec">Circular Peg Holes</div>
+    <div class="ctrl">
+      <div class="clabel">Pitch X<small>jarak horizontal</small></div>
+      <input type="range" id="pitchX" min="10" max="50" value="25.4" step="0.1" oninput="onR(this,'vpx','mm')">
+      <span class="rval" id="vpx">25.4mm</span>
+    </div>
+    <div class="ctrl">
+      <div class="clabel">Pitch Y<small>jarak vertikal</small></div>
+      <input type="range" id="pitchY" min="10" max="50" value="25.4" step="0.1" oninput="onR(this,'vpy','mm')">
+      <span class="rval" id="vpy">25.4mm</span>
+    </div>
+    <div class="ctrl">
+      <div class="clabel">Hole diameter<small>diameter lubang</small></div>
+      <input type="range" id="slotW" min="3" max="12" value="6" step="0.5" oninput="onR(this,'vsw','mm')">
+      <span class="rval" id="vsw">6mm</span>
+    </div>
+    <div class="togrow">
+      <span class="toglabel">Staggered (offset row)</span>
+      <label class="tog"><input type="checkbox" id="stagger" onchange="live()"><span class="ts"></span></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec">Tampilan</div>
+    <div class="togrow" style="margin-bottom:0">
+      <span class="toglabel">Grid lantai</span>
+      <label class="tog"><input type="checkbox" id="showGrid" checked onchange="toggleGrid()"><span class="ts"></span></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec">Estimasi Print</div>
+    <div class="sgrid">
+      <div class="scard"><div class="sv" id="ssz" style="color:var(--blue)">-</div><div class="sl">Ukuran mm</div></div>
+      <div class="scard"><div class="sv" id="ssl" style="color:var(--acc)">-</div><div class="sl">Total Holes</div></div>
+      <div class="scard"><div class="sv" id="sgr" style="color:var(--green)">-</div><div class="sl">~Gram PETG</div></div>
+      <div class="scard"><div class="sv" id="stm" style="color:#7c3aed">-</div><div class="sl">~Print Time</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec">Warna Material</div>
+    <div class="colorpicks">
+      <button class="cpick active" style="background:#b0bcc8" data-hex="#b0bcc8" onclick="setColor(this)" title="Abu Default"></button>
+      <button class="cpick" style="background:#e8e0d4" data-hex="#e8e0d4" onclick="setColor(this)" title="Krem"></button>
+      <button class="cpick" style="background:#c8d8b8" data-hex="#c8d8b8" onclick="setColor(this)" title="Sage"></button>
+      <button class="cpick" style="background:#b8ccd8" data-hex="#b8ccd8" onclick="setColor(this)" title="Biru Muda"></button>
+      <button class="cpick" style="background:#d4b8c8" data-hex="#d4b8c8" onclick="setColor(this)" title="Pink"></button>
+      <button class="cpick" style="background:#c8b898" data-hex="#c8b898" onclick="setColor(this)" title="Tan"></button>
+      <button class="cpick" style="background:#1a1a1a" data-hex="#1a1a1a" onclick="setColor(this)" title="Hitam"></button>
+      <button class="cpick" style="background:#e85d26" data-hex="#e85d26" onclick="setColor(this)" title="Orange"></button>
+    </div>
+    <div class="ctrl" style="margin-top:10px;margin-bottom:0">
+      <div class="clabel">Custom<small>pilih warna sendiri</small></div>
+      <input type="color" id="customColor" value="#b0bcc8" oninput="setCustomColor(this)"
+        style="width:38px;height:28px;border:1.5px solid var(--brd2);border-radius:6px;cursor:pointer;padding:2px;background:var(--surf)">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <button class="btndl show" id="dlBtn" onclick="downloadSTL()">↓ Download STL</button>
+
+</div><!-- /sidebar -->
+
+<div class="viewport" id="vp">
+  <canvas id="canvas3d"></canvas>
+  <div class="vptop">
+    <div class="vpbadge">Preview · <span id="vinfo">loading...</span></div>
+    <div class="vpbtns">
+      <button class="vpbtn" onclick="resetCam()">⟲ Reset</button>
+      <button class="vpbtn" onclick="setView('iso')">◆ Iso</button>
+      <button class="vpbtn" onclick="setView('front')">▣ Front</button>
+      <button class="vpbtn" onclick="setView('top')">⬆ Top</button>
+    </div>
+  </div>
+</div>
+</div><!-- /app -->
+
+<div class="toast" id="toast">✓ STL berhasil di-download!</div>
+
+<script>
+// ===== STATE =====
+const S={
+  cols:4,rows:4,tileSize:25,thickness:7,
+  pitchX:25.4,pitchY:25.4,slotW:6,slotH:13,
+  stagger:false
+};
+let mesh=null,stlBuf=null,liveT=null;
+
+// ===== THREE SETUP =====
+const canvas=document.getElementById('canvas3d');
+const vpEl=document.getElementById('vp');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=0.85;
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.physicallyCorrectLights=true;
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x2a3240); // dark neutral bg — board putih jadi kontras jelas
+
+const camera=new THREE.PerspectiveCamera(38,1,0.1,8000);
+camera.position.set(350,280,480);
+
+// ── PMREMGenerator untuk env map ──
+const pmrem=new THREE.PMREMGenerator(renderer);
+pmrem.compileCubemapShader();
+
+function buildEnvMap(){
+  const envScene=new THREE.Scene();
+  const sky=new THREE.Mesh(
+    new THREE.SphereGeometry(500,24,12),
+    new THREE.ShaderMaterial({
+      side:THREE.BackSide,
+      uniforms:{
+        top:{value:new THREE.Color(0x8ab4d8)},
+        mid:{value:new THREE.Color(0xc8daf0)},
+        bot:{value:new THREE.Color(0x8090a8)}
+      },
+      vertexShader:`varying vec3 vP; void main(){vP=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      fragmentShader:`
+        uniform vec3 top,mid,bot;
+        varying vec3 vP;
+        void main(){
+          float h=normalize(vP).y;
+          vec3 c=h>0.?mix(mid,top,h):mix(mid,bot,-h);
+          gl_FragColor=vec4(c,1.);
+        }`
+    })
+  );
+  envScene.add(sky);
+  // Bright key patch
+  const kp=new THREE.Mesh(new THREE.SphereGeometry(22,8,8),new THREE.MeshBasicMaterial({color:0xfff8e8}));
+  kp.position.set(200,300,-50); envScene.add(kp);
+  // Soft fill patch
+  const fp=new THREE.Mesh(new THREE.SphereGeometry(35,8,8),new THREE.MeshBasicMaterial({color:0xc8daff}));
+  fp.position.set(-300,80,200); envScene.add(fp);
+
+  const cubeRT=new THREE.WebGLCubeRenderTarget(256,{format:THREE.RGBAFormat,generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter});
+  const cubeCamera=new THREE.CubeCamera(1,1000,cubeRT);
+  cubeCamera.update(renderer,envScene);
+  const env=pmrem.fromCubemap(cubeRT.texture).texture;
+  cubeRT.dispose();
+  return env;
+}
+
+const envMap=buildEnvMap();
+scene.environment=envMap;
+
+// ── Lights ──
+// Key light — lebih soft, shadow ON dengan proper bias
+const key=new THREE.DirectionalLight(0xfff4e0, 1.2);
+key.position.set(180, 400, 220);
+key.castShadow=true;
+key.shadow.mapSize.set(2048,2048);
+key.shadow.camera.near=10; key.shadow.camera.far=3000;
+key.shadow.camera.left=key.shadow.camera.bottom=-600;
+key.shadow.camera.right=key.shadow.camera.top=600;
+key.shadow.bias=-0.0003;
+key.shadow.normalBias=0.5;  // prevent self-shadow acne tanpa matiin shadow
+key.shadow.radius=2;
+scene.add(key);
+
+// Hemisphere ambient — lebih gelap biar ada kontras
+const hemi=new THREE.HemisphereLight(0x7090b8, 0x303848, 0.5);
+scene.add(hemi);
+
+// Fill cool dari bawah-kiri — subtle
+const fill=new THREE.DirectionalLight(0xb0c8e8, 0.3);
+fill.position.set(-300, 60, -200);
+scene.add(fill);
+
+// Rim dari belakang — bikin edge board keliatan
+const rim=new THREE.DirectionalLight(0xffffff, 0.25);
+rim.position.set(-50, -200, -400);
+scene.add(rim);
+
+// Shadow ground — hanya untuk bayangan board ke lantai
+const gGeo=new THREE.PlaneGeometry(4000,4000);
+const gMat=new THREE.ShadowMaterial({opacity:0.0}); // invisible, just catch
+const ground=new THREE.Mesh(gGeo,gMat);
+ground.rotation.x=-Math.PI/2;ground.position.y=-60;ground.receiveShadow=true;
+scene.add(ground);
+
+// Subtle grid
+const grid=new THREE.GridHelper(1200,32,0x3a4558,0x303848);
+grid.position.y=-60;grid.material.opacity=0.7;grid.material.transparent=true;
+scene.add(grid);
+
+// ── Materials ──
+const boardMat=new THREE.MeshStandardMaterial({
+  color:0xb0bcc8,        // abu-abu medium, cukup gelap untuk kontras vs lighting
+  roughness:0.55,        // rougher = shadow keliatan lebih jelas
+  metalness:0.0,
+  envMap,
+  envMapIntensity:0.4,   // env lebih subtle, tidak overexposed
+});
+const holeMat=new THREE.MeshStandardMaterial({
+  color:0x050810,
+  roughness:1.0,
+  metalness:0.0,
+  envMapIntensity:0.0,
+});
+const edgeMat=new THREE.MeshStandardMaterial({color:0xe8f0f8,roughness:0.25,envMap,envMapIntensity:0.7});
+const maleMat=new THREE.MeshStandardMaterial({color:0xe85d26,roughness:0.3,metalness:0.0,envMap,envMapIntensity:0.8});
+const femaleMat=new THREE.MeshStandardMaterial({color:0x2563eb,roughness:0.3,metalness:0.0,envMap,envMapIntensity:0.8});
+
+// ===== ORBIT =====
+let isDrag=false,isRPan=false,lastM={x:0,y:0};
+let sph={th:0.55,ph:0.7,r:650};
+let tgt=new THREE.Vector3(0,0,0);
+
+canvas.addEventListener('mousedown',e=>{
+  if(e.button===0)isDrag=true;
+  if(e.button===2)isRPan=true;
+  lastM={x:e.clientX,y:e.clientY};
+});
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+window.addEventListener('mouseup',()=>{isDrag=false;isRPan=false;});
+window.addEventListener('mousemove',e=>{
+  const dx=e.clientX-lastM.x,dy=e.clientY-lastM.y;
+  lastM={x:e.clientX,y:e.clientY};
+  if(isDrag){sph.th-=dx*0.007;sph.ph=Math.max(0.06,Math.min(Math.PI-0.06,sph.ph-dy*0.007));camUpd();}
+  if(isRPan){const s=sph.r*0.001;tgt.x-=dx*s;tgt.y+=dy*s;camUpd();}
+});
+canvas.addEventListener('wheel',e=>{sph.r=Math.max(60,Math.min(3000,sph.r+e.deltaY*0.5));camUpd();},{passive:true});
+
+function camUpd(){
+  const x=sph.r*Math.sin(sph.ph)*Math.sin(sph.th);
+  const y=sph.r*Math.cos(sph.ph);
+  const z=sph.r*Math.sin(sph.ph)*Math.cos(sph.th);
+  camera.position.set(tgt.x+x,tgt.y+y,tgt.z+z);
+  camera.lookAt(tgt);
+}
+camUpd();
+
+function resize(){
+  const w=vpEl.clientWidth,h=vpEl.clientHeight;
+  renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',resize);
+(function loop(){requestAnimationFrame(loop);renderer.render(scene,camera);})();
+
+// ===== UI =====
+// Init derived state
+S.panelW=S.cols*S.tileSize; S.panelH=S.rows*S.tileSize;
+
+function onPanelDim(el,key,vid){
+  S[key]=parseInt(el.value);
+  document.getElementById(vid).textContent=el.value+'mm';
+  S.cols=Math.max(1,Math.round(S.panelW/S.tileSize));
+  S.rows=Math.max(1,Math.round(S.panelH/S.tileSize));
+  document.getElementById('tileCount').textContent=S.cols+' × '+S.rows;
+  stats();live();
+}
+function onR(el,vid,sfx=''){
+  const map={tileSize:'tileSize',thickness:'thickness',pitchX:'pitchX',pitchY:'pitchY',slotW:'slotW'};
+  S[map[el.id]||el.id]=parseFloat(el.value);
+  document.getElementById(vid).textContent=el.value+sfx;
+  if(el.id==='tileSize'){
+    S.cols=Math.max(1,Math.round(S.panelW/S.tileSize));
+    S.rows=Math.max(1,Math.round(S.panelH/S.tileSize));
+    document.getElementById('tileCount').textContent=S.cols+' × '+S.rows;
+  }
+  stats();live();
+}
+function live(){clearTimeout(liveT);liveT=setTimeout(()=>generateModel(),95);}
+
+function stats(){
+  const{cols,rows,tileSize,thickness,pitchX,pitchY}=S;
+  const W=cols*tileSize,H=rows*tileSize;
+  const border=Math.min(6,tileSize*0.18);
+  const nX=Math.max(1,Math.floor((tileSize-border*2)/pitchX)+1);
+  const nY=Math.max(1,Math.floor((tileSize-border*2)/pitchY)+1);
+  const totalHoles=cols*rows*nX*nY;
+  const vol=(W*H*thickness/1000)*0.4;
+  const grams=Math.round(vol*1.27);
+  const mins=Math.round(W*H*thickness*0.00004+totalHoles*0.2);
+  document.getElementById('ssz').textContent=`${W}×${H}`;
+  document.getElementById('ssl').textContent=totalHoles;
+  document.getElementById('sgr').textContent=`~${grams}g`;
+  document.getElementById('stm').textContent=`~${Math.floor(mins/60)}h${(mins%60).toString().padStart(2,'0')}m`;
+}
+
+
+
+// ===== CIRCLE HOLE SHAPE =====
+function makeSlotShape(r){
+  const SEGS=20;
+  const pts=[];
+  for(let i=0;i<SEGS;i++){
+    const a=(i/SEGS)*Math.PI*2;
+    pts.push(new THREE.Vector2(Math.cos(a)*r,Math.sin(a)*r));
+  }
+  return new THREE.Shape(pts);
+}
+
+// Rounded board corner shape
+function makeBoardShape(w,h,r){
+  const s=new THREE.Shape();
+  s.moveTo(-w/2+r,-h/2);
+  s.lineTo(w/2-r,-h/2);s.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r);
+  s.lineTo(w/2,h/2-r);s.quadraticCurveTo(w/2,h/2,w/2-r,h/2);
+  s.lineTo(-w/2+r,h/2);s.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r);
+  s.lineTo(-w/2,-h/2+r);s.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2);
+  return s;
+}
+
+// ===== GENERATE =====
+function generateModel(){
+  S.stagger=document.getElementById('stagger').checked;
+
+  if(mesh){scene.remove(mesh);mesh.traverse(o=>{if(o.geometry)o.geometry.dispose();});mesh=null;}
+  stlBuf=null;
+
+  const{cols,rows,tileSize,thickness,pitchX,pitchY,slotW,stagger}=S;
+  const W=cols*tileSize,H=rows*tileSize;
+  const border=Math.min(6,tileSize*0.18),cornerR=Math.min(8,tileSize*0.2);
+
+  const group=new THREE.Group();
+
+  // ── BOARD: extruded shape with centered hole grid ──
+  const boardShape=makeBoardShape(W,H,cornerR);
+  const nX=Math.max(1,Math.floor((tileSize-slotW)/pitchX)+1);
+  const nY=Math.max(1,Math.floor((tileSize-slotW)/pitchY)+1);
+  // Center the grid within each tile
+  const gridSpanX=(nX-1)*pitchX;
+  const gridSpanY=(nY-1)*pitchY;
+
+  for(let tr=0;tr<rows;tr++){
+    for(let tc=0;tc<cols;tc++){
+      // tile center
+      const tcx=-W/2+tc*tileSize+tileSize/2;
+      const tcy= H/2-tr*tileSize-tileSize/2;
+      // grid start (centered)
+      const startX=tcx-gridSpanX/2;
+      const startY=tcy+gridSpanY/2;
+      for(let sy=0;sy<nY;sy++){
+        for(let sx=0;sx<nX;sx++){
+          const offX=(stagger&&sy%2===1)?pitchX*0.5:0;
+          const cx=startX+sx*pitchX+offX;
+          const cy=startY-sy*pitchY;
+          const r=slotW/2;
+          // clip: don't place hole if center is outside tile with margin
+          const margin=r+1;
+          const tx0=-W/2+tc*tileSize+margin;
+          const tx1=-W/2+(tc+1)*tileSize-margin;
+          const ty0= H/2-(tr+1)*tileSize+margin;
+          const ty1= H/2-tr*tileSize-margin;
+          if(cx<tx0||cx>tx1||cy<ty0||cy>ty1) continue;
+
+          const hole=makeSlotShape(r);
+          const hpts=hole.getPoints(20).map(p=>new THREE.Vector2(p.x+cx,p.y+cy));
+          boardShape.holes.push(new THREE.Shape(hpts));
+        }
+      }
+    }
+  }
+
+  const extOpts={depth:thickness,bevelEnabled:true,bevelThickness:0.8,bevelSize:0.6,bevelSegments:3,steps:1};
+  const boardGeo=new THREE.ExtrudeGeometry(boardShape,extOpts);
+  boardGeo.translate(0,0,-thickness/2);
+  const boardMesh=new THREE.Mesh(boardGeo,boardMat);
+  boardMesh.castShadow=true; boardMesh.receiveShadow=true;
+  group.add(boardMesh);
+
+  // ── TILE DIVIDER LINES ──
+  const lMat=new THREE.LineBasicMaterial({color:0x9ab0c8,transparent:true,opacity:0.55});
+  for(let c=1;c<cols;c++){
+    const x=-W/2+c*tileSize;
+    const pts=[new THREE.Vector3(x,-H/2,thickness/2+0.8),new THREE.Vector3(x,H/2,thickness/2+0.8)];
+    group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),lMat));
+  }
+  for(let r=1;r<rows;r++){
+    const y=-H/2+r*tileSize;
+    const pts=[new THREE.Vector3(-W/2,y,thickness/2+0.8),new THREE.Vector3(W/2,y,thickness/2+0.8)];
+    group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),lMat));
+  }
+
+  scene.add(group);
+  mesh=group;
+
+  // Camera fit
+  sph.r=Math.max(W,H)*2.0; tgt.set(0,0,0); camUpd();
+  ground.position.y=-thickness/2-5;
+
+  // Update shadow frustum to tightly fit board
+  const s=Math.max(W,H)*0.65;
+  key.shadow.camera.left=key.shadow.camera.bottom=-s;
+  key.shadow.camera.right=key.shadow.camera.top=s;
+  key.shadow.camera.updateProjectionMatrix();
+
+  document.getElementById('vinfo').textContent=`${W}×${H}mm · ${cols}×${rows} tiles`;
+
+  stlBuf=exportSTLFromMesh(boardMesh);
+  document.getElementById('dlBtn').classList.add('show');
+  resize(); stats();
+}
+
+// ===== STL EXPORT FROM THREE.JS GEOMETRY =====
+// Export langsung dari BufferGeometry — lubang dijamin bolong karena sama dgn preview
+function exportSTLFromMesh(mesh){
+  const geo = mesh.geometry;
+  const pos = geo.attributes.position;
+  const idx = geo.index;
+  const{cols,rows,tileSize}=S;
+  const W=cols*tileSize,H=rows*tileSize;
+
+  // Count triangles
+  const triCount = idx ? idx.count/3 : pos.count/3;
+  const buf = new ArrayBuffer(84 + triCount*50);
+  const dv  = new DataView(buf);
+
+  // Header
+  const hdr=`PegboardGen ${cols}x${rows} ${W}x${H}mm`;
+  for(let i=0;i<80;i++) dv.setUint8(i, i<hdr.length ? hdr.charCodeAt(i) : 0);
+  dv.setUint32(80, triCount, true);
+
+  const vA=new THREE.Vector3(), vB=new THREE.Vector3(), vC=new THREE.Vector3();
+  const cb=new THREE.Vector3(), ab=new THREE.Vector3();
+  let off=84;
+
+  function writeTri(ax,ay,az,bx,by,bz,cx,cy,cz){
+    vA.set(ax,ay,az); vB.set(bx,by,bz); vC.set(cx,cy,cz);
+    cb.subVectors(vC,vB); ab.subVectors(vA,vB);
+    cb.cross(ab).normalize();
+    dv.setFloat32(off,cb.x,true);off+=4;
+    dv.setFloat32(off,cb.y,true);off+=4;
+    dv.setFloat32(off,cb.z,true);off+=4;
+    dv.setFloat32(off,ax,true);off+=4; dv.setFloat32(off,ay,true);off+=4; dv.setFloat32(off,az,true);off+=4;
+    dv.setFloat32(off,bx,true);off+=4; dv.setFloat32(off,by,true);off+=4; dv.setFloat32(off,bz,true);off+=4;
+    dv.setFloat32(off,cx,true);off+=4; dv.setFloat32(off,cy,true);off+=4; dv.setFloat32(off,cz,true);off+=4;
+    dv.setUint16(off,0,true);off+=2;
+  }
+
+  if(idx){
+    for(let i=0;i<idx.count;i+=3){
+      const a=idx.getX(i), b=idx.getX(i+1), c=idx.getX(i+2);
+      writeTri(
+        pos.getX(a),pos.getY(a),pos.getZ(a),
+        pos.getX(b),pos.getY(b),pos.getZ(b),
+        pos.getX(c),pos.getY(c),pos.getZ(c)
+      );
+    }
+  } else {
+    for(let i=0;i<pos.count;i+=3){
+      writeTri(
+        pos.getX(i),  pos.getY(i),  pos.getZ(i),
+        pos.getX(i+1),pos.getY(i+1),pos.getZ(i+1),
+        pos.getX(i+2),pos.getY(i+2),pos.getZ(i+2)
+      );
+    }
+  }
+  return buf;
+}
+
+// ===== DOWNLOAD =====
+function downloadSTL(){
+  if(!stlBuf)return;
+  const{cols,rows,tileSize}=S;
+  const blob=new Blob([stlBuf],{type:'application/octet-stream'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`skadis_${cols}x${rows}_${tileSize}mm.stl`;a.click();
+  URL.revokeObjectURL(url);
+  const t=document.getElementById('toast');
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ===== GRID TOGGLE =====
+function toggleGrid(){
+  grid.visible=document.getElementById('showGrid').checked;
+}
+
+// ===== COLOR PICKER =====
+function setColor(btn){
+  document.querySelectorAll('.cpick').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const hex=btn.dataset.hex;
+  document.getElementById('customColor').value=hex;
+  applyColor(hex);
+}
+function setCustomColor(input){
+  document.querySelectorAll('.cpick').forEach(b=>b.classList.remove('active'));
+  applyColor(input.value);
+}
+function applyColor(hex){
+  boardMat.color.set(hex);
+  // auto-adjust roughness slightly for dark colors
+  const brightness=parseInt(hex.slice(1),16);
+  const lum=((brightness>>16)&0xff)*0.299+((brightness>>8)&0xff)*0.587+(brightness&0xff)*0.114;
+  boardMat.roughness=lum<100?0.45:0.55;
+}
+
+// ===== CAMERA =====
+function resetCam(){sph={th:0.55,ph:0.7,r:650};tgt.set(0,0,0);camUpd();}
+function setView(v){
+  if(v==='front'){sph.ph=Math.PI/2;sph.th=0;}
+  if(v==='top'){sph.ph=0.05;sph.th=0;}
+  if(v==='iso'){sph.ph=0.7;sph.th=0.55;}
+  camUpd();
+}
+
+// ===== INIT =====
+document.getElementById('tileCount').textContent=S.cols+' × '+S.rows;
+stats();
+resize();
+setTimeout(()=>generateModel(),180);
+</script>
+</body>
+</html>
