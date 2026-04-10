@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>SplitBill Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0; -webkit-tap-highlight-color: transparent;}
+:root{
+  --bg:#0f0f0f;
+  --surface:#181818;
+  --surface2:#222222;
+  --surface3:#2a2a2a;
+  --border:#333;
+  --text:#f0ede8;
+  --text2:#999;
+  --text3:#666;
+  --accent:#e8d5a3;
+  --accent-dark:#c9b87a;
+  --whatsapp:#25D366;
+  --font:'Plus Jakarta Sans', sans-serif;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  font-size:14px;
+  line-height:1.5;
+  overflow-x:hidden;
+}
+
+/* APP HEADER */
+#app-branding{
+  padding: 24px 20px 10px;
+  background: var(--surface);
+}
+#app-branding h1 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#app-branding p {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 600;
+}
+
+/* MOBILE TAB SYSTEM */
+#tab-nav{
+  display:flex;
+  position:sticky;
+  top:0;
+  background:var(--surface);
+  z-index:100;
+  border-bottom:1px solid var(--border);
+}
+.tab-btn{
+  flex:1;
+  padding:16px;
+  background:none;
+  border:none;
+  color:var(--text3);
+  font-family:var(--font);
+  font-weight:700;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:all 0.2s;
+  border-bottom:2px solid transparent;
+}
+.tab-btn.active{
+  color:var(--accent);
+  border-bottom-color:var(--accent);
+}
+
+/* LAYOUT CONTAINER */
+#main-container{
+  display:flex;
+  width:200vw;
+  transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.view-pane{
+  width:100vw;
+  height:calc(100vh - 120px);
+  overflow-y:auto;
+  padding:20px;
+  padding-bottom:120px;
+}
+
+/* SECTION STYLING */
+.sec{margin-bottom:28px;}
+.sec-title{
+  font-size:11px;
+  font-weight:800;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:16px;
+  display:flex;
+  align-items:center; gap:10px;
+}
+.sec-title::after{content:''; flex:1; height:1px; background:var(--border)}
+
+/* INPUTS */
+input{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px 16px;
+  font-size:16px; 
+  color:var(--text);
+  font-family:var(--font);
+  width:100%;
+  outline:none;
+}
+input:focus{border-color:var(--accent-dark); background:var(--surface3)}
+
+/* CARDS */
+.card{
+  background:var(--surface2);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:12px;
+  border:1px solid var(--border);
+}
+
+/* PERSON ROW */
+.person-row{display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+.avatar{
+  width:40px; height:40px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:14px; flex-shrink:0;
+}
+
+/* ITEM BLOCK */
+.item-grid{display:grid; grid-template-columns: 1fr 100px; gap:8px; margin-top:10px;}
+.tags-scroll{
+  display:flex; overflow-x:auto; gap:8px; margin-top:12px; padding-bottom:4px;
+  scrollbar-width:none;
+}
+.tags-scroll::-webkit-scrollbar{display:none}
+.tag{
+  white-space:nowrap; padding:8px 16px; border-radius:30px; font-size:12px; font-weight:600;
+  border:1px solid var(--border); transition:all 0.2s;
+}
+.tag.off{background:transparent; color:var(--text3)}
+
+/* PREVIEW */
+#preview-pane{background:#f8f6f2; color:#1a1a1a;}
+.receipt-card{
+  background:#fff; border-radius:20px; padding:20px; margin-bottom:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.05); border:1px solid #e8e3db;
+}
+.receipt-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;}
+.receipt-user{display:flex; align-items:center; gap:12px; font-weight:800; font-size:16px;}
+.receipt-price{font-size:18px; font-weight:800; color:#1a1a1a;}
+
+.line-item{display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; color:#555;}
+.line-total{border-top:1px dashed #ddd; margin-top:10px; padding-top:10px; font-weight:800; display:flex; justify-content:space-between;}
+
+/* BUTTONS */
+.btn-primary{
+  background:var(--accent); color:#1a1a1a; border:none; border-radius:14px;
+  padding:16px; font-weight:800; width:100%; font-family:var(--font);
+  text-transform:uppercase; letter-spacing:0.5px;
+}
+.btn-wa{
+  background:var(--whatsapp); color:white; border:none; border-radius:12px;
+  padding:12px; width:100%; font-weight:700; display:flex; align-items:center;
+  justify-content:center; gap:8px; margin-top:15px; cursor:pointer;
+}
+.btn-circle-del{
+  width:32px; height:32px; border-radius:50%; background:#331a1a; border:1px solid #552222; color:#ff6b6b; font-size:18px; display:flex; align-items:center; justify-content:center;
+}
+
+/* MODAL & TOAST */
+#modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px;}
+.modal-box{background:var(--surface); padding:30px; border-radius:24px; text-align:center; border:1px solid var(--border); width:100%;}
+#toast{position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:12px 24px; border-radius:50px; font-weight:600; font-size:13px; opacity:0; pointer-events:none; transition:0.3s; z-index:2000;}
+
+/* SUMMARY STICKY */
+#summary-bar{
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:16px 20px; display:flex; justify-content:space-between; align-items:center;
+  z-index:90;
+}
+
+@media (min-width: 768px) {
+  #tab-nav { display: none; }
+  #main-container { width: 100vw; transform: none !important; }
+  .view-pane { width: 50vw; height: 100vh; }
+  #summary-bar { width: 50vw; }
+}
+</style>
+</head>
+<body>
+
+<div id="modal-overlay">
+  <div class="modal-box">
+    <div style="font-size:50px; margin-bottom:20px;">🤝</div>
+    <h2 style="margin-bottom:10px; color:var(--accent);">SplitBill Pro</h2>
+    <p style="color:var(--text2); margin-bottom:25px; font-size:14px;">Tips: Jika link di WhatsApp berwarna hitam (tidak bisa diklik), minta teman kamu untuk <b>balas pesan</b> tersebut atau <b>simpan nomor kamu</b>.</p>
+    <button class="btn-primary" onclick="closeModal()">Gue Ngerti</button>
+  </div>
+</div>
+
+<div id="toast">Berhasil disalin!</div>
+
+<header id="app-branding">
+  <h1><span>🧾</span> SplitBill Pro</h1>
+  <p>Hitung patungan jadi makin gampang & adil</p>
+</header>
+
+<nav id="tab-nav">
+  <button class="tab-btn active" id="btn-tab-1" onclick="switchTab(0)">📝 Input</button>
+  <button class="tab-btn" id="btn-tab-2" onclick="switchTab(1)">💰 Hasil</button>
+</nav>
+
+<div id="main-container">
+  <div class="view-pane" id="editor-pane">
+    <div class="sec">
+      <div class="sec-title">Siapa Saja?</div>
+      <div id="people-list"></div>
+      <button class="btn-primary" style="background:var(--surface2); color:var(--text); border:1px dashed var(--border)" onclick="addPerson()">+ Tambah Orang</button>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">Pesanan</div>
+      <div id="items-list"></div>
+      <button class="btn-primary" style="background:var(--surface2); color:var(--text); border:1px dashed var(--border)" onclick="addItem()">+ Tambah Menu</button>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">Ekstra</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <label style="font-size:10px; color:var(--text3); font-weight:800; display:block; margin-bottom:5px; letter-spacing:0.5px">PAJAK / LAYANAN</label>
+          <input type="number" id="service-fee" placeholder="0" oninput="renderPreview()"/>
+        </div>
+        <div>
+          <label style="font-size:10px; color:var(--text3); font-weight:800; display:block; margin-bottom:5px; letter-spacing:0.5px">DISKON TOTAL</label>
+          <input type="number" id="discount" placeholder="0" oninput="renderPreview()"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view-pane" id="preview-pane">
+    <div id="results-list"></div>
+    <div id="group-share-area" style="margin-top:20px;"></div>
+  </div>
+</div>
+
+<div id="summary-bar">
+  <div>
+    <div style="font-size:11px; color:var(--text3); font-weight:700;">ESTIMASI TOTAL</div>
+    <div id="grand-total-display" style="font-size:18px; font-weight:800; color:var(--accent);">Rp 0</div>
+  </div>
+  <button class="btn-primary" style="width:auto; padding:12px 24px; margin:0;" onclick="switchTab(1)">Cek Hasil</button>
+</div>
+
+<script>
+const PALETTE = [
+  {bg:'#1e3a5f', fg:'#7eb8f7', pbg:'#e8f1fb', pfg:'#1e3a5f'},
+  {bg:'#1a3d2b', fg:'#6fcf97', pbg:'#e8f5ee', pfg:'#1a3d2b'},
+  {bg:'#4a2500', fg:'#f0a050', pbg:'#fef0e0', pfg:'#4a2500'},
+  {bg:'#3d1a2e', fg:'#e878b0', pbg:'#fde8f3', pfg:'#3d1a2e'},
+  {bg:'#2a1a4a', fg:'#a888f0', pbg:'#f0ebfe', pfg:'#2a1a4a'}
+];
+
+const WA_ICON = `<svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>`;
+
+let people = [], items = [], pid = 0, iid = 0;
+const gc = i => PALETTE[i % PALETTE.length];
+const fmt = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+const ini = n => n.trim() ? n.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) : '?';
+
+function switchTab(idx) {
+  document.getElementById('main-container').style.transform = `translateX(-${idx * 100}vw)`;
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+  if(idx === 1) renderPreview();
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 2000);
+}
+
+function getShareUrl() {
+  const data = {
+    p: people.map(x => x.name),
+    i: items.map(x => ({ n: x.name, p: x.price, q: x.qty, s: x.persons })),
+    f: parseFloat(document.getElementById('service-fee').value) || 0,
+    d: parseFloat(document.getElementById('discount').value) || 0
+  };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const url = new URL(window.location.href);
+  url.searchParams.set('b', encoded);
+  return url.toString();
+}
+
+function loadData() {
+  const params = new URLSearchParams(window.location.search);
+  const b64 = params.get('b');
+  if (!b64) return false;
+  try {
+    const data = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    people = data.p.map((n, i) => ({ id: i, name: n }));
+    pid = people.length;
+    items = data.i.map((it, i) => ({ id: i, name: it.n, price: it.p, qty: it.q, persons: it.s }));
+    iid = items.length;
+    document.getElementById('service-fee').value = data.f || 0;
+    document.getElementById('discount').value = data.d || 0;
+    return true;
+  } catch(e) { return false; }
+}
+
+function addPerson() {
+  people.push({ id: pid++, name: '' });
+  renderPeople(); renderItems(); renderPreview();
+}
+
+function removePerson(id) {
+  people = people.filter(p => p.id !== id);
+  items.forEach(it => it.persons = it.persons.filter(x => x !== id));
+  renderPeople(); renderItems(); renderPreview();
+}
+
+function renderPeople() {
+  const list = document.getElementById('people-list');
+  list.innerHTML = people.map((p, i) => {
+    const c = gc(i);
+    return `<div class="person-row">
+      <div class="avatar" style="background:${c.bg}; color:${c.fg}">${ini(p.name)}</div>
+      <input type="text" placeholder="Nama..." value="${p.name}" oninput="people[${i}].name=this.value; renderItems(); renderPreview();"/>
+      <button class="btn-circle-del" onclick="removePerson(${p.id})">×</button>
+    </div>`;
+  }).join('');
+}
+
+function addItem() {
+  items.push({ id: iid++, name: '', price: 0, qty: 1, persons: [] });
+  renderItems(); renderPreview();
+}
+
+function toggleItemPerson(itemId, personId) {
+  const it = items.find(x => x.id === itemId);
+  const idx = it.persons.indexOf(personId);
+  if (idx > -1) it.persons.splice(idx, 1);
+  else it.persons.push(personId);
+  renderItems(); renderPreview();
+}
+
+function renderItems() {
+  const list = document.getElementById('items-list');
+  list.innerHTML = items.map((it, idx) => {
+    return `<div class="card">
+      <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <input type="text" placeholder="Menu..." value="${it.name}" oninput="items[${idx}].name=this.value; renderPreview();" style="flex:1"/>
+        <button class="btn-circle-del" onclick="items.splice(${idx}, 1); renderItems(); renderPreview();">×</button>
+      </div>
+      <div class="item-grid">
+        <input type="number" placeholder="Harga" value="${it.price || ''}" oninput="items[${idx}].price=parseFloat(this.value)||0; renderPreview();"/>
+        <input type="number" placeholder="Qty" value="${it.qty || 1}" oninput="items[${idx}].qty=parseFloat(this.value)||1; renderPreview();"/>
+      </div>
+      <div class="tags-scroll">
+        ${people.map((p, pi) => {
+          const on = it.persons.includes(p.id);
+          const c = gc(pi);
+          return `<div class="tag ${on ? '' : 'off'}" 
+            style="${on ? `background:${c.bg}; color:${c.fg}; border-color:${c.fg}` : ''}" 
+            onclick="toggleItemPerson(${it.id}, ${p.id})">
+            ${p.name || 'Orang ' + (pi + 1)}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openWA(msg) {
+  // Tambahkan sedikit instruksi di awal pesan jika link tidak bisa diklik
+  const finalMsg = "💡 *Jika link di bawah tidak bisa diklik, silakan balas pesan ini dulu ya!*\n\n" + msg;
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(finalMsg)}`;
+  window.open(url, '_blank');
+}
+
+function copyToClipboard(msg) {
+  const el = document.createElement('textarea');
+  el.value = msg;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+  showToast("Tagihan disalin!");
+}
+
+function renderPreview() {
+  const svc = parseFloat(document.getElementById('service-fee').value) || 0;
+  const dsc = parseFloat(document.getElementById('discount').value) || 0;
+  
+  let subTotal = 0;
+  const userStats = {};
+  people.forEach(p => userStats[p.id] = { name: p.name || 'Teman', sub: 0, items: [] });
+
+  items.forEach(it => {
+    const line = it.price * it.qty;
+    subTotal += line;
+    if (it.persons.length > 0) {
+      const perPerson = line / it.persons.length;
+      it.persons.forEach(pid => {
+        if (userStats[pid]) {
+          userStats[pid].sub += perPerson;
+          userStats[pid].items.push({ name: it.name || 'Menu', share: perPerson });
+        }
+      });
+    }
+  });
+
+  const grandTotal = subTotal + svc - dsc;
+  document.getElementById('grand-total-display').textContent = fmt(grandTotal);
+
+  const resList = document.getElementById('results-list');
+  const activeUsers = people.filter(p => userStats[p.id].sub > 0);
+
+  if (activeUsers.length === 0) {
+    resList.innerHTML = `<div style="text-align:center; padding:60px 20px; color:#999;">
+      <div style="font-size:50px; margin-bottom:15px;">🧾</div>
+      <p style="font-weight:700">Belum ada pesanan.</p>
+      <p style="font-size:12px">Isi menu dan pilih orangnya dulu ya.</p>
+    </div>`;
+    document.getElementById('group-share-area').innerHTML = '';
+    return;
+  }
+
+  resList.innerHTML = activeUsers.map((p, pi) => {
+    const stat = userStats[p.id];
+    const ratio = subTotal > 0 ? stat.sub / subTotal : 0;
+    const mySvc = ratio * svc;
+    const myDsc = ratio * dsc;
+    const myTotal = stat.sub + mySvc - myDsc;
+    const c = gc(pi);
+
+    let msg = `*Tagihan Split Bill: ${stat.name}*\n\n`;
+    stat.items.forEach(i => msg += `• ${i.name}: ${fmt(i.share)}\n`);
+    if(svc > 0) msg += `• Pajak/Svc: ${fmt(mySvc)}\n`;
+    if(dsc > 0) msg += `• Diskon: ${fmt(myDsc)}\n`;
+    msg += `\n*TOTAL: ${fmt(myTotal)}*\n\n🔗 *Rincian Lengkap:* \n${getShareUrl()}`;
+
+    return `<div class="receipt-card">
+      <div class="receipt-header">
+        <div class="receipt-user">
+          <div class="avatar" style="background:${c.pbg}; color:${c.pfg}">${ini(stat.name)}</div>
+          ${stat.name}
+        </div>
+        <div class="receipt-price">${fmt(myTotal)}</div>
+      </div>
+      ${stat.items.map(i => `<div class="line-item"><span>${i.name}</span><span>${fmt(i.share)}</span></div>`).join('')}
+      ${svc > 0 ? `<div class="line-item"><span>Pajak (Proporsional)</span><span>+${fmt(mySvc)}</span></div>` : ''}
+      ${dsc > 0 ? `<div class="line-item"><span>Diskon (Proporsional)</span><span style="color:#27ae60">-${fmt(myDsc)}</span></div>` : ''}
+      <div class="line-total"><span>Total</span><span>${fmt(myTotal)}</span></div>
+      
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button class="btn-wa" onclick="openWA(\`${msg}\`)">${WA_ICON} WhatsApp</button>
+        <button class="btn-wa" style="background:#eee; color:#666; width:55px;" onclick="copyToClipboard(\`${msg}\`)">📋</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  let overallMsg = `*RINGKASAN PATUNGAN* 🧾\n\n`;
+  activeUsers.forEach(p => {
+    const stat = userStats[p.id];
+    const ratio = subTotal > 0 ? stat.sub / subTotal : 0;
+    const myTotal = stat.sub + (ratio * svc) - (ratio * dsc);
+    overallMsg += `• *${stat.name}*: ${fmt(myTotal)}\n`;
+  });
+  overallMsg += `\n*TOTAL SEMUA: ${fmt(grandTotal)}*\n\n🔗 *Cek rincian di sini:* \n${getShareUrl()}`;
+
+  document.getElementById('group-share-area').innerHTML = `
+    <div style="background:#1a1a1a; padding:24px; border-radius:24px; color:#fff;">
+      <div style="font-size:11px; color:#999; font-weight:800; letter-spacing:1px; margin-bottom:15px; text-transform:uppercase">Ringkasan Grup</div>
+      ${activeUsers.map(p => {
+        const stat = userStats[p.id];
+        const ratio = subTotal > 0 ? stat.sub / subTotal : 0;
+        const myTotal = stat.sub + (ratio * svc) - (ratio * dsc);
+        return `<div class="line-item" style="color:#eee; margin-bottom:8px;"><span>${stat.name}</span><span style="font-weight:700">${fmt(myTotal)}</span></div>`;
+      }).join('')}
+      <div class="line-total" style="font-size:18px; color:var(--accent); border-color:#333; margin-top:15px; padding-top:15px;">
+        <span>Total Akhir</span><span>${fmt(grandTotal)}</span>
+      </div>
+      <button class="btn-wa" style="margin-top:25px; background:var(--accent); color:#1a1a1a;" onclick="openWA(\`${overallMsg}\`)">
+        🚀 Kirim Rekap ke Grup
+      </button>
+      <p style="font-size:10px; color:#666; text-align:center; margin-top:15px;">Tips: Jika link tidak bisa diklik, minta teman balas pesan ini.</p>
+    </div>
+  `;
+}
+
+window.onload = () => {
+  if (!loadData()) {
+    addPerson(); addPerson(); addItem();
+  }
+  renderPeople(); renderItems(); renderPreview();
+};
+</script>
+</body>
+</html>
