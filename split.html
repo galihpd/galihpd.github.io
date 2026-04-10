@@ -142,6 +142,7 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
   background:var(--accent); color:#1a1a1a; border:none; border-radius:16px;
   padding:18px; font-weight:800; width:100%; font-family:var(--font);
   text-transform:uppercase; letter-spacing:0.5px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
 }
 .btn-wa{
   background:var(--whatsapp); color:white; border:none; border-radius:14px;
@@ -151,6 +152,13 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
 .btn-circle-del{
   width:36px; height:36px; border-radius:50%; background:#331a1a; border:1px solid #552222; color:#ff6b6b; font-size:20px; display:flex; align-items:center; justify-content:center; cursor: pointer;
 }
+
+/* LOADER AI */
+.loader-spinner {
+  width: 22px; height: 22px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid #1a1a1a;
+  border-radius: 50%; animation: spin 0.8s linear infinite; display: none;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* MODAL & TOAST */
 #modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:1000; display:flex; align-items:center; justify-content:center; padding:25px;}
@@ -175,9 +183,9 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
     <div style="font-size:50px; margin-bottom:20px;">⚖️</div>
     <h2 style="margin-bottom:12px; color:var(--accent);">Halo, Buddy!</h2>
     <p style="color:var(--text2); margin-bottom:25px; font-size:14px; line-height:1.6; text-align:left;">
-      • <b>Pajak & Service:</b> Dibagi proporsional (adil sesuai harga makananmu).<br>
-      • <b>Diskon:</b> Dipotong otomatis ke tiap orang secara adil.<br>
-      • <b>Otomatis:</b> Ga perlu klik simpan, hasil berubah tiap kamu ketik.
+      • <b>AI Scan:</b> Upload struk, menu otomatis terisi.<br>
+      • <b>Pajak & Service:</b> Dibagi proporsional (sesuai harga makananmu).<br>
+      • <b>Diskon:</b> Dipotong otomatis ke tiap orang secara adil.
     </p>
     <button class="btn-primary" onclick="closeModal()">Sikat!</button>
   </div>
@@ -193,6 +201,19 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
 
 <div id="main-container">
   <div id="input-side">
+    
+    <div class="sec">
+      <div class="sec-title">Males ngetik? Upload struk aja!!</div>
+      <div class="card" style="border: 2px dashed var(--accent-dark); text-align: center; padding: 25px; background: rgba(232,213,163,0.03);">
+        <input type="file" id="receipt-upload" accept="image/*" style="display:none" onchange="processAI(this)"/>
+        <button class="btn-primary" onclick="document.getElementById('receipt-upload').click()">
+          <span id="btn-label">📷 SCAN STRUK OTOMATIS</span>
+          <div id="loader" class="loader-spinner"></div>
+        </button>
+        <p style="font-size:11px; color:var(--text3); margin-top:12px;">Pastikan teks pada struk terlihat jelas</p>
+      </div>
+    </div>
+
     <div class="sec">
       <div class="sec-title">1. Siapa yang Ikut?</div>
       <div id="people-list"></div>
@@ -236,7 +257,9 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
 </div>
 
 <script>
-// Logic core tetap sama, hanya update UI/Nama
+// EDIT DI SINI: Paste API Key kamu
+const apiKey = "AIzaSyBfcLXFzO98XQVCbX8ltzGtVOCWLE_Xsig"; 
+
 const PALETTE = [
   {bg:'#1e3a5f', fg:'#7eb8f7', pbg:'#e8f1fb', pfg:'#1e3a5f'},
   {bg:'#1a3d2b', fg:'#6fcf97', pbg:'#e8f5ee', pfg:'#1a3d2b'},
@@ -259,6 +282,67 @@ function showToast(msg) {
   setTimeout(() => t.style.opacity = '0', 2000);
 }
 
+// --- FUNGSI AI TERBARU ---
+async function processAI(input) {
+  if (!apiKey) { alert("Isi API Key di variabel 'apiKey' (baris 211) dulu bro!"); return; }
+  const file = input.files[0]; if (!file) return;
+
+  const btnLabel = document.getElementById('btn-label');
+  const loader = document.getElementById('loader');
+  
+  btnLabel.style.display = 'none'; loader.style.display = 'inline-block';
+
+  try {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64Data = e.target.result.split(',')[1];
+      const result = await fetchAI(base64Data);
+      
+      if (result && result.items) {
+        // Bersihkan item dummy di awal jika ada
+        if (items.length === 1 && !items[0].name && items[0].price === 0) items = [];
+        
+        result.items.forEach(it => {
+          items.push({ 
+            id: iid++, 
+            name: it.name || "Menu", 
+            price: parseFloat(it.price) || 0, 
+            qty: parseFloat(it.qty) || 1, 
+            persons: [] 
+          });
+        });
+        renderItems(); renderPreview();
+        showToast("Struk berhasil terbaca!");
+      }
+    };
+    reader.readAsDataURL(file);
+  } catch (err) {
+    alert("Gagal scan: " + err.message);
+  } finally {
+    btnLabel.style.display = 'inline-block'; loader.style.display = 'none';
+    input.value = "";
+  }
+}
+
+async function fetchAI(base64) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const prompt = "Extract items from this receipt. Return ONLY JSON: {\"items\": [{\"name\": \"string\", \"price\": number, \"qty\": number}]}. Unit price, no tax/totals.";
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: base64 } }] }],
+      generationConfig: { responseMimeType: "application/json" }
+    })
+  });
+  
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  return JSON.parse(data.candidates[0].content.parts[0].text);
+}
+
+// --- LOGIK APP ASLI ---
 function getShareUrl() {
   const data = {
     p: people.map(x => x.name),
@@ -329,11 +413,11 @@ function renderItems() {
   list.innerHTML = items.map((it, idx) => {
     return `<div class="card">
       <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <input type="text" placeholder="Menu (contoh: Nasi Goreng)..." value="${it.name}" oninput="items[${idx}].name=this.value; renderPreview();" style="flex:1"/>
+        <input type="text" placeholder="Menu..." value="${it.name}" oninput="items[${idx}].name=this.value; renderPreview();" style="flex:1"/>
         <button class="btn-circle-del" onclick="items.splice(${idx}, 1); renderItems(); renderPreview();">×</button>
       </div>
       <div class="item-grid">
-        <input type="number" placeholder="Harga Satuan" value="${it.price || ''}" oninput="items[${idx}].price=parseFloat(this.value)||0; renderPreview();"/>
+        <input type="number" placeholder="Harga" value="${it.price || ''}" oninput="items[${idx}].price=parseFloat(this.value)||0; renderPreview();"/>
         <input type="number" placeholder="Jumlah" value="${it.qty || 1}" oninput="items[${idx}].qty=parseFloat(this.value)||1; renderPreview();"/>
       </div>
       <div class="tags-scroll">
