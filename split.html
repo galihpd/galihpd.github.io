@@ -116,27 +116,12 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
 }
 
 .item-grid{display:grid; grid-template-columns: 1fr 110px; gap:10px; margin-top:12px;}
-
-/* SLIDER STYLING */
 .tags-scroll{
-  display:flex; 
-  overflow-x:auto; 
-  gap:10px; 
-  margin-top:15px; 
-  padding-bottom:10px; 
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-  cursor: grab;
-  -webkit-overflow-scrolling: touch;
+  display:flex; overflow-x:auto; gap:10px; margin-top:15px; padding-bottom:4px; scrollbar-width:none;
 }
-.tags-scroll:active { cursor: grabbing; }
-.tags-scroll::-webkit-scrollbar { height: 4px; }
-.tags-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-
 .tag{
   white-space:nowrap; padding:10px 18px; border-radius:30px; font-size:12px; font-weight:700;
   border:1px solid var(--border); transition:all 0.2s; cursor:pointer;
-  user-select: none;
 }
 .tag.off{background:transparent; color:var(--text3)}
 
@@ -251,6 +236,7 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
 </div>
 
 <script>
+// Logic core tetap sama, hanya update UI/Nama
 const PALETTE = [
   {bg:'#1e3a5f', fg:'#7eb8f7', pbg:'#e8f1fb', pfg:'#1e3a5f'},
   {bg:'#1a3d2b', fg:'#6fcf97', pbg:'#e8f5ee', pfg:'#1a3d2b'},
@@ -273,63 +259,40 @@ function showToast(msg) {
   setTimeout(() => t.style.opacity = '0', 2000);
 }
 
-// AKALAN PEAK LINK SHORTENER
 function getShareUrl() {
-  const data = [
-    1, // version
-    parseFloat(document.getElementById('service-fee').value) || 0,
-    parseFloat(document.getElementById('discount').value) || 0,
-    people.map(p => p.name),
-    items.map(it => [
-      it.name,
-      it.price,
-      it.qty,
-      it.persons.map(id => people.findIndex(p => p.id === id)) // Mapping index agar irit digit
-    ])
-  ];
-  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
+  const data = {
+    p: people.map(x => x.name),
+    i: items.map(x => ({ n: x.name, p: x.price, q: x.qty, s: x.persons })),
+    f: parseFloat(document.getElementById('service-fee').value) || 0,
+    d: parseFloat(document.getElementById('discount').value) || 0
+  };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   const url = new URL(window.location.href);
-  url.searchParams.set('v', b64);
+  url.searchParams.set('b', encoded);
   return url.toString();
 }
 
 function loadData() {
   const params = new URLSearchParams(window.location.search);
-  let b64 = params.get('v');
+  const b64 = params.get('b');
   if (!b64) return false;
   try {
-    b64 = b64.replace(/-/g, '+').replace(/_/g, '/');
-    while (b64.length % 4) b64 += '=';
     const data = JSON.parse(decodeURIComponent(escape(atob(b64))));
-    const [ver, svc, dsc, p_names, p_items] = data;
-    people = p_names.map((n, i) => ({ id: i, name: n }));
+    people = data.p.map((n, i) => ({ id: i, name: n }));
     pid = people.length;
-    items = p_items.map((it, i) => ({
-      id: i, name: it[0], price: it[1], qty: it[2],
-      persons: it[3].map(idx => people[idx].id)
-    }));
+    items = data.i.map((it, i) => ({ id: i, name: it.n, price: it.p, qty: it.q, persons: it.s }));
     iid = items.length;
-    document.getElementById('service-fee').value = svc;
-    document.getElementById('discount').value = dsc;
+    document.getElementById('service-fee').value = data.f || 0;
+    document.getElementById('discount').value = data.d || 0;
     return true;
   } catch(e) { return false; }
 }
 
-// Draggable Logic for Tags
-function initDraggable() {
-  document.querySelectorAll('.tags-scroll').forEach(slider => {
-    let isDown = false, startX, scrollLeft;
-    slider.onmousedown = (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; };
-    slider.onmouseleave = () => isDown = false;
-    slider.onmouseup = () => isDown = false;
-    slider.onmousemove = (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; slider.scrollLeft = scrollLeft - (x - startX) * 2; };
-  });
+function addPerson() {
+  people.push({ id: pid++, name: '' });
+  renderPeople(); renderItems(); renderPreview();
 }
 
-function addPerson() { people.push({ id: pid++, name: '' }); renderPeople(); renderItems(); renderPreview(); }
 function removePerson(id) {
   people = people.filter(p => p.id !== id);
   items.forEach(it => it.persons = it.persons.filter(x => x !== id));
@@ -337,40 +300,66 @@ function removePerson(id) {
 }
 
 function renderPeople() {
-  document.getElementById('people-list').innerHTML = people.map((p, i) => `
-    <div class="person-row">
-      <div class="avatar" style="background:${gc(i).bg}; color:${gc(i).fg}">${ini(p.name)}</div>
+  const list = document.getElementById('people-list');
+  list.innerHTML = people.map((p, i) => {
+    const c = gc(i);
+    return `<div class="person-row">
+      <div class="avatar" style="background:${c.bg}; color:${c.fg}">${ini(p.name)}</div>
       <input type="text" placeholder="Nama Buddy..." value="${p.name}" oninput="people[${i}].name=this.value; renderItems(); renderPreview();"/>
       <button class="btn-circle-del" onclick="removePerson(${p.id})">×</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-function addItem() { items.push({ id: iid++, name: '', price: 0, qty: 1, persons: [] }); renderItems(); renderPreview(); }
+function addItem() {
+  items.push({ id: iid++, name: '', price: 0, qty: 1, persons: [] });
+  renderItems(); renderPreview();
+}
+
+function toggleItemPerson(itemId, personId) {
+  const it = items.find(x => x.id === itemId);
+  const idx = it.persons.indexOf(personId);
+  if (idx > -1) it.persons.splice(idx, 1);
+  else it.persons.push(personId);
+  renderItems(); renderPreview();
+}
 
 function renderItems() {
-  document.getElementById('items-list').innerHTML = items.map((it, idx) => `
-    <div class="card">
-      <div style="display:flex; gap:10px; margin-bottom:10px; padding:18px 18px 0;">
-        <input type="text" placeholder="Menu..." value="${it.name}" oninput="items[${idx}].name=this.value; renderPreview();" style="flex:1"/>
+  const list = document.getElementById('items-list');
+  list.innerHTML = items.map((it, idx) => {
+    return `<div class="card">
+      <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <input type="text" placeholder="Menu (contoh: Nasi Goreng)..." value="${it.name}" oninput="items[${idx}].name=this.value; renderPreview();" style="flex:1"/>
         <button class="btn-circle-del" onclick="items.splice(${idx}, 1); renderItems(); renderPreview();">×</button>
       </div>
-      <div class="item-grid" style="padding:0 18px;">
+      <div class="item-grid">
         <input type="number" placeholder="Harga Satuan" value="${it.price || ''}" oninput="items[${idx}].price=parseFloat(this.value)||0; renderPreview();"/>
         <input type="number" placeholder="Jumlah" value="${it.qty || 1}" oninput="items[${idx}].qty=parseFloat(this.value)||1; renderPreview();"/>
       </div>
-      <div class="tags-scroll" style="padding:15px 18px 15px;">
+      <div class="tags-scroll">
         ${people.map((p, pi) => {
           const on = it.persons.includes(p.id);
           const c = gc(pi);
           return `<div class="tag ${on ? '' : 'off'}" 
             style="${on ? `background:${c.bg}; color:${c.fg}; border-color:${c.fg}` : ''}" 
-            onclick="const itm=items[${idx}]; const i=itm.persons.indexOf(${p.id}); i>-1?itm.persons.splice(i,1):itm.persons.push(${p.id}); renderItems(); renderPreview();">
+            onclick="toggleItemPerson(${it.id}, ${p.id})">
             ${p.name || 'Buddy ' + (pi + 1)}
           </div>`;
         }).join('')}
       </div>
-    </div>`).join('');
-  initDraggable();
+    </div>`;
+  }).join('');
+}
+
+function openWA(msg) {
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function copyToClipboard(msg) {
+  const el = document.createElement('textarea');
+  el.value = msg; document.body.appendChild(el); el.select();
+  document.execCommand('copy'); document.body.removeChild(el);
+  showToast("Tagihan disalin!");
 }
 
 function renderPreview() {
@@ -384,16 +373,21 @@ function renderPreview() {
     const line = it.price * it.qty;
     subTotal += line;
     if (it.persons.length > 0) {
-      const per = line / it.persons.length;
-      it.persons.forEach(pid => { if (userStats[pid]) { userStats[pid].sub += per; userStats[pid].items.push({ name: it.name || 'Menu', share: per }); }});
+      const perPerson = line / it.persons.length;
+      it.persons.forEach(pid => {
+        if (userStats[pid]) {
+          userStats[pid].sub += perPerson;
+          userStats[pid].items.push({ name: it.name || 'Menu', share: perPerson });
+        }
+      });
     }
   });
 
   const grandTotal = subTotal + svc - dsc;
   document.getElementById('grand-total-display-mobile').textContent = fmt(grandTotal);
 
-  const activeUsers = people.filter(p => userStats[p.id].sub > 0);
   const resList = document.getElementById('results-list');
+  const activeUsers = people.filter(p => userStats[p.id].sub > 0);
 
   if (activeUsers.length === 0) {
     resList.innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--text3);"><p>Hasil hitungan akan tampil otomatis di sini.</p></div>`;
@@ -402,26 +396,60 @@ function renderPreview() {
   }
 
   resList.innerHTML = activeUsers.map((p, pi) => {
-    const stat = userStats[p.id], ratio = subTotal > 0 ? stat.sub / subTotal : 0;
-    const mySvc = ratio * svc, myDsc = ratio * dsc, myTotal = stat.sub + mySvc - myDsc, c = gc(pi);
-    let msg = `*Tagihan BillBuddy: ${stat.name}*\n\n` + stat.items.map(i => `• ${i.name}: ${fmt(i.share)}`).join('\n') + `\n\n*TOTAL: ${fmt(myTotal)}*\n🔗 Link: ${getShareUrl()}`;
+    const stat = userStats[p.id];
+    const ratio = subTotal > 0 ? stat.sub / subTotal : 0;
+    const mySvc = ratio * svc;
+    const myDsc = ratio * dsc;
+    const myTotal = stat.sub + mySvc - myDsc;
+    const c = gc(pi);
+
+    let msg = `*Tagihan BillBuddy: ${stat.name}*\n\n`;
+    stat.items.forEach(i => msg += `• ${i.name}: ${fmt(i.share)}\n`);
+    if(svc > 0) msg += `• Pajak/Svc: ${fmt(mySvc)}\n`;
+    if(dsc > 0) msg += `• Diskon: ${fmt(myDsc)}\n`;
+    msg += `\n*TOTAL: ${fmt(myTotal)}*\n\n🔗 *Rincian Lengkap:* \n${getShareUrl()}`;
 
     return `<div class="receipt-card">
       <div class="receipt-header">
-        <div class="receipt-user"><div class="avatar" style="background:${c.pbg}; color:${c.pfg}">${ini(stat.name)}</div>${stat.name}</div>
+        <div class="receipt-user">
+          <div class="avatar" style="background:${c.pbg}; color:${c.pfg}">${ini(stat.name)}</div>
+          ${stat.name}
+        </div>
         <div class="receipt-price">${fmt(myTotal)}</div>
       </div>
+      ${stat.items.map(i => `<div class="line-item"><span>${i.name}</span><span>${fmt(i.share)}</span></div>`).join('')}
+      ${svc > 0 ? `<div class="line-item"><span>Pajak</span><span>+${fmt(mySvc)}</span></div>` : ''}
+      ${dsc > 0 ? `<div class="line-item"><span>Diskon</span><span style="color:#27ae60">-${fmt(myDsc)}</span></div>` : ''}
       <div class="line-total"><span>Total Tagihan</span><span>${fmt(myTotal)}</span></div>
       <div style="display:flex; gap:10px; margin-top:20px;">
-        <button class="btn-wa" onclick="window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(\`${msg}\`), '_blank')">${WA_ICON} WhatsApp</button>
-        <button class="btn-wa" style="background:#f0f0f0; color:#555; width:60px;" onclick="const e=document.createElement('textarea');e.value=\`${msg}\`;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);showToast('Disalin!')">📋</button>
+        <button class="btn-wa" onclick="openWA(\`${msg}\`)">${WA_ICON} Kirim WhatsApp</button>
+        <button class="btn-wa" style="background:#f0f0f0; color:#555; width:60px;" onclick="copyToClipboard(\`${msg}\`)">📋</button>
       </div>
     </div>`;
   }).join('');
 
+  let overallMsg = `*RINGKASAN BILLBUDDY* 🧾\n\n`;
+  activeUsers.forEach(p => {
+    const stat = userStats[p.id];
+    const ratio = subTotal > 0 ? stat.sub / subTotal : 0;
+    const myTotal = stat.sub + (ratio * svc) - (ratio * dsc);
+    overallMsg += `• *${stat.name}*: ${fmt(myTotal)}\n`;
+  });
+  overallMsg += `\n*TOTAL SEMUA: ${fmt(grandTotal)}*\n\n🔗 *Detail:* \n${getShareUrl()}`;
+
   document.getElementById('group-share-area').innerHTML = `
     <div style="background:#1a1a1a; padding:25px; border-radius:24px; color:#fff; border: 1px solid var(--border);">
-      <button class="btn-primary" onclick="const e=document.createElement('textarea');e.value=\`${getShareUrl()}\`;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);showToast('Link Pendek Disalin!')">🔗 Copy Link Ringkas</button>
+      <div style="font-size:11px; color:#999; font-weight:800; letter-spacing:1.5px; margin-bottom:20px; text-transform:uppercase; text-align:center;">Rekap Seluruh Buddy</div>
+      ${activeUsers.map(p => {
+        const stat = userStats[p.id];
+        const ratio = subTotal > 0 ? stat.sub / subTotal : 0;
+        const myTotal = stat.sub + (ratio * svc) - (ratio * dsc);
+        return `<div class="line-item" style="color:#eee; margin-bottom:10px;"><span>${stat.name}</span><span style="font-weight:700">${fmt(myTotal)}</span></div>`;
+      }).join('')}
+      <div class="line-total" style="font-size:18px; color:var(--accent); border-color:#333; margin-top:15px; padding-top:15px;">
+        <span>Total Akhir</span><span>${fmt(grandTotal)}</span>
+      </div>
+      <button class="btn-wa" style="margin-top:25px; background:var(--accent); color:#1a1a1a;" onclick="openWA(\`${overallMsg}\`)">🚀 Share Rekap ke Grup</button>
     </div>
   `;
 }
