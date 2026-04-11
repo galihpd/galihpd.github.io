@@ -56,25 +56,6 @@ body{
   opacity: 0.7;
 }
 
-/* AI SCAN SECTION */
-.ai-scan-card {
-  background: linear-gradient(145deg, #1e1e1e, #141414);
-  border: 2px dashed var(--accent);
-  border-radius: 20px;
-  padding: 25px;
-  margin-bottom: 30px;
-  text-align: center;
-}
-.loader {
-  display: none;
-  margin-top: 15px;
-  color: var(--accent);
-  font-weight: 700;
-  font-size: 13px;
-  animation: pulse 1.5s infinite;
-}
-@keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-
 /* RESPONSIVE LAYOUT ENGINE */
 #main-container {
   max-width: 1200px;
@@ -181,7 +162,6 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
   text-transform:uppercase; letter-spacing:0.5px; cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-wa{
   background:var(--whatsapp); color:white; border:none; border-radius:14px;
   padding:14px; width:100%; font-weight:700; display:flex; align-items:center;
@@ -214,7 +194,6 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
     <div style="font-size:50px; margin-bottom:20px;">⚖️</div>
     <h2 style="margin-bottom:12px; color:var(--accent);">Halo, Buddy!</h2>
     <p style="color:var(--text2); margin-bottom:25px; font-size:14px; line-height:1.6; text-align:left;">
-      • <b>AI Scan:</b> Upload struk, AI otomatis input pesananmu.<br>
       • <b>Pajak & Service:</b> Dibagi proporsional (sesuai harga makananmu).<br>
       • <b>Diskon:</b> Dipotong otomatis ke tiap orang secara adil.<br>
       • <b>Cara Pakai:</b> Isi nama, masukkan menu, lalu pilih siapa yang makan.
@@ -234,19 +213,6 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
 <div id="main-container">
   <div id="input-side">
     
-    <!-- FITUR BARU: AI SCAN STRUK -->
-    <div class="sec">
-        <div class="sec-title">0. AI Auto-Scan (Beta)</div>
-        <div class="ai-scan-card">
-            <p style="font-size: 13px; color: var(--text2); margin-bottom: 20px;">Gak mau ribet ketik? Foto strukmu biar AI yang input!</p>
-            <input type="file" id="aiInput" accept="image/*" hidden onchange="handleAiScan(event)">
-            <button class="btn-primary" id="btn-ai-scan" onclick="document.getElementById('aiInput').click()">
-                📸 Foto & Scan Struk Otomatis
-            </button>
-            <div id="ai-loader" class="loader">AI sedang membaca struk kamu...</div>
-        </div>
-    </div>
-
     <div class="sec">
       <div class="sec-title">1. Siapa yang Ikut?</div>
       <div id="people-list"></div>
@@ -289,13 +255,7 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
   <button class="btn-primary" style="width:auto; padding:12px 24px;" onclick="window.scrollTo({top: document.getElementById('results-side').offsetTop - 20, behavior: 'smooth'})">Lihat Detail ↓</button>
 </div>
 
-<script type="module">
-import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-
-// --- CONFIG API ---
-const API_KEY = "AIzaSyBByoAvNVprIbap6rQ57a_rWZbmgacfQB0"; 
-const MODEL_NAME = "gemini-2.5-flash"; 
-
+<script>
 let people = [], items = [], pid = 0, iid = 0;
 
 const PALETTE = [
@@ -312,68 +272,14 @@ const gc = i => PALETTE[i % PALETTE.length];
 const fmt = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
 const ini = n => n.trim() ? n.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) : '?';
 
-window.closeModal = function() { document.getElementById('modal-overlay').style.display = 'none'; }
-
+function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.style.opacity = '1';
   setTimeout(() => t.style.opacity = '0', 2000);
 }
 
-// --- AI SCAN HANDLER ---
-window.handleAiScan = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const btn = document.getElementById('btn-ai-scan');
-    const loader = document.getElementById('ai-loader');
-
-    btn.disabled = true;
-    loader.style.display = 'block';
-
-    try {
-        const genAI = new GoogleGenerativeAI(API_KEY);
-        const model = genAI.getGenerativeModel({ 
-            model: MODEL_NAME,
-            generationConfig: { responseMimeType: "application/json" }
-        });
-
-        // Convert file to base64
-        const base64Data = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result.split(',')[1]);
-            reader.readAsDataURL(file);
-        });
-
-        const prompt = "Ekstrak menu dari struk ini. Berikan nama item, harga satuan (price), dan kuantitas (qty). Abaikan pajak dan diskon. Format JSON: { \"items\": [ { \"name\": \"NAMA\", \"price\": 0, \"qty\": 1 } ] }";
-
-        const result = await model.generateContent([
-            prompt,
-            { inlineData: { data: base64Data, mimeType: file.type } }
-        ]);
-        
-        const response = await result.response;
-        const data = JSON.parse(response.text());
-
-        if (data.items && data.items.length > 0) {
-            data.items.forEach(it => {
-                items.push({ id: iid++, name: it.name, price: it.price, qty: it.qty || 1, persons: [] });
-            });
-            renderItems();
-            renderPreview();
-            showToast("Berhasil scan " + data.items.length + " menu!");
-        }
-    } catch (error) {
-        console.error("AI Error:", error);
-        alert("Gagal membaca struk. Pastikan foto jelas dan API Key valid.");
-    } finally {
-        btn.disabled = false;
-        loader.style.display = 'none';
-        event.target.value = ''; // Reset input
-    }
-};
-
-window.getShareUrl = function() {
+function getShareUrl() {
   const data = {
     p: people.map(x => x.name),
     i: items.map(x => ({ n: x.name, p: x.price, q: x.qty, s: x.persons })),
@@ -386,12 +292,12 @@ window.getShareUrl = function() {
   return url.toString();
 }
 
-window.addPerson = function() {
+function addPerson() {
   people.push({ id: pid++, name: '' });
   renderPeople(); renderItems(); renderPreview();
 }
 
-window.removePerson = function(id) {
+function removePerson(id) {
   people = people.filter(p => p.id !== id);
   items.forEach(it => it.persons = it.persons.filter(x => x !== id));
   renderPeople(); renderItems(); renderPreview();
@@ -409,12 +315,12 @@ function renderPeople() {
   }).join('');
 }
 
-window.addItem = function() {
+function addItem() {
   items.push({ id: iid++, name: '', price: 0, qty: 1, persons: [] });
   renderItems(); renderPreview();
 }
 
-window.toggleItemPerson = function(itemId, personId) {
+function toggleItemPerson(itemId, personId) {
   const it = items.find(x => x.id === itemId);
   const idx = it.persons.indexOf(personId);
   if (idx > -1) it.persons.splice(idx, 1);
@@ -450,18 +356,18 @@ function renderItems() {
   }).join('');
 }
 
-window.openWA = function(msg) {
+function openWA(msg) {
   window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-window.copyToClipboard = function(msg) {
+function copyToClipboard(msg) {
   const el = document.createElement('textarea');
   el.value = msg; document.body.appendChild(el); el.select();
   document.execCommand('copy'); document.body.removeChild(el);
   showToast("Tagihan disalin!");
 }
 
-window.renderPreview = function() {
+function renderPreview() {
   const svc = parseFloat(document.getElementById('service-fee').value) || 0;
   const dsc = parseFloat(document.getElementById('discount').value) || 0;
   let subTotal = 0;
@@ -553,24 +459,10 @@ window.renderPreview = function() {
   `;
 }
 
-// Global scope attachment for HTML onclick
-window.renderPreview = renderPreview;
-
-window.addEventListener('load', () => { 
-  addPerson(); addPerson(); 
-  // Initial check for shared URL
-  const params = new URLSearchParams(window.location.search);
-  if(params.has('b')) {
-      try {
-          const raw = JSON.parse(decodeURIComponent(escape(atob(params.get('b')))));
-          people = raw.p.map((n, i) => ({ id: pid++, name: n }));
-          items = raw.i.map((it, i) => ({ id: iid++, name: it.n, price: it.p, qty: it.q, persons: it.s }));
-          document.getElementById('service-fee').value = raw.f;
-          document.getElementById('discount').value = raw.d;
-      } catch(e) { console.error("Link error", e); }
-  }
+window.onload = () => { 
+  addPerson(); addPerson(); addItem(); 
   renderPeople(); renderItems(); renderPreview(); 
-});
+};
 </script>
 </body>
 </html>
