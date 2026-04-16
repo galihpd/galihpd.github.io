@@ -258,6 +258,10 @@ input:focus{border-color:var(--accent-dark); background:var(--surface3)}
 <script>
 let people = [], items = [], pid = 0, iid = 0;
 
+// FIX: store pesan di sini, bukan di-embed langsung ke onclick HTML
+// Ini mencegah backtick/newline/kutip dalam nama orang & menu merusak parsing HTML
+let _msgStore = {};
+
 const PALETTE = [
   {bg:'#1e3a5f', fg:'#7eb8f7', pbg:'#e8f1fb', pfg:'#1e3a5f'},
   {bg:'#1a3d2b', fg:'#6fcf97', pbg:'#e8f5ee', pfg:'#1a3d2b'},
@@ -309,7 +313,7 @@ function renderPeople() {
     const c = gc(i);
     return `<div class="person-row">
       <div class="avatar" style="background:${c.bg}; color:${c.fg}">${ini(p.name)}</div>
-      <input type="text" placeholder="Nama Buddy..." value="${p.name}" oninput="people[${i}].name=this.value; renderItems(); renderPreview();"/>
+      <input type="text" placeholder="Nama Buddy..." value="${p.name.replace(/"/g, '&quot;')}" oninput="people[${i}].name=this.value; renderItems(); renderPreview();"/>
       <button class="btn-circle-del" onclick="removePerson(${p.id})">×</button>
     </div>`;
   }).join('');
@@ -333,7 +337,7 @@ function renderItems() {
   list.innerHTML = items.map((it, idx) => {
     return `<div class="card">
       <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <input type="text" placeholder="Menu..." value="${it.name}" oninput="items[${idx}].name=this.value; renderPreview();" style="flex:1"/>
+        <input type="text" placeholder="Menu..." value="${it.name.replace(/"/g, '&quot;')}" oninput="items[${idx}].name=this.value; renderPreview();" style="flex:1"/>
         <button class="btn-circle-del" onclick="items.splice(${idx}, 1); renderItems(); renderPreview();">×</button>
       </div>
       <div class="item-grid">
@@ -348,7 +352,7 @@ function renderItems() {
           return `<div class="tag ${on ? '' : 'off'}" 
             style="${on ? `background:${c.bg}; color:${c.fg}; border-color:${c.fg}` : ''}" 
             onclick="toggleItemPerson(${it.id}, ${p.id})">
-            ${p.name || 'Buddy ' + (pi + 1)}
+            ${(p.name || 'Buddy ' + (pi + 1)).replace(/</g, '&lt;').replace(/>/g, '&gt;')}
           </div>`;
         }).join('')}
       </div>
@@ -356,11 +360,16 @@ function renderItems() {
   }).join('');
 }
 
-function openWA(msg) {
-  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+// FIX: fungsi WA & copy sekarang lookup pesan dari _msgStore pakai key,
+// bukan dari string yang di-embed di HTML (yang rusak kalau ada backtick/newline)
+function openWA(key) {
+  const msg = _msgStore[key];
+  if (msg) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-function copyToClipboard(msg) {
+function copyToClipboard(key) {
+  const msg = _msgStore[key];
+  if (!msg) return;
   const el = document.createElement('textarea');
   el.value = msg; document.body.appendChild(el); el.select();
   document.execCommand('copy'); document.body.removeChild(el);
@@ -400,6 +409,10 @@ function renderPreview() {
     return;
   }
 
+  // Reset message store setiap render
+  _msgStore = {};
+  const shareUrl = getShareUrl();
+
   resList.innerHTML = activeUsers.map((p, pi) => {
     const stat = userStats[p.id];
     const ratio = subTotal > 0 ? stat.sub / subTotal : 0;
@@ -408,27 +421,32 @@ function renderPreview() {
     const myTotal = stat.sub + mySvc - myDsc;
     const c = gc(pi);
 
+    // Bangun pesan teks dulu...
     let msg = `*Tagihan BillBuddy: ${stat.name}*\n\n`;
     stat.items.forEach(i => msg += `• ${i.name}: ${fmt(i.share)}\n`);
     if(svc > 0) msg += `• Pajak/Svc: ${fmt(mySvc)}\n`;
     if(dsc > 0) msg += `• Diskon: ${fmt(myDsc)}\n`;
-    msg += `\n*TOTAL: ${fmt(myTotal)}*\n\n🔗 *Rincian Lengkap:* \n${getShareUrl()}`;
+    msg += `\n*TOTAL: ${fmt(myTotal)}*\n\n🔗 *Rincian Lengkap:* \n${shareUrl}`;
+
+    // ...lalu simpan ke store dengan key aman, BUKAN embed ke onclick
+    const msgKey = 'p_' + p.id;
+    _msgStore[msgKey] = msg;
 
     return `<div class="receipt-card">
       <div class="receipt-header">
         <div class="receipt-user">
           <div class="avatar" style="background:${c.pbg}; color:${c.pfg}">${ini(stat.name)}</div>
-          ${stat.name}
+          ${stat.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
         </div>
         <div class="receipt-price">${fmt(myTotal)}</div>
       </div>
-      ${stat.items.map(i => `<div class="line-item"><span>${i.name}</span><span>${fmt(i.share)}</span></div>`).join('')}
+      ${stat.items.map(i => `<div class="line-item"><span>${i.name.replace(/</g,'&lt;')}</span><span>${fmt(i.share)}</span></div>`).join('')}
       ${svc > 0 ? `<div class="line-item"><span>Pajak</span><span>+${fmt(mySvc)}</span></div>` : ''}
       ${dsc > 0 ? `<div class="line-item"><span>Diskon</span><span style="color:#27ae60">-${fmt(myDsc)}</span></div>` : ''}
       <div class="line-total"><span>Total Tagihan</span><span>${fmt(myTotal)}</span></div>
       <div style="display:flex; gap:10px; margin-top:20px;">
-        <button class="btn-wa" onclick="openWA(\`${msg}\`)">${WA_ICON} Kirim WhatsApp</button>
-        <button class="btn-wa" style="background:#f0f0f0; color:#555; width:60px;" onclick="copyToClipboard(\`${msg}\`)">📋</button>
+        <button class="btn-wa" onclick="openWA('${msgKey}')">${WA_ICON} Kirim WhatsApp</button>
+        <button class="btn-wa" style="background:#f0f0f0; color:#555; width:60px;" onclick="copyToClipboard('${msgKey}')">📋</button>
       </div>
     </div>`;
   }).join('');
@@ -440,7 +458,8 @@ function renderPreview() {
     const myTotal = stat.sub + (ratio * svc) - (ratio * dsc);
     overallMsg += `• *${stat.name}*: ${fmt(myTotal)}\n`;
   });
-  overallMsg += `\n*TOTAL SEMUA: ${fmt(grandTotal)}*\n\n🔗 *Detail:* \n${getShareUrl()}`;
+  overallMsg += `\n*TOTAL SEMUA: ${fmt(grandTotal)}*\n\n🔗 *Detail:* \n${shareUrl}`;
+  _msgStore['group'] = overallMsg;
 
   document.getElementById('group-share-area').innerHTML = `
     <div style="background:#1a1a1a; padding:25px; border-radius:24px; color:#fff; border: 1px solid var(--border);">
@@ -449,12 +468,12 @@ function renderPreview() {
         const stat = userStats[p.id];
         const ratio = subTotal > 0 ? stat.sub / subTotal : 0;
         const myTotal = stat.sub + (ratio * svc) - (ratio * dsc);
-        return `<div class="line-item" style="color:#eee; margin-bottom:10px;"><span>${stat.name}</span><span style="font-weight:700">${fmt(myTotal)}</span></div>`;
+        return `<div class="line-item" style="color:#eee; margin-bottom:10px;"><span>${stat.name.replace(/</g,'&lt;')}</span><span style="font-weight:700">${fmt(myTotal)}</span></div>`;
       }).join('')}
       <div class="line-total" style="font-size:18px; color:var(--accent); border-color:#333; margin-top:15px; padding-top:15px;">
         <span>Total Akhir</span><span>${fmt(grandTotal)}</span>
       </div>
-      <button class="btn-wa" style="margin-top:25px; background:var(--accent); color:#1a1a1a;" onclick="openWA(\`${overallMsg}\`)">🚀 Share Rekap ke Grup</button>
+      <button class="btn-wa" style="margin-top:25px; background:var(--accent); color:#1a1a1a;" onclick="openWA('group')">🚀 Share Rekap ke Grup</button>
     </div>
   `;
 }
