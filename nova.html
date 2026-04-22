@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nova View - Rocket Launch</title>
+    <title>Nova View - Rocket Launch & ISS Tracker</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Plus Jakarta Sans -->
@@ -77,6 +77,17 @@
             object-fit: cover;
             background: #222;
         }
+        
+        /* Ikon Khusus ISS Tracker */
+        .iss-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.9);
+            box-shadow: 0 0 15px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.7);
+            object-fit: cover;
+            background: #000;
+        }
 
         /* Responsive Fixes */
         @media (max-width: 768px) {
@@ -106,9 +117,9 @@
                 max-height: 60vh !important;
                 z-index: 40;
             }
-            .flag-icon {
-                width: 22px;
-                height: 22px;
+            .flag-icon, .iss-icon {
+                width: 24px;
+                height: 24px;
             }
         }
 
@@ -139,7 +150,11 @@
     </div>
 
     <!-- Container untuk Label Ikon Bendera -->
-    <div id="labels-container" class="absolute inset-0 pointer-events-none z-0 overflow-hidden"></div>
+    <div id="labels-container" class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div id="iss-label" class="marker-label" style="opacity: 0;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/ISS_emblem.png" class="iss-icon">
+        </div>
+    </div>
 
     <!-- Loading Screen -->
     <div id="loading-screen" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center transition-opacity duration-700">
@@ -167,6 +182,12 @@
                 <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
                 Tonton Live Stream
             </a>
+
+            <!-- Tombol Fokus ISS -->
+            <button id="follow-iss-btn" onclick="followISS()" style="display: none;" class="w-full py-4 mb-5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-extrabold tracking-widest uppercase rounded-xl transition-all text-center flex items-center justify-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Fokus & Ikuti ISS
+            </button>
 
             <div id="modal-countdown-container" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-5 flex flex-col items-center">
                 <span class="text-[8px] font-bold text-red-500 uppercase tracking-widest mb-1">T-Minus Countdown</span>
@@ -326,6 +347,11 @@
         let targetGlobeRotation = null; // Target rotasi untuk animasi Fly-to
         let previousMousePosition = { x: 0, y: 0 };
         let sunLight; // Simpan sunlight secara global
+        let issMesh, issHalo; // Variabel ISS Tracker
+        let lastIssPos = null; // Menyimpan posisi terakhir untuk prediksi
+        let lastIssTime = null; // Menyimpan waktu terakhir untuk prediksi
+        let issTrailLine; // Mesh untuk garis orbit
+        let isFollowingISS = false; // Status mode follow ISS
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         
@@ -466,6 +492,45 @@
             );
         }
 
+        // Helper: Prediksi Jejak Orbit Masa Depan ISS (Satu Lingkaran Penuh)
+        function predictISSOrbit(lat1_deg, lon1_deg, lat2_deg, lon2_deg) {
+            const R_EARTH = 1.05;
+            const PERIOD = 5574; // 92.9 menit (dalam detik) untuk 1 orbit
+
+            const phi1 = lat1_deg * Math.PI / 180;
+            const phi2 = lat2_deg * Math.PI / 180;
+            const lam1 = lon1_deg * Math.PI / 180;
+            const lam2 = lon2_deg * Math.PI / 180;
+
+            // Kalkulasi arah (heading) inersial menggunakan matematika Great Circle
+            const dLam = lam2 - lam1;
+            const y = Math.sin(dLam) * Math.cos(phi2);
+            const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLam);
+            const heading = Math.atan2(y, x);
+
+            const predictedPoints = [];
+            // Pergeseran akibat rotasi bumi per putaran orbit
+            const earthRotPerRad = ((PERIOD / 86400) * 360 * Math.PI / 180) / (2 * Math.PI);
+
+            // Buat 200 titik mengitari 360 derajat (1 orbit penuh keliling bumi)
+            for (let i = 0; i <= 200; i++) {
+                const d = (i / 200) * Math.PI * 2;
+
+                const futurePhi = Math.asin(Math.sin(phi2) * Math.cos(d) + Math.cos(phi2) * Math.sin(d) * Math.cos(heading));
+                const futureLam = lam2 + Math.atan2(Math.sin(heading) * Math.sin(d) * Math.cos(phi2), Math.cos(d) - Math.sin(phi2) * Math.sin(futurePhi));
+
+                // Penyesuaian rotasi bumi relatif terhadap ground track
+                const lonOffset = futureLam - (d * earthRotPerRad);
+
+                const finalLat = futurePhi * 180 / Math.PI;
+                const finalLon = lonOffset * 180 / Math.PI;
+
+                predictedPoints.push(latLongToVector3(finalLat, finalLon, R_EARTH));
+            }
+
+            issTrailLine.geometry.setFromPoints(predictedPoints);
+        }
+
         function flyToLatLon(lat, lon) {
             const targetX = lat * (Math.PI / 180);
             const targetYAbsolute = -(lon + 90) * (Math.PI / 180);
@@ -528,6 +593,102 @@
                 }
             } catch(e) {
                 document.getElementById('astronaut-count').innerText = "N/A";
+            }
+        }
+
+        // Fitur Live Tracking ISS 
+        async function fetchISSPosition() {
+            if(!issMesh) return;
+            try {
+                // Sesuai permintaan untuk hit API open-notify (menggunakan http)
+                const res = await fetch('http://api.open-notify.org/iss-now.json');
+                const data = await res.json();
+                
+                if(data.message === 'success') {
+                    const lat = parseFloat(data.iss_position.latitude);
+                    const lon = parseFloat(data.iss_position.longitude);
+                    const pos = latLongToVector3(lat, lon, 1.05); // Set ketinggian orbit LEO di 1.05
+                    
+                    issMesh.position.copy(pos);
+                    issHalo.position.copy(pos);
+                    issMesh.userData.worldPosition.copy(pos);
+
+                    // Buat Prediksi Orbit secara Instan
+                    const nowTime = Date.now();
+                    if (lastIssPos && lastIssTime) {
+                        const dt = (nowTime - lastIssTime) / 1000;
+                        // Pengaman Math: Render prediksi HANYA jika ISS benar-benar bergerak agar tidak error
+                        if (dt > 0 && (Math.abs(lat - lastIssPos.lat) > 0.0001 || Math.abs(lon - lastIssPos.lon) > 0.0001)) {
+                            predictISSOrbit(lastIssPos.lat, lastIssPos.lon, lat, lon);
+                            lastIssPos = { lat, lon };
+                            lastIssTime = nowTime;
+                        }
+                    } else {
+                        lastIssPos = { lat, lon };
+                        lastIssTime = nowTime;
+                    }
+
+                    // Update data simulasi modal secara realtime
+                    issMesh.userData.launch = {
+                        name: "Stasiun Luar Angkasa Internasional",
+                        launch_service_provider: { name: "Multi-National" },
+                        pad: { name: "Low Earth Orbit (LEO)", latitude: lat, longitude: lon },
+                        status: { name: "In Orbit" },
+                        net: null, 
+                        isISS: true
+                    };
+                    
+                    // Jika modal ISS sedang terbuka saat data update, perbarui angkanya juga
+                    if(currentSelectedLaunch?.isISS) {
+                        document.getElementById('modal-coord').innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                    }
+                }
+            } catch(e) {
+                console.error("Gagal melacak ISS, mencoba fallback HTTPS:", e);
+                // Fallback aman agar tetap jalan jika HTTP diblokir browser (Mixed Content blocker)
+                try {
+                    const fallbackRes = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+                    const fallbackData = await fallbackRes.json();
+                    if(fallbackData.latitude) {
+                        const lat = fallbackData.latitude;
+                        const lon = fallbackData.longitude;
+                        const pos = latLongToVector3(lat, lon, 1.05);
+                        
+                        issMesh.position.copy(pos);
+                        issHalo.position.copy(pos);
+                        issMesh.userData.worldPosition.copy(pos);
+
+                        // Buat Prediksi Orbit secara Instan (Fallback mode)
+                        const nowTime = Date.now();
+                        if (lastIssPos && lastIssTime) {
+                            const dt = (nowTime - lastIssTime) / 1000;
+                            // Pengaman Math: Render prediksi HANYA jika ISS benar-benar bergerak
+                            if (dt > 0 && (Math.abs(lat - lastIssPos.lat) > 0.0001 || Math.abs(lon - lastIssPos.lon) > 0.0001)) {
+                                predictISSOrbit(lastIssPos.lat, lastIssPos.lon, lat, lon);
+                                lastIssPos = { lat, lon };
+                                lastIssTime = nowTime;
+                            }
+                        } else {
+                            lastIssPos = { lat, lon };
+                            lastIssTime = nowTime;
+                        }
+
+                        issMesh.userData.launch = {
+                            name: "Stasiun Luar Angkasa Internasional",
+                            launch_service_provider: { name: "Multi-National" },
+                            pad: { name: "Low Earth Orbit (LEO)", latitude: lat, longitude: lon },
+                            status: { name: "In Orbit" },
+                            net: null,
+                            isISS: true
+                        };
+                        
+                        if(currentSelectedLaunch?.isISS) {
+                            document.getElementById('modal-coord').innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                        }
+                    }
+                } catch(err) {
+                    // Fail silently
+                }
             }
         }
 
@@ -667,8 +828,21 @@
                 markerGroup.add(sunLight);
                 markerGroup.add(sunLight.target);
             }
+            if (issMesh && issHalo) {
+                markerGroup.add(issMesh);
+                markerGroup.add(issHalo);
+            }
+            if (issTrailLine) {
+                markerGroup.add(issTrailLine); // FIXED: Mencegah garis terhapus saat render data!
+            }
             
-            document.getElementById('labels-container').innerHTML = '';
+            // Clean up launch labels, but keep ISS label
+            const labelsContainer = document.getElementById('labels-container');
+            Array.from(labelsContainer.children).forEach(child => {
+                if (child.id !== 'iss-label') {
+                    labelsContainer.removeChild(child);
+                }
+            });
             launchMarkers = [];
 
             if (launchesArray.length === 0) {
@@ -720,7 +894,6 @@
             marker.position.copy(position);
             
             const haloGeo = new THREE.SphereGeometry(0.045, 16, 16);
-            // FIXED BUG HERE: Ditambahkan namespace THREE. yang hilang sebelumnya
             const haloMat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.3 });
             const halo = new THREE.Mesh(haloGeo, haloMat);
             halo.position.copy(position);
@@ -752,7 +925,7 @@
             const cameraPosition = new THREE.Vector3();
             camera.getWorldPosition(cameraPosition);
 
-            launchMarkers.forEach(marker => {
+            const updateLabelPos = (marker) => {
                 const vector = marker.userData.worldPosition.clone();
                 vector.applyMatrix4(markerGroup.matrixWorld);
                 
@@ -769,7 +942,13 @@
                 } else {
                     marker.userData.label.style.opacity = '0';
                 }
-            });
+            };
+
+            launchMarkers.forEach(updateLabelPos);
+            
+            if(issMesh && issMesh.userData.worldPosition.lengthSq() > 0) {
+                updateLabelPos(issMesh);
+            }
         }
 
         function showLaunchDetail(launch, lock = false) {
@@ -780,6 +959,40 @@
             }
 
             currentSelectedLaunch = launch;
+
+            // Handle UI specifically for ISS
+            if (launch.isISS) {
+                const flagImg = document.getElementById('modal-flag');
+                flagImg.src = "https://upload.wikimedia.org/wikipedia/commons/1/15/ISS_emblem.png";
+                flagImg.classList.remove('hidden');
+
+                document.getElementById('modal-title').innerText = launch.name;
+                document.getElementById('modal-provider').innerText = launch.launch_service_provider.name;
+                document.getElementById('modal-pad').innerText = launch.pad.name;
+                document.getElementById('modal-status').innerText = launch.status.name;
+                document.getElementById('modal-time').innerText = "Live Tracking";
+                document.getElementById('modal-coord').innerText = `${launch.pad.latitude.toFixed(4)}, ${launch.pad.longitude.toFixed(4)}`;
+                
+                document.getElementById('live-btn').style.display = 'none';
+                document.getElementById('follow-iss-btn').style.display = 'flex';
+                document.getElementById('cal-btn').style.display = 'none';
+                
+                updateModalCountdown();
+
+                const modal = document.getElementById('launch-modal');
+                modal.classList.add('active');
+
+                if (lock) {
+                    isLocked = true;
+                    document.getElementById('modal-backdrop').classList.remove('hidden');
+                    document.getElementById('close-btn').innerText = "Tutup Monitor";
+                } else {
+                    document.getElementById('close-btn').innerText = "Klik Dot Untuk Detail";
+                }
+                return;
+            }
+
+            // Normal Launch Detail
             const countryCode = getCountryCode(launch.pad?.location?.name);
             const flagUrl = getFlagUrl(countryCode);
 
@@ -805,6 +1018,8 @@
                 liveBtn.style.display = 'none';
             }
 
+            document.getElementById('follow-iss-btn').style.display = 'none';
+
             if (launch.net) {
                 document.getElementById('cal-btn').href = getCalendarUrl(launch);
                 document.getElementById('cal-btn').style.display = 'flex';
@@ -827,6 +1042,15 @@
         }
 
         function updateModalCountdown() {
+            if (currentSelectedLaunch?.isISS) {
+                const container = document.getElementById('modal-countdown-container');
+                const text = document.getElementById('modal-countdown');
+                container.className = "bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 mb-5 flex flex-col items-center";
+                text.className = "text-xl font-mono font-extrabold text-emerald-400";
+                text.innerText = "IN ORBIT";
+                return;
+            }
+
             if (currentSelectedLaunch?.net) {
                 const cdString = getCountdown(currentSelectedLaunch.net);
                 document.getElementById('modal-countdown').innerText = cdString;
@@ -849,12 +1073,22 @@
             document.getElementById('modal-backdrop').classList.add('hidden');
         }
 
+        function followISS() {
+            isFollowingISS = true;
+            isLocked = false;
+            targetGlobeRotation = null;
+            settings.autoRotation = false;
+            document.getElementById('rotation-toggle').checked = false;
+            document.getElementById('launch-modal').classList.remove('active');
+            document.getElementById('modal-backdrop').classList.add('hidden');
+        }
+
         function updateClock() {
             const now = new Date();
             document.getElementById('local-time').textContent = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
             document.getElementById('utc-time').textContent = `UTC ${now.getUTCHours().toString().padStart(2, '0')}:${now.getUTCMinutes().toString().padStart(2, '0')}:${now.getUTCSeconds().toString().padStart(2, '0')}`;
             updateSunPosition(); 
-            if (currentSelectedLaunch) updateModalCountdown();
+            if (currentSelectedLaunch && !currentSelectedLaunch.isISS) updateModalCountdown();
         }
 
         function init() {
@@ -918,12 +1152,48 @@
             markerGroup.add(sunLight);
             markerGroup.add(sunLight.target);
 
+            // Inisialisasi ISS Marker (Warna Emerald)
+            const issGeo = new THREE.SphereGeometry(0.025, 16, 16);
+            const issMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.95 });
+            issMesh = new THREE.Mesh(issGeo, issMat);
+            
+            const issHaloGeo = new THREE.SphereGeometry(0.05, 16, 16);
+            const issHaloMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.3 });
+            issHalo = new THREE.Mesh(issHaloGeo, issHaloMat);
+
+            issMesh.userData = {
+                isMarker: true,
+                isISS: true,
+                halo: issHalo,
+                label: document.getElementById('iss-label'),
+                worldPosition: new THREE.Vector3(),
+                pulse: 0
+            };
+
+            // Inisialisasi Garis Orbit Prediksi (Lingkaran Penuh memutari Bumi)
+            const trailMat = new THREE.LineBasicMaterial({ 
+                color: 0xff2222, // Warna diubah menjadi Merah menyala
+                transparent: true, 
+                opacity: 0.8 // Opacity dinaikkan agar lebih jelas saat di-zoom
+            });
+            const trailGeo = new THREE.BufferGeometry();
+            issTrailLine = new THREE.Line(trailGeo, trailMat);
+            
+            // FIXED: Mematikan frustum culling agar garis tidak hilang mendadak saat kamera di-zoom terlalu dekat
+            issTrailLine.frustumCulled = false; 
+            
+            markerGroup.add(issTrailLine);
+            markerGroup.add(issMesh);
+            markerGroup.add(issHalo);
+
             setupControls();
             setupMobileInteractions();
             setInterval(updateClock, 1000);
             updateClock(); 
             
             fetchAstronauts(); 
+            fetchISSPosition();
+            setInterval(fetchISSPosition, 1000); // ISS tracker berjalan tiap 1 detik (Diperbarui)
             
             document.getElementById('search-launch').addEventListener('input', filterLaunches);
             
@@ -932,6 +1202,7 @@
             const handleStart = (x, y) => {
                 if (isLocked) return;
                 isDragging = true;
+                isFollowingISS = false; // Matikan auto-follow jika user menggeser manual
                 targetGlobeRotation = null; 
                 previousMousePosition = { x, y };
             };
@@ -1059,7 +1330,27 @@
         function animate() {
             requestAnimationFrame(animate);
             
-            if (targetGlobeRotation && !isDragging) {
+            // Animasi mengikuti ISS atau Fly-To biasa
+            if (isFollowingISS && issMesh && issMesh.userData.launch) {
+                const lat = issMesh.userData.launch.pad.latitude;
+                const lon = issMesh.userData.launch.pad.longitude;
+                const targetX = lat * (Math.PI / 180);
+                const targetYAbsolute = -(lon + 90) * (Math.PI / 180);
+
+                let currentY = earth.rotation.y % (2 * Math.PI);
+                if(currentY < 0) currentY += 2 * Math.PI; 
+                let tY = targetYAbsolute % (2 * Math.PI);
+                if(tY < 0) tY += 2 * Math.PI;
+
+                let diff = tY - currentY;
+                if (diff > Math.PI) diff -= 2 * Math.PI;
+                if (diff < -Math.PI) diff += 2 * Math.PI;
+
+                mainGroup.rotation.x += (targetX - mainGroup.rotation.x) * 0.05;
+                earth.rotation.y += diff * 0.05;
+                clouds.rotation.y += diff * 0.05;
+                markerGroup.rotation.y += diff * 0.05;
+            } else if (targetGlobeRotation && !isDragging) {
                 mainGroup.rotation.x += (targetGlobeRotation.x - mainGroup.rotation.x) * 0.05;
                 
                 const diffY = targetGlobeRotation.y - earth.rotation.y;
@@ -1082,6 +1373,14 @@
                 m.userData.halo.scale.set(scale, scale, scale);
                 m.userData.halo.material.opacity = 0.4 - (Math.sin(m.userData.pulse) * 0.2);
             });
+            
+            if (issMesh) {
+                issMesh.userData.pulse += 0.05;
+                const scale = 1 + Math.sin(issMesh.userData.pulse) * 0.4;
+                issMesh.userData.halo.scale.set(scale, scale, scale);
+                issMesh.userData.halo.material.opacity = 0.4 - (Math.sin(issMesh.userData.pulse) * 0.2);
+            }
+
             updateLabels();
             renderer.render(scene, camera);
         }
