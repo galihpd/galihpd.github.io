@@ -121,7 +121,7 @@
         .animate-ticker {
             display: inline-block;
             padding-left: 100%;
-            animation: ticker 40s linear infinite;
+            animation: ticker 120s linear infinite;
         }
         @keyframes ticker {
             0% { transform: translate(0, 0); }
@@ -162,11 +162,11 @@
                 <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors">✕</button>
             </div>
             
-            <!-- Patch/Image Container -->
-            <div id="modal-image-container" class="w-full h-32 mb-4 rounded-xl bg-zinc-900/50 border border-white/5 overflow-hidden relative hidden">
-                <img id="modal-image" src="" class="w-full h-full object-cover opacity-80 mix-blend-lighten" alt="Launch Visual">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-            </div>
+            <!-- Link Live Stream / Webcast (Pengganti Visual) -->
+            <a id="live-btn" href="#" target="_blank" style="display: none;" class="w-full py-4 mb-5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-[11px] font-extrabold tracking-widest uppercase rounded-xl transition-all text-center flex items-center justify-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                Tonton Live Stream
+            </a>
 
             <div id="modal-countdown-container" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-5 flex flex-col items-center">
                 <span class="text-[8px] font-bold text-red-500 uppercase tracking-widest mb-1">T-Minus Countdown</span>
@@ -195,10 +195,6 @@
             </div>
             
             <div class="flex gap-2 mt-6">
-                <a id="live-btn" href="#" target="_blank" class="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-extrabold tracking-widest uppercase rounded-xl transition-all text-center flex items-center justify-center gap-1.5 hidden">
-                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                    Webcast
-                </a>
                 <a id="cal-btn" href="#" target="_blank" class="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white text-[10px] font-extrabold tracking-widest uppercase rounded-xl transition-all text-center flex items-center justify-center gap-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     Ingatkan
@@ -262,7 +258,6 @@
             
             <input type="text" id="search-launch" placeholder="Cari misi, agensi, atau lokasi..." class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white placeholder-zinc-500 mb-3 focus:outline-none focus:border-cyan-500 transition-colors flex-shrink-0">
 
-            <!-- PERBAIKAN SCROLL: min-h-0 dan max-h ditambahkan agar scrollbar selalu aktif mengikuti batasan parent -->
             <div id="launch-list" class="space-y-2 overflow-y-auto custom-scroll pr-2 text-[11px] flex-grow min-h-0 max-h-[55vh] md:max-h-[60vh]">
                 <div class="py-4 text-center">
                     <div class="inline-block w-4 h-4 border-2 border-zinc-800 border-t-cyan-500 rounded-full animate-spin"></div>
@@ -536,7 +531,6 @@
             }
         }
 
-        // PERBAIKAN: Membangun Live Ticker dari data peluncuran yang sudah ada agar roket dan nama misi tertera jelas!
         function updateTickerFromLaunches() {
             let tickerItems = [];
             let allUpdates = [];
@@ -636,7 +630,7 @@
                 allLaunchesData = data.results || [];
                 updateStatsText();
                 renderLaunchData(allLaunchesData);
-                updateTickerFromLaunches(); // Membangun ticker live feed dengan data yang lengkap
+                updateTickerFromLaunches(); 
             } catch (error) {
                 console.error(error);
                 document.getElementById('launch-list').innerHTML = `<div class="py-4 text-center text-zinc-500 italic">Gagal memuat data. Periksa koneksi.</div>`;
@@ -653,7 +647,6 @@
             document.getElementById('stats-text').textContent = `${allLaunchesData.length} Misi • Terbanyak oleh ${topProvider || 'Beragam'}`;
         }
 
-        // Fitur Filter Data
         function filterLaunches() {
             const query = document.getElementById('search-launch').value.toLowerCase();
             const filtered = allLaunchesData.filter(l =>
@@ -669,9 +662,7 @@
             const listContainer = document.getElementById('launch-list');
             listContainer.innerHTML = '';
             
-            // Bersihkan marker lama
             while(markerGroup.children.length > 0) markerGroup.remove(markerGroup.children[0]); 
-            // Re-add sunLight and its target because they were removed in the loop above
             if (sunLight) {
                 markerGroup.add(sunLight);
                 markerGroup.add(sunLight.target);
@@ -729,10 +720,9 @@
             marker.position.copy(position);
             
             const haloGeo = new THREE.SphereGeometry(0.045, 16, 16);
-            const haloMat = new MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.3 });
-            // Koreksi pemanggilan THREE namespace untuk haloMat
-            const fixedHaloMat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.3 });
-            const halo = new THREE.Mesh(haloGeo, fixedHaloMat);
+            // FIXED BUG HERE: Ditambahkan namespace THREE. yang hilang sebelumnya
+            const haloMat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.3 });
+            const halo = new THREE.Mesh(haloGeo, haloMat);
             halo.position.copy(position);
             
             const labelEl = document.createElement('div');
@@ -804,25 +794,15 @@
             document.getElementById('modal-time').innerText = launch.net ? new Date(launch.net).toISOString().replace('T', ' ').substring(0, 19) : 'TBD';
             document.getElementById('modal-coord').innerText = `${launch.pad?.latitude?.toFixed(4)}, ${launch.pad?.longitude?.toFixed(4)}`;
             
-            const imageUrl = (launch.mission_patches && launch.mission_patches.length > 0) ? launch.mission_patches[0].image_url : launch.image;
-            const imgContainer = document.getElementById('modal-image-container');
-            const imgEl = document.getElementById('modal-image');
-            if (imageUrl) {
-                imgEl.src = imageUrl;
-                imgContainer.classList.remove('hidden');
-            } else {
-                imgContainer.classList.add('hidden');
-            }
-
             const liveBtn = document.getElementById('live-btn');
             if (launch.vidURLs && launch.vidURLs.length > 0) {
                 liveBtn.href = launch.vidURLs[0].url;
-                liveBtn.classList.remove('hidden');
+                liveBtn.style.display = 'flex';
             } else if (launch.vid_urls && launch.vid_urls.length > 0) {
                 liveBtn.href = launch.vid_urls[0].url;
-                liveBtn.classList.remove('hidden');
+                liveBtn.style.display = 'flex';
             } else {
-                liveBtn.classList.add('hidden');
+                liveBtn.style.display = 'none';
             }
 
             if (launch.net) {
