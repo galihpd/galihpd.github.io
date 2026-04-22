@@ -58,7 +58,7 @@
             pointer-events: auto;
         }
 
-        /* Label Ikon Bendera Terintegrasi - Fix untuk Desktop */
+        /* Label Ikon Bendera Terintegrasi */
         .marker-label {
             position: absolute;
             pointer-events: none;
@@ -111,9 +111,32 @@
                 height: 22px;
             }
         }
+
+        /* Animasi Ticker Live Updates */
+        .ticker-container {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .animate-ticker {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 40s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
     </style>
 </head>
 <body class="bg-black text-white">
+
+    <!-- Live Updates Ticker -->
+    <div class="fixed bottom-0 left-0 right-0 h-7 bg-cyan-950/80 border-t border-cyan-500/30 z-[70] backdrop-blur-md flex items-center ticker-container pointer-events-none">
+        <div id="ticker-content" class="animate-ticker text-[10px] font-mono text-cyan-400 tracking-wider">
+            Memuat Live Updates dari The SpaceDevs...
+        </div>
+    </div>
 
     <!-- Container untuk Label Ikon Bendera -->
     <div id="labels-container" class="absolute inset-0 pointer-events-none z-0 overflow-hidden"></div>
@@ -139,6 +162,12 @@
                 <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors">✕</button>
             </div>
             
+            <!-- Patch/Image Container -->
+            <div id="modal-image-container" class="w-full h-32 mb-4 rounded-xl bg-zinc-900/50 border border-white/5 overflow-hidden relative hidden">
+                <img id="modal-image" src="" class="w-full h-full object-cover opacity-80 mix-blend-lighten" alt="Launch Visual">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+            </div>
+
             <div id="modal-countdown-container" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-5 flex flex-col items-center">
                 <span class="text-[8px] font-bold text-red-500 uppercase tracking-widest mb-1">T-Minus Countdown</span>
                 <span id="modal-countdown" class="text-xl font-mono font-extrabold text-white">00d 00h 00m 00s</span>
@@ -165,9 +194,19 @@
                 </div>
             </div>
             
-            <button id="close-btn" onclick="closeModal()" class="w-full mt-6 py-4 bg-cyan-500 hover:bg-cyan-400 text-black text-[10px] font-extrabold tracking-widest uppercase rounded-xl transition-all shadow-lg shadow-cyan-500/20">
-                Tutup Monitor
-            </button>
+            <div class="flex gap-2 mt-6">
+                <a id="live-btn" href="#" target="_blank" class="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-extrabold tracking-widest uppercase rounded-xl transition-all text-center flex items-center justify-center gap-1.5 hidden">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    Webcast
+                </a>
+                <a id="cal-btn" href="#" target="_blank" class="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white text-[10px] font-extrabold tracking-widest uppercase rounded-xl transition-all text-center flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    Ingatkan
+                </a>
+                <button id="close-btn" onclick="closeModal()" class="flex-1 py-3 bg-cyan-500 hover:bg-cyan-400 text-black text-[10px] font-extrabold tracking-widest uppercase rounded-xl transition-all shadow-lg shadow-cyan-500/20">
+                    Tutup
+                </button>
+            </div>
         </div>
     </div>
 
@@ -178,27 +217,53 @@
             <p class="text-[8px] md:text-[10px] font-light tracking-[0.2em] text-cyan-400 uppercase mt-1 text-glow">Monitor Peluncuran Roket Realtime</p>
         </div>
         
-        <div class="glass px-4 py-2.5 md:px-5 md:py-3 rounded-2xl inline-block pointer-events-auto border-l-4 border-l-cyan-500">
-            <div class="flex flex-col">
-                <span class="text-[8px] md:text-[9px] font-bold tracking-widest text-zinc-500 uppercase mb-0.5">Waktu Lokal</span>
-                <span id="local-time" class="text-lg md:text-xl font-bold tracking-tighter text-white time-glow">00:00:00</span>
-                <div class="flex items-center gap-2 mt-0.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="utc-time" class="text-[8px] md:text-[9px] font-medium tracking-widest text-zinc-400 uppercase">UTC 00:00:00</span>
+        <div class="flex flex-col gap-3">
+            <!-- Panel Waktu Lokal -->
+            <div class="glass px-4 py-2.5 md:px-5 md:py-3 rounded-2xl pointer-events-auto border-l-4 border-l-cyan-500 w-fit">
+                <div class="flex flex-col">
+                    <span class="text-[8px] md:text-[9px] font-bold tracking-widest text-zinc-500 uppercase mb-0.5">Waktu Lokal</span>
+                    <span id="local-time" class="text-lg md:text-xl font-bold tracking-tighter text-white time-glow">00:00:00</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="utc-time" class="text-[8px] md:text-[9px] font-medium tracking-widest text-zinc-400 uppercase">UTC 00:00:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Manusia di Orbit -->
+            <div class="glass px-4 py-2 md:px-5 md:py-2.5 rounded-2xl pointer-events-auto border-l-4 border-l-emerald-500 w-fit cursor-pointer group transition-all">
+                <div class="flex items-center gap-3">
+                    <div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[8px] md:text-[9px] font-bold tracking-widest text-zinc-500 uppercase mb-0.5">Manusia di Orbit</span>
+                        <span id="astronaut-count" class="text-sm font-bold text-white leading-none">Memuat...</span>
+                    </div>
+                </div>
+                <!-- Dropdown Daftar Astronot -->
+                <div id="astronaut-list" class="max-h-0 overflow-y-auto custom-scroll transition-all duration-300 opacity-0 group-hover:max-h-48 group-hover:opacity-100 group-hover:mt-3">
+                    <div class="border-t border-white/10 pt-2 space-y-1.5 pr-2" id="astronaut-names">
+                        <!-- Data Astronot Masuk Ke Sini -->
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Panel Manifest -->
-        <div id="manifest-panel" class="glass w-72 md:w-80 rounded-2xl p-4 pointer-events-auto overflow-hidden shadow-2xl launch-panel hidden md:block">
-            <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+        <div id="manifest-panel" class="glass w-72 md:w-80 rounded-2xl p-4 pointer-events-auto shadow-2xl launch-panel hidden md:block flex flex-col max-h-[70vh]">
+            <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2 flex-shrink-0">
                 <div class="flex flex-col">
                     <span class="text-[9px] md:text-[10px] font-bold tracking-widest text-white uppercase">Manifest Peluncuran</span>
-                    <span class="text-[8px] text-zinc-500 uppercase tracking-tighter">Situs Aktif Berpendar Merah</span>
+                    <span id="stats-text" class="text-[8px] text-zinc-500 uppercase tracking-tighter">Memuat data...</span>
                 </div>
-                <span class="px-2 py-0.5 bg-cyan-500/20 text-cyan-400 text-[8px] font-bold rounded uppercase animate-pulse">40 Jalur</span>
+                <span id="live-badge" class="px-2 py-0.5 bg-cyan-500/20 text-cyan-400 text-[8px] font-bold rounded uppercase animate-pulse">Live</span>
             </div>
-            <div id="launch-list" class="space-y-2 max-h-60 md:max-h-80 overflow-y-auto custom-scroll pr-2 text-[11px]">
+            
+            <input type="text" id="search-launch" placeholder="Cari misi, agensi, atau lokasi..." class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white placeholder-zinc-500 mb-3 focus:outline-none focus:border-cyan-500 transition-colors flex-shrink-0">
+
+            <!-- PERBAIKAN SCROLL: min-h-0 dan max-h ditambahkan agar scrollbar selalu aktif mengikuti batasan parent -->
+            <div id="launch-list" class="space-y-2 overflow-y-auto custom-scroll pr-2 text-[11px] flex-grow min-h-0 max-h-[55vh] md:max-h-[60vh]">
                 <div class="py-4 text-center">
                     <div class="inline-block w-4 h-4 border-2 border-zinc-800 border-t-cyan-500 rounded-full animate-spin"></div>
                 </div>
@@ -207,7 +272,7 @@
     </div>
 
     <!-- Mobile Toggles -->
-    <div class="fixed bottom-6 left-6 right-6 flex justify-between items-center md:hidden z-50 pointer-events-none">
+    <div class="fixed bottom-10 left-6 right-6 flex justify-between items-center md:hidden z-50 pointer-events-none">
         <button id="mobile-manifest-toggle" class="w-12 h-12 glass rounded-full flex items-center justify-center pointer-events-auto border-cyan-500/50 text-cyan-400 shadow-lg active:scale-90 transition-transform">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
@@ -259,10 +324,13 @@
     <script>
         let scene, camera, renderer, earth, clouds, mainGroup, markerGroup;
         let launchMarkers = [];
+        let allLaunchesData = []; // Cache lokal untuk fitur Search
         let currentSelectedLaunch = null;
         let isDragging = false;
         let isLocked = false; 
+        let targetGlobeRotation = null; // Target rotasi untuk animasi Fly-to
         let previousMousePosition = { x: 0, y: 0 };
+        let sunLight; // Simpan sunlight secara global
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         
@@ -274,7 +342,34 @@
             exposure: 1.1
         };
 
-        // Fungsi Helper untuk Mendapatkan Kode Negara (ISO 3166-1 alpha-2)
+        const FALLBACK_ASTRONAUTS = {
+            count: "Simulasi",
+            results: [
+                { name: "Oleg Kononenko (Data Offline)", agency: { abbrev: "ROSCOSMOS" } },
+                { name: "Sunita Williams (Data Offline)", agency: { abbrev: "NASA" } }
+            ]
+        };
+
+        const FALLBACK_LAUNCHES = {
+            results: [
+                {
+                    name: "Falcon 9 | Demo Misi (Offline)",
+                    net: new Date(Date.now() + 86400000).toISOString(),
+                    launch_service_provider: { name: "SpaceX" },
+                    status: { id: 1, name: "Go", abbrev: "GO" },
+                    pad: { name: "Cape Canaveral", location: { name: "USA" }, latitude: 28.3922, longitude: -80.6077 }
+                },
+                {
+                    name: "Long March | Misi Simulasi",
+                    net: new Date(Date.now() + 172800000).toISOString(),
+                    launch_service_provider: { name: "CASC" },
+                    status: { id: 2, name: "TBD", abbrev: "TBD" },
+                    pad: { name: "Wenchang", location: { name: "China" }, latitude: 19.6143, longitude: 110.9511 }
+                }
+            ]
+        };
+
+        // Helper: Kode Negara
         function getCountryCode(locationName) {
             if (!locationName) return "un";
             const loc = locationName.toUpperCase();
@@ -292,10 +387,36 @@
             return "un"; 
         }
 
-        // Menggunakan CDN Flagicons untuk mendapatkan gambar bendera asli (SVG)
         function getFlagUrl(code) {
             if (code === "un") return "https://flagcdn.com/w80/un.png";
             return `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
+        }
+
+        // Helper: Warna Berdasarkan Status Peluncuran
+        function getStatusColorHex(statusId) {
+            if (statusId === 1) return 0x10b981; // Hijau (Go)
+            if (statusId === 2 || statusId === 8) return 0xf59e0b; // Kuning (TBD/Unconfirmed)
+            return 0xef4444; // Merah (Hold/Delay/Other)
+        }
+        function getStatusColorClass(statusId) {
+            if (statusId === 1) return 'text-emerald-400';
+            if (statusId === 2 || statusId === 8) return 'text-amber-400';
+            return 'text-red-400';
+        }
+
+        // Helper: Format Google Calendar URL
+        function getCalendarUrl(launch) {
+            const date = new Date(launch.net);
+            const endDate = new Date(date.getTime() + 2 * 60 * 60 * 1000); // Durasi default 2 jam
+            const formatDate = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g,"");
+            
+            const start = formatDate(date);
+            const end = formatDate(endDate);
+            const text = encodeURIComponent(`🚀 Peluncuran: ${launch.name}`);
+            const details = encodeURIComponent(`Penyedia: ${launch.launch_service_provider?.name}\nStatus: ${launch.status?.name}\n\nDipantau via Novalaunch.`);
+            const location = encodeURIComponent(launch.pad?.name || 'Situs Peluncuran Antariksa');
+            
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}`;
         }
 
         function getCountdown(dateString) {
@@ -321,6 +442,25 @@
             return `Dalam ${diffDays} Hari`;
         }
 
+        // Helper: Kalkulasi Posisi Matahari Realtime (Client-Side Astronomi)
+        function updateSunPosition() {
+            if(!sunLight) return;
+            const now = new Date();
+
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+
+            const declination = -23.44 * Math.cos((360 / 365) * (dayOfYear + 10) * (Math.PI / 180));
+
+            const hoursUTC = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+            const longitude = (12 - hoursUTC) * 15;
+
+            const sunPos = latLongToVector3(declination, longitude, 5); 
+            sunLight.position.copy(sunPos);
+        }
+
         function latLongToVector3(lat, lon, radius) {
             const phi = (90 - lat) * (Math.PI / 180);
             const theta = (lon + 180) * (Math.PI / 180);
@@ -329,6 +469,114 @@
                 radius * Math.cos(phi),
                 radius * Math.sin(phi) * Math.sin(theta)
             );
+        }
+
+        function flyToLatLon(lat, lon) {
+            const targetX = lat * (Math.PI / 180);
+            const targetYAbsolute = -(lon + 90) * (Math.PI / 180);
+
+            let currentY = earth.rotation.y % (2 * Math.PI);
+            if(currentY < 0) currentY += 2 * Math.PI; 
+            let tY = targetYAbsolute % (2 * Math.PI);
+            if(tY < 0) tY += 2 * Math.PI;
+
+            let diff = tY - currentY;
+            if (diff > Math.PI) diff -= 2 * Math.PI;
+            if (diff < -Math.PI) diff += 2 * Math.PI;
+
+            targetGlobeRotation = {
+                x: targetX,
+                y: earth.rotation.y + diff
+            };
+
+            settings.autoRotation = false;
+            document.getElementById('rotation-toggle').checked = false;
+        }
+
+        // Fitur Astronaut di Orbit (Panel Kiri Atas)
+        async function fetchAstronauts() {
+            const CACHE_KEY = 'novalaunch_astro_cache_v2';
+            const CACHE_EXPIRY_KEY = 'novalaunch_astro_expiry_v2';
+            const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+            const now = new Date().getTime();
+
+            try {
+                const cached = localStorage.getItem(CACHE_KEY);
+                const expiry = localStorage.getItem(CACHE_EXPIRY_KEY);
+                let data;
+                
+                if (cached && expiry && (now - parseInt(expiry) < TWELVE_HOURS)) {
+                    data = JSON.parse(cached);
+                } else {
+                    const res = await fetch('https://ll.thespacedevs.com/2.3.0/astronauts/?in_space=true');
+                    if (res.status === 429) {
+                        data = FALLBACK_ASTRONAUTS; 
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                        localStorage.setItem(CACHE_EXPIRY_KEY, (now - TWELVE_HOURS + 5 * 60 * 1000).toString()); 
+                    } else if (!res.ok) {
+                        throw new Error('Gagal');
+                    } else {
+                        data = await res.json();
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                        localStorage.setItem(CACHE_EXPIRY_KEY, now.toString());
+                    }
+                }
+
+                document.getElementById('astronaut-count').innerText = `${data.count} Orang`;
+                if (data.results) {
+                    document.getElementById('astronaut-names').innerHTML = data.results.map(a => `
+                        <div class="flex items-center justify-between gap-3 text-[10px] py-0.5">
+                            <span class="text-zinc-200 font-medium">${a.name}</span>
+                            <span class="text-emerald-400 font-mono text-[8.5px] px-1.5 py-0.5 bg-emerald-500/10 rounded uppercase">${a.agency?.abbrev || 'UNK'}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) {
+                document.getElementById('astronaut-count').innerText = "N/A";
+            }
+        }
+
+        // PERBAIKAN: Membangun Live Ticker dari data peluncuran yang sudah ada agar roket dan nama misi tertera jelas!
+        function updateTickerFromLaunches() {
+            let tickerItems = [];
+            let allUpdates = [];
+            
+            if (allLaunchesData.length > 0 && allLaunchesData[0].name.includes("Offline")) {
+                 document.getElementById('ticker-content').innerHTML = "🔴 SISTEM OFFLINE: API Rate Limit The SpaceDevs Tercapai. Menampilkan data simulasi fallback (Tunggu 5-10 menit).";
+                 return;
+            }
+
+            allLaunchesData.forEach(launch => {
+                if (launch.updates && launch.updates.length > 0) {
+                    launch.updates.forEach(u => {
+                        allUpdates.push({
+                            launchName: launch.name,
+                            comment: u.comment,
+                            time: new Date(u.created_on)
+                        });
+                    });
+                }
+            });
+            allUpdates.sort((a, b) => b.time - a.time);
+
+            if (allUpdates.length > 0) {
+                tickerItems = allUpdates.slice(0, 10).map(u => {
+                    const d = u.time;
+                    return `🚀 <span class="text-white font-bold">${u.launchName.toUpperCase()}</span> | 🔴 UPDATE (${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')} UTC): ${u.comment}`;
+                });
+            } else {
+                tickerItems = allLaunchesData.slice(0, 5).map(launch => {
+                    const cd = getRelativeTime(launch.net);
+                    return `🚀 MISI TERDEKAT: <span class="text-white font-bold">${launch.name}</span> | Status: ${launch.status?.name} | Penyedia: ${launch.launch_service_provider?.name}`;
+                });
+            }
+
+            if (tickerItems.length > 0) {
+                const combined = tickerItems.join('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+                document.getElementById('ticker-content').innerHTML = combined + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + combined;
+            } else {
+                document.getElementById('ticker-content').innerHTML = "Menunggu data peluncuran...";
+            }
         }
 
         async function fetchUpcomingLaunches() {
@@ -341,95 +589,156 @@
                 const cachedData = localStorage.getItem(CACHE_KEY);
                 const expiry = localStorage.getItem(CACHE_EXPIRY_KEY);
 
-                if (cachedData && expiry && (now - expiry < ONE_HOUR)) {
-                    renderLaunchData(JSON.parse(cachedData));
-                    return;
+                let data;
+                if (cachedData && expiry && (now - parseInt(expiry) < ONE_HOUR)) {
+                    data = JSON.parse(cachedData);
+                    
+                    if(data.results && data.results[0]?.name?.includes("Offline")) {
+                        const badge = document.getElementById('live-badge');
+                        if(badge) {
+                            badge.className = "px-2 py-0.5 bg-red-500/20 text-red-400 text-[8px] font-bold rounded uppercase animate-pulse";
+                            badge.innerText = "RATE LIMIT";
+                        }
+                    }
+                } else {
+                    const response = await fetch('https://ll.thespacedevs.com/2.3.0/launches/upcoming/?limit=40&mode=normal');
+                    
+                    if (response.status === 429) {
+                        console.warn("API Throttled. Menggunakan data simulasi fallback.");
+                        data = FALLBACK_LAUNCHES;
+                        
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                        localStorage.setItem(CACHE_EXPIRY_KEY, (now - ONE_HOUR + 5 * 60 * 1000).toString());
+                        
+                        const badge = document.getElementById('live-badge');
+                        if(badge) {
+                            badge.className = "px-2 py-0.5 bg-red-500/20 text-red-400 text-[8px] font-bold rounded uppercase animate-pulse";
+                            badge.innerText = "RATE LIMIT";
+                        }
+                    } else if (!response.ok) {
+                        throw new Error('Gagal ambil data');
+                    } else {
+                        data = await response.json();
+                        
+                        if(data.results) {
+                            data.results.sort((a, b) => {
+                                const aS = a.status?.id === 1 ? 0 : 1;
+                                const bS = b.status?.id === 1 ? 0 : 1;
+                                if (aS !== bS) return aS - bS;
+                                return new Date(a.net) - new Date(b.net);
+                            });
+                        }
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                        localStorage.setItem(CACHE_EXPIRY_KEY, now.toString());
+                    }
                 }
 
-                const response = await fetch('https://ll.thespacedevs.com/2.3.0/launches/upcoming/?limit=40&mode=normal');
-                if (!response.ok) {
-                    if (cachedData) { renderLaunchData(JSON.parse(cachedData)); return; }
-                    throw new Error('Gagal ambil data');
-                }
-                const data = await response.json();
-                if(data.results) {
-                    data.results.sort((a, b) => {
-                        const aS = a.status?.id === 1 ? 0 : 1;
-                        const bS = b.status?.id === 1 ? 0 : 1;
-                        if (aS !== bS) return aS - bS;
-                        return new Date(a.net) - new Date(b.net);
-                    });
-                }
-                localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-                localStorage.setItem(CACHE_EXPIRY_KEY, now.toString());
-                renderLaunchData(data);
+                allLaunchesData = data.results || [];
+                updateStatsText();
+                renderLaunchData(allLaunchesData);
+                updateTickerFromLaunches(); // Membangun ticker live feed dengan data yang lengkap
             } catch (error) {
                 console.error(error);
                 document.getElementById('launch-list').innerHTML = `<div class="py-4 text-center text-zinc-500 italic">Gagal memuat data. Periksa koneksi.</div>`;
             }
         }
 
-        function renderLaunchData(data) {
+        function updateStatsText() {
+            const providers = {};
+            allLaunchesData.forEach(l => {
+                const p = l.launch_service_provider?.name;
+                if(p) providers[p] = (providers[p] || 0) + 1;
+            });
+            const topProvider = Object.keys(providers).sort((a,b) => providers[b] - providers[a])[0];
+            document.getElementById('stats-text').textContent = `${allLaunchesData.length} Misi • Terbanyak oleh ${topProvider || 'Beragam'}`;
+        }
+
+        // Fitur Filter Data
+        function filterLaunches() {
+            const query = document.getElementById('search-launch').value.toLowerCase();
+            const filtered = allLaunchesData.filter(l =>
+                (l.name || '').toLowerCase().includes(query) ||
+                (l.launch_service_provider?.name || '').toLowerCase().includes(query) ||
+                (l.pad?.name || '').toLowerCase().includes(query) ||
+                (l.pad?.location?.name || '').toLowerCase().includes(query)
+            );
+            renderLaunchData(filtered);
+        }
+
+        function renderLaunchData(launchesArray) {
             const listContainer = document.getElementById('launch-list');
             listContainer.innerHTML = '';
+            
+            // Bersihkan marker lama
             while(markerGroup.children.length > 0) markerGroup.remove(markerGroup.children[0]); 
+            // Re-add sunLight and its target because they were removed in the loop above
+            if (sunLight) {
+                markerGroup.add(sunLight);
+                markerGroup.add(sunLight.target);
+            }
+            
             document.getElementById('labels-container').innerHTML = '';
             launchMarkers = [];
 
-            if (data.results) {
-                data.results.forEach(launch => {
-                    const countryCode = getCountryCode(launch.pad?.location?.name);
-                    const flagUrl = getFlagUrl(countryCode);
-                    const provider = launch.launch_service_provider?.name || 'Unknown';
-                    const relativeTime = getRelativeTime(launch.net);
-                    const statusColor = launch.status?.id === 1 ? 'text-emerald-400' : 'text-zinc-500';
-
-                    const item = document.createElement('div');
-                    item.className = "group border-l-2 border-white/5 pl-3 py-2.5 hover:border-cyan-500 hover:bg-white/10 rounded-r-lg transition-all cursor-pointer";
-                    item.onclick = () => {
-                        showLaunchDetail(launch, true);
-                        if(window.innerWidth < 768) document.getElementById('manifest-panel').classList.add('hidden');
-                    };
-                    item.innerHTML = `
-                        <div class="flex justify-between items-start gap-2">
-                            <span class="font-bold text-zinc-100 truncate w-44 leading-tight group-hover:text-white transition-colors flex items-center gap-1.5">
-                                <img src="${flagUrl}" class="w-3.5 h-3.5 rounded-full object-cover">
-                                ${launch.name}
-                            </span>
-                            <span class="text-cyan-400 font-mono text-[9px] whitespace-nowrap bg-cyan-950/30 px-1 rounded">${relativeTime}</span>
-                        </div>
-                        <div class="flex justify-between items-center mt-1 ml-5">
-                            <p class="text-zinc-500 text-[10px] truncate w-32 uppercase tracking-tighter font-semibold">${provider}</p>
-                            <span class="text-[8px] uppercase tracking-widest font-bold ${statusColor}">${launch.status?.abbrev}</span>
-                        </div>
-                    `;
-                    listContainer.appendChild(item);
-
-                    if (launch.pad && launch.pad.latitude !== null) {
-                        addLaunchMarker(launch.pad.latitude, launch.pad.longitude, launch, flagUrl);
-                    }
-                });
+            if (launchesArray.length === 0) {
+                listContainer.innerHTML = `<div class="py-4 text-center text-zinc-500 text-xs">Pencarian tidak ditemukan.</div>`;
+                return;
             }
+
+            launchesArray.forEach(launch => {
+                const countryCode = getCountryCode(launch.pad?.location?.name);
+                const flagUrl = getFlagUrl(countryCode);
+                const provider = launch.launch_service_provider?.name || 'Unknown';
+                const relativeTime = getRelativeTime(launch.net);
+                const statusColor = getStatusColorClass(launch.status?.id);
+
+                const item = document.createElement('div');
+                item.className = "group border-l-2 border-white/5 pl-3 py-2.5 hover:border-cyan-500 hover:bg-white/10 rounded-r-lg transition-all cursor-pointer";
+                item.onclick = () => {
+                    showLaunchDetail(launch, true);
+                    if(window.innerWidth < 768) document.getElementById('manifest-panel').classList.add('hidden');
+                };
+                item.innerHTML = `
+                    <div class="flex justify-between items-start gap-2">
+                        <span class="font-bold text-zinc-100 truncate w-44 leading-tight group-hover:text-white transition-colors flex items-center gap-1.5">
+                            <img src="${flagUrl}" class="w-3.5 h-3.5 rounded-full object-cover">
+                            ${launch.name}
+                        </span>
+                        <span class="text-cyan-400 font-mono text-[9px] whitespace-nowrap bg-cyan-950/30 px-1 rounded">${relativeTime}</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-1 ml-5">
+                        <p class="text-zinc-500 text-[10px] truncate w-32 uppercase tracking-tighter font-semibold">${provider}</p>
+                        <span class="text-[8px] uppercase tracking-widest font-bold ${statusColor}">${launch.status?.abbrev}</span>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+
+                if (launch.pad && launch.pad.latitude !== null) {
+                    addLaunchMarker(launch.pad.latitude, launch.pad.longitude, launch, flagUrl);
+                }
+            });
         }
 
         function addLaunchMarker(lat, lon, launchData, flagUrl) {
             const position = latLongToVector3(lat, lon, 1);
+            const colorHex = getStatusColorHex(launchData.status?.id);
             
             const markerGeo = new THREE.SphereGeometry(0.022, 16, 16);
-            const markerMat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.95 });
+            const markerMat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.95 });
             const marker = new THREE.Mesh(markerGeo, markerMat);
             marker.position.copy(position);
             
             const haloGeo = new THREE.SphereGeometry(0.045, 16, 16);
-            const haloMat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.3 });
-            const halo = new THREE.Mesh(haloGeo, haloMat);
+            const haloMat = new MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.3 });
+            // Koreksi pemanggilan THREE namespace untuk haloMat
+            const fixedHaloMat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.3 });
+            const halo = new THREE.Mesh(haloGeo, fixedHaloMat);
             halo.position.copy(position);
             
-            // Menggunakan Gambar Asli (Flag URL) agar pasti muncul di Desktop
             const labelEl = document.createElement('div');
             labelEl.className = 'marker-label';
             labelEl.style.opacity = '0'; 
-            labelEl.innerHTML = `<img src="${flagUrl}" class="flag-icon">`;
+            labelEl.innerHTML = `<img src="${flagUrl}" class="flag-icon" style="border-color: #${colorHex.toString(16)}">`;
             document.getElementById('labels-container').appendChild(labelEl);
             
             marker.userData = { 
@@ -476,6 +785,10 @@
         function showLaunchDetail(launch, lock = false) {
             if (isLocked && !lock) return; 
 
+            if (lock && launch.pad && launch.pad.latitude !== null && launch.pad.longitude !== null) {
+                flyToLatLon(launch.pad.latitude, launch.pad.longitude);
+            }
+
             currentSelectedLaunch = launch;
             const countryCode = getCountryCode(launch.pad?.location?.name);
             const flagUrl = getFlagUrl(countryCode);
@@ -491,6 +804,34 @@
             document.getElementById('modal-time').innerText = launch.net ? new Date(launch.net).toISOString().replace('T', ' ').substring(0, 19) : 'TBD';
             document.getElementById('modal-coord').innerText = `${launch.pad?.latitude?.toFixed(4)}, ${launch.pad?.longitude?.toFixed(4)}`;
             
+            const imageUrl = (launch.mission_patches && launch.mission_patches.length > 0) ? launch.mission_patches[0].image_url : launch.image;
+            const imgContainer = document.getElementById('modal-image-container');
+            const imgEl = document.getElementById('modal-image');
+            if (imageUrl) {
+                imgEl.src = imageUrl;
+                imgContainer.classList.remove('hidden');
+            } else {
+                imgContainer.classList.add('hidden');
+            }
+
+            const liveBtn = document.getElementById('live-btn');
+            if (launch.vidURLs && launch.vidURLs.length > 0) {
+                liveBtn.href = launch.vidURLs[0].url;
+                liveBtn.classList.remove('hidden');
+            } else if (launch.vid_urls && launch.vid_urls.length > 0) {
+                liveBtn.href = launch.vid_urls[0].url;
+                liveBtn.classList.remove('hidden');
+            } else {
+                liveBtn.classList.add('hidden');
+            }
+
+            if (launch.net) {
+                document.getElementById('cal-btn').href = getCalendarUrl(launch);
+                document.getElementById('cal-btn').style.display = 'flex';
+            } else {
+                document.getElementById('cal-btn').style.display = 'none';
+            }
+
             updateModalCountdown();
 
             const modal = document.getElementById('launch-modal');
@@ -501,7 +842,7 @@
                 document.getElementById('modal-backdrop').classList.remove('hidden');
                 document.getElementById('close-btn').innerText = "Tutup Monitor";
             } else {
-                document.getElementById('close-btn').innerText = "Klik Dot Untuk Mengunci Data";
+                document.getElementById('close-btn').innerText = "Klik Dot Untuk Detail";
             }
         }
 
@@ -532,6 +873,7 @@
             const now = new Date();
             document.getElementById('local-time').textContent = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
             document.getElementById('utc-time').textContent = `UTC ${now.getUTCHours().toString().padStart(2, '0')}:${now.getUTCMinutes().toString().padStart(2, '0')}:${now.getUTCSeconds().toString().padStart(2, '0')}`;
+            updateSunPosition(); 
             if (currentSelectedLaunch) updateModalCountdown();
         }
 
@@ -547,10 +889,24 @@
             renderer.toneMappingExposure = settings.exposure;
             document.body.appendChild(renderer.domElement);
 
-            scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-            const sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
-            sunLight.position.set(5, 3, 5);
-            scene.add(sunLight);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+            
+            sunLight = new THREE.DirectionalLight(0xffffff, 1.8);
+
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsMaterial = new THREE.PointsMaterial({color: 0xFFFFFF, size: 0.015, transparent: true, opacity: 0.8});
+            const starsVertices = [];
+            for(let i = 0; i < 2000; i++) {
+                const x = (Math.random() - 0.5) * 20;
+                const y = (Math.random() - 0.5) * 20;
+                const z = (Math.random() - 0.5) * 20;
+                if(Math.sqrt(x*x + y*y + z*z) > 2.5) { 
+                    starsVertices.push(x, y, z);
+                }
+            }
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+            const starField = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(starField);
 
             mainGroup = new THREE.Group();
             scene.add(mainGroup);
@@ -578,16 +934,25 @@
 
             markerGroup = new THREE.Group();
             mainGroup.add(markerGroup);
+            
+            markerGroup.add(sunLight);
+            markerGroup.add(sunLight.target);
 
             setupControls();
             setupMobileInteractions();
             setInterval(updateClock, 1000);
+            updateClock(); 
+            
+            fetchAstronauts(); 
+            
+            document.getElementById('search-launch').addEventListener('input', filterLaunches);
             
             window.addEventListener('resize', onWindowResize);
             
             const handleStart = (x, y) => {
                 if (isLocked) return;
                 isDragging = true;
+                targetGlobeRotation = null; 
                 previousMousePosition = { x, y };
             };
             const handleMove = (x, y) => {
@@ -664,10 +1029,16 @@
                 clouds.material.opacity = val;
                 document.getElementById('opacity-val').textContent = val.toFixed(1);
             });
-            document.getElementById('rotation-toggle').addEventListener('change', (e) => settings.autoRotation = e.target.checked);
+            document.getElementById('rotation-toggle').addEventListener('change', (e) => {
+                settings.autoRotation = e.target.checked;
+                if (e.target.checked) targetGlobeRotation = null; 
+            });
             document.getElementById('rotation-speed').addEventListener('input', (e) => settings.rotationSpeed = e.target.value / 10000);
             document.getElementById('exposure-control').addEventListener('input', (e) => renderer.toneMappingExposure = e.target.value / 10);
-            document.getElementById('reset-view').addEventListener('click', () => resetToIndonesia());
+            
+            document.getElementById('reset-view').addEventListener('click', () => {
+                flyToLatLon(-0.7893, 113.9213);
+            });
         }
 
         function setupMobileInteractions() {
@@ -707,11 +1078,24 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            if (!isDragging && settings.autoRotation) {
+            
+            if (targetGlobeRotation && !isDragging) {
+                mainGroup.rotation.x += (targetGlobeRotation.x - mainGroup.rotation.x) * 0.05;
+                
+                const diffY = targetGlobeRotation.y - earth.rotation.y;
+                earth.rotation.y += diffY * 0.05;
+                clouds.rotation.y += diffY * 0.05;
+                markerGroup.rotation.y += diffY * 0.05;
+
+                if (Math.abs(targetGlobeRotation.x - mainGroup.rotation.x) < 0.001 && Math.abs(diffY) < 0.001) {
+                    targetGlobeRotation = null;
+                }
+            } else if (!isDragging && settings.autoRotation) {
                 earth.rotation.y += settings.rotationSpeed;
                 clouds.rotation.y += settings.rotationSpeed * 1.05;
                 markerGroup.rotation.y += settings.rotationSpeed;
             }
+
             launchMarkers.forEach(m => {
                 m.userData.pulse += 0.05;
                 const scale = 1 + Math.sin(m.userData.pulse) * 0.4;
