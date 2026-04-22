@@ -84,7 +84,18 @@
             height: 34px;
             border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.9);
-            box-shadow: 0 0 15px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.7);
+            box-shadow: 0 0 15px rgba(0,0,0,0.8), 0 0 12px rgba(239, 68, 68, 0.7);
+            object-fit: cover;
+            background: #000;
+        }
+
+        /* Ikon Khusus Tiangong Tracker */
+        .tiangong-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.9);
+            box-shadow: 0 0 15px rgba(0,0,0,0.8), 0 0 12px rgba(245, 158, 11, 0.7);
             object-fit: cover;
             background: #000;
         }
@@ -107,6 +118,9 @@
                 max-height: 50vh !important;
                 z-index: 40;
             }
+            .launch-panel.hidden {
+                display: none !important;
+            }
             .controls-panel {
                 position: fixed !important;
                 bottom: 5rem !important;
@@ -117,7 +131,7 @@
                 max-height: 60vh !important;
                 z-index: 40;
             }
-            .flag-icon, .iss-icon {
+            .flag-icon, .iss-icon, .tiangong-icon {
                 width: 24px;
                 height: 24px;
             }
@@ -154,6 +168,9 @@
         <div id="iss-label" class="marker-label" style="opacity: 0;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/ISS_emblem.png" class="iss-icon">
         </div>
+        <div id="tiangong-label" class="marker-label" style="opacity: 0;">
+            <img src="https://flagcdn.com/w80/cn.png" class="tiangong-icon">
+        </div>
     </div>
 
     <!-- Loading Screen -->
@@ -184,9 +201,15 @@
             </a>
 
             <!-- Tombol Fokus ISS -->
-            <button id="follow-iss-btn" onclick="followISS()" style="display: none;" class="w-full py-4 mb-5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-extrabold tracking-widest uppercase rounded-xl transition-all text-center flex items-center justify-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <button id="follow-iss-btn" onclick="followISS()" style="display: none;" class="w-full py-4 mb-5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-[11px] font-extrabold tracking-widest uppercase rounded-xl transition-all text-center flex items-center justify-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
                 Fokus & Ikuti ISS
+            </button>
+
+            <!-- Tombol Fokus Tiangong -->
+            <button id="follow-tiangong-btn" onclick="followTiangong()" style="display: none;" class="w-full py-4 mb-5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[11px] font-extrabold tracking-widest uppercase rounded-xl transition-all text-center flex items-center justify-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                Fokus & Ikuti Tiangong
             </button>
 
             <div id="modal-countdown-container" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-5 flex flex-col items-center">
@@ -268,7 +291,7 @@
         </div>
 
         <!-- Panel Manifest -->
-        <div id="manifest-panel" class="glass w-72 md:w-80 rounded-2xl p-4 pointer-events-auto shadow-2xl launch-panel hidden md:block flex flex-col max-h-[70vh]">
+        <div id="manifest-panel" class="glass w-72 md:w-80 rounded-2xl p-4 pointer-events-auto shadow-2xl launch-panel hidden md:flex flex flex-col max-h-[70vh]">
             <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2 flex-shrink-0">
                 <div class="flex flex-col">
                     <span class="text-[9px] md:text-[10px] font-bold tracking-widest text-white uppercase">Manifest Peluncuran</span>
@@ -279,7 +302,7 @@
             
             <input type="text" id="search-launch" placeholder="Cari misi, agensi, atau lokasi..." class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white placeholder-zinc-500 mb-3 focus:outline-none focus:border-cyan-500 transition-colors flex-shrink-0">
 
-            <div id="launch-list" class="space-y-2 overflow-y-auto custom-scroll pr-2 text-[11px] flex-grow min-h-0 max-h-[55vh] md:max-h-[60vh]">
+            <div id="launch-list" class="space-y-2 overflow-y-auto custom-scroll pr-2 text-[11px] flex-grow min-h-0">
                 <div class="py-4 text-center">
                     <div class="inline-block w-4 h-4 border-2 border-zinc-800 border-t-cyan-500 rounded-full animate-spin"></div>
                 </div>
@@ -293,7 +316,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
         <button id="mobile-controls-toggle" class="w-12 h-12 glass rounded-full flex items-center justify-center pointer-events-auto border-white/20 text-white shadow-lg active:scale-90 transition-transform">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33 1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33 1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
     </div>
 
@@ -313,6 +336,20 @@
                     </div>
                     <input type="range" id="cloud-opacity" min="0" max="100" value="80" class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer">
                 </div>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-[10px] font-bold tracking-widest text-zinc-500 uppercase mb-4">Stasiun Angkasa</label>
+            <div class="space-y-4">
+                <label class="flex items-center justify-between cursor-pointer group">
+                    <span class="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors">Tampilkan ISS</span>
+                    <input type="checkbox" id="iss-toggle" checked class="w-5 h-5 md:w-4 md:h-4 rounded border-zinc-700 bg-zinc-900 text-cyan-500">
+                </label>
+                <label class="flex items-center justify-between cursor-pointer group">
+                    <span class="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors">Tampilkan Tiangong</span>
+                    <input type="checkbox" id="tiangong-toggle" checked class="w-5 h-5 md:w-4 md:h-4 rounded border-zinc-700 bg-zinc-900 text-cyan-500">
+                </label>
             </div>
         </div>
 
@@ -347,11 +384,19 @@
         let targetGlobeRotation = null; // Target rotasi untuk animasi Fly-to
         let previousMousePosition = { x: 0, y: 0 };
         let sunLight; // Simpan sunlight secara global
+        
         let issMesh, issHalo; // Variabel ISS Tracker
-        let lastIssPos = null; // Menyimpan posisi terakhir untuk prediksi
-        let lastIssTime = null; // Menyimpan waktu terakhir untuk prediksi
-        let issTrailLine; // Mesh untuk garis orbit
-        let isFollowingISS = false; // Status mode follow ISS
+        let lastIssPos = null;
+        let lastIssTime = null;
+        let issTrailLine;
+        let isFollowingISS = false;
+
+        let tiangongMesh, tiangongHalo; // Variabel Tiangong Tracker
+        let lastTiangongPos = null;
+        let lastTiangongTime = null;
+        let tiangongTrailLine;
+        let isFollowingTiangong = false;
+
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         
@@ -360,7 +405,9 @@
             cloudOpacity: 0.8,
             autoRotation: true,
             rotationSpeed: 0.0012,
-            exposure: 1.1
+            exposure: 1.1,
+            showISS: true,
+            showTiangong: true
         };
 
         const FALLBACK_ASTRONAUTS = {
@@ -492,34 +539,29 @@
             );
         }
 
-        // Helper: Prediksi Jejak Orbit Masa Depan ISS (Satu Lingkaran Penuh)
-        function predictISSOrbit(lat1_deg, lon1_deg, lat2_deg, lon2_deg) {
+        // Helper: Prediksi Jejak Orbit Masa Depan (Satu Lingkaran Penuh)
+        function predictOrbit(lat1_deg, lon1_deg, lat2_deg, lon2_deg, trailMesh, periodSecs = 5574) {
             const R_EARTH = 1.05;
-            const PERIOD = 5574; // 92.9 menit (dalam detik) untuk 1 orbit
 
             const phi1 = lat1_deg * Math.PI / 180;
             const phi2 = lat2_deg * Math.PI / 180;
             const lam1 = lon1_deg * Math.PI / 180;
             const lam2 = lon2_deg * Math.PI / 180;
 
-            // Kalkulasi arah (heading) inersial menggunakan matematika Great Circle
             const dLam = lam2 - lam1;
             const y = Math.sin(dLam) * Math.cos(phi2);
             const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLam);
             const heading = Math.atan2(y, x);
 
             const predictedPoints = [];
-            // Pergeseran akibat rotasi bumi per putaran orbit
-            const earthRotPerRad = ((PERIOD / 86400) * 360 * Math.PI / 180) / (2 * Math.PI);
+            const earthRotPerRad = ((periodSecs / 86400) * 360 * Math.PI / 180) / (2 * Math.PI);
 
-            // Buat 200 titik mengitari 360 derajat (1 orbit penuh keliling bumi)
             for (let i = 0; i <= 200; i++) {
                 const d = (i / 200) * Math.PI * 2;
 
                 const futurePhi = Math.asin(Math.sin(phi2) * Math.cos(d) + Math.cos(phi2) * Math.sin(d) * Math.cos(heading));
                 const futureLam = lam2 + Math.atan2(Math.sin(heading) * Math.sin(d) * Math.cos(phi2), Math.cos(d) - Math.sin(phi2) * Math.sin(futurePhi));
 
-                // Penyesuaian rotasi bumi relatif terhadap ground track
                 const lonOffset = futureLam - (d * earthRotPerRad);
 
                 const finalLat = futurePhi * 180 / Math.PI;
@@ -528,7 +570,7 @@
                 predictedPoints.push(latLongToVector3(finalLat, finalLon, R_EARTH));
             }
 
-            issTrailLine.geometry.setFromPoints(predictedPoints);
+            trailMesh.geometry.setFromPoints(predictedPoints);
         }
 
         function flyToLatLon(lat, lon) {
@@ -600,26 +642,23 @@
         async function fetchISSPosition() {
             if(!issMesh) return;
             try {
-                // Sesuai permintaan untuk hit API open-notify (menggunakan http)
                 const res = await fetch('http://api.open-notify.org/iss-now.json');
                 const data = await res.json();
                 
                 if(data.message === 'success') {
                     const lat = parseFloat(data.iss_position.latitude);
                     const lon = parseFloat(data.iss_position.longitude);
-                    const pos = latLongToVector3(lat, lon, 1.05); // Set ketinggian orbit LEO di 1.05
+                    const pos = latLongToVector3(lat, lon, 1.05);
                     
                     issMesh.position.copy(pos);
                     issHalo.position.copy(pos);
                     issMesh.userData.worldPosition.copy(pos);
 
-                    // Buat Prediksi Orbit secara Instan
                     const nowTime = Date.now();
                     if (lastIssPos && lastIssTime) {
                         const dt = (nowTime - lastIssTime) / 1000;
-                        // Pengaman Math: Render prediksi HANYA jika ISS benar-benar bergerak agar tidak error
                         if (dt > 0 && (Math.abs(lat - lastIssPos.lat) > 0.0001 || Math.abs(lon - lastIssPos.lon) > 0.0001)) {
-                            predictISSOrbit(lastIssPos.lat, lastIssPos.lon, lat, lon);
+                            predictOrbit(lastIssPos.lat, lastIssPos.lon, lat, lon, issTrailLine, 5574);
                             lastIssPos = { lat, lon };
                             lastIssTime = nowTime;
                         }
@@ -628,7 +667,6 @@
                         lastIssTime = nowTime;
                     }
 
-                    // Update data simulasi modal secara realtime
                     issMesh.userData.launch = {
                         name: "Stasiun Luar Angkasa Internasional",
                         launch_service_provider: { name: "Multi-National" },
@@ -638,14 +676,12 @@
                         isISS: true
                     };
                     
-                    // Jika modal ISS sedang terbuka saat data update, perbarui angkanya juga
                     if(currentSelectedLaunch?.isISS) {
                         document.getElementById('modal-coord').innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
                     }
                 }
             } catch(e) {
-                console.error("Gagal melacak ISS, mencoba fallback HTTPS:", e);
-                // Fallback aman agar tetap jalan jika HTTP diblokir browser (Mixed Content blocker)
+                // Fallback aman HTTPS
                 try {
                     const fallbackRes = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                     const fallbackData = await fallbackRes.json();
@@ -658,13 +694,11 @@
                         issHalo.position.copy(pos);
                         issMesh.userData.worldPosition.copy(pos);
 
-                        // Buat Prediksi Orbit secara Instan (Fallback mode)
                         const nowTime = Date.now();
                         if (lastIssPos && lastIssTime) {
                             const dt = (nowTime - lastIssTime) / 1000;
-                            // Pengaman Math: Render prediksi HANYA jika ISS benar-benar bergerak
                             if (dt > 0 && (Math.abs(lat - lastIssPos.lat) > 0.0001 || Math.abs(lon - lastIssPos.lon) > 0.0001)) {
-                                predictISSOrbit(lastIssPos.lat, lastIssPos.lon, lat, lon);
+                                predictOrbit(lastIssPos.lat, lastIssPos.lon, lat, lon, issTrailLine, 5574);
                                 lastIssPos = { lat, lon };
                                 lastIssTime = nowTime;
                             }
@@ -686,9 +720,55 @@
                             document.getElementById('modal-coord').innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
                         }
                     }
-                } catch(err) {
-                    // Fail silently
+                } catch(err) {}
+            }
+        }
+
+        // Fitur Live Tracking Tiangong (ID API n2yo telah disesuaikan dengan NORAD 48274 = Tiangong)
+        async function fetchTiangongPosition() {
+            if(!tiangongMesh) return;
+            try {
+                // Catatan: Memakai ID 48274 dari N2YO untuk Tiangong dengan Key yang diberikan
+                const res = await fetch('https://api.n2yo.com/rest/v1/satellite/positions/48274/-6.2000/106.8167/0/1?apiKey=UPA7CR-V9N3ZW-PWQSHH-5Q2X');
+                const data = await res.json();
+
+                if(data && data.positions && data.positions.length > 0) {
+                    const lat = parseFloat(data.positions[0].satlatitude);
+                    const lon = parseFloat(data.positions[0].satlongitude);
+                    const pos = latLongToVector3(lat, lon, 1.05);
+
+                    tiangongMesh.position.copy(pos);
+                    tiangongHalo.position.copy(pos);
+                    tiangongMesh.userData.worldPosition.copy(pos);
+
+                    const nowTime = Date.now();
+                    if (lastTiangongPos && lastTiangongTime) {
+                        const dt = (nowTime - lastTiangongTime) / 1000;
+                        if (dt > 0 && (Math.abs(lat - lastTiangongPos.lat) > 0.0001 || Math.abs(lon - lastTiangongPos.lon) > 0.0001)) {
+                            predictOrbit(lastTiangongPos.lat, lastTiangongPos.lon, lat, lon, tiangongTrailLine, 5532);
+                            lastTiangongPos = { lat, lon };
+                            lastTiangongTime = nowTime;
+                        }
+                    } else {
+                        lastTiangongPos = { lat, lon };
+                        lastTiangongTime = nowTime;
+                    }
+
+                    tiangongMesh.userData.launch = {
+                        name: "Stasiun Luar Angkasa Tiangong",
+                        launch_service_provider: { name: "CMSA" },
+                        pad: { name: "Low Earth Orbit (LEO)", latitude: lat, longitude: lon },
+                        status: { name: "In Orbit" },
+                        net: null,
+                        isTiangong: true
+                    };
+
+                    if(currentSelectedLaunch?.isTiangong) {
+                        document.getElementById('modal-coord').innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                    }
                 }
+            } catch(e) {
+                console.error("Gagal melacak Tiangong:", e);
             }
         }
 
@@ -833,13 +913,19 @@
                 markerGroup.add(issHalo);
             }
             if (issTrailLine) {
-                markerGroup.add(issTrailLine); // FIXED: Mencegah garis terhapus saat render data!
+                markerGroup.add(issTrailLine); 
+            }
+            if (tiangongMesh && tiangongHalo) {
+                markerGroup.add(tiangongMesh);
+                markerGroup.add(tiangongHalo);
+            }
+            if (tiangongTrailLine) {
+                markerGroup.add(tiangongTrailLine);
             }
             
-            // Clean up launch labels, but keep ISS label
             const labelsContainer = document.getElementById('labels-container');
             Array.from(labelsContainer.children).forEach(child => {
-                if (child.id !== 'iss-label') {
+                if (child.id !== 'iss-label' && child.id !== 'tiangong-label') {
                     labelsContainer.removeChild(child);
                 }
             });
@@ -946,8 +1032,16 @@
 
             launchMarkers.forEach(updateLabelPos);
             
-            if(issMesh && issMesh.userData.worldPosition.lengthSq() > 0) {
+            if(settings.showISS && issMesh && issMesh.userData.worldPosition.lengthSq() > 0) {
                 updateLabelPos(issMesh);
+            } else if (issMesh && issMesh.userData.label) {
+                issMesh.userData.label.style.opacity = '0';
+            }
+
+            if(settings.showTiangong && tiangongMesh && tiangongMesh.userData.worldPosition.lengthSq() > 0) {
+                updateLabelPos(tiangongMesh);
+            } else if (tiangongMesh && tiangongMesh.userData.label) {
+                tiangongMesh.userData.label.style.opacity = '0';
             }
         }
 
@@ -974,7 +1068,41 @@
                 document.getElementById('modal-coord').innerText = `${launch.pad.latitude.toFixed(4)}, ${launch.pad.longitude.toFixed(4)}`;
                 
                 document.getElementById('live-btn').style.display = 'none';
+                document.getElementById('follow-tiangong-btn').style.display = 'none';
                 document.getElementById('follow-iss-btn').style.display = 'flex';
+                document.getElementById('cal-btn').style.display = 'none';
+                
+                updateModalCountdown();
+
+                const modal = document.getElementById('launch-modal');
+                modal.classList.add('active');
+
+                if (lock) {
+                    isLocked = true;
+                    document.getElementById('modal-backdrop').classList.remove('hidden');
+                    document.getElementById('close-btn').innerText = "Tutup Monitor";
+                } else {
+                    document.getElementById('close-btn').innerText = "Klik Dot Untuk Detail";
+                }
+                return;
+            }
+
+            // Handle UI specifically for Tiangong
+            if (launch.isTiangong) {
+                const flagImg = document.getElementById('modal-flag');
+                flagImg.src = getFlagUrl('cn'); // Bendera China
+                flagImg.classList.remove('hidden');
+
+                document.getElementById('modal-title').innerText = launch.name;
+                document.getElementById('modal-provider').innerText = launch.launch_service_provider.name;
+                document.getElementById('modal-pad').innerText = launch.pad.name;
+                document.getElementById('modal-status').innerText = launch.status.name;
+                document.getElementById('modal-time').innerText = "Live Tracking";
+                document.getElementById('modal-coord').innerText = `${launch.pad.latitude.toFixed(4)}, ${launch.pad.longitude.toFixed(4)}`;
+                
+                document.getElementById('live-btn').style.display = 'none';
+                document.getElementById('follow-iss-btn').style.display = 'none';
+                document.getElementById('follow-tiangong-btn').style.display = 'flex';
                 document.getElementById('cal-btn').style.display = 'none';
                 
                 updateModalCountdown();
@@ -1019,6 +1147,7 @@
             }
 
             document.getElementById('follow-iss-btn').style.display = 'none';
+            document.getElementById('follow-tiangong-btn').style.display = 'none';
 
             if (launch.net) {
                 document.getElementById('cal-btn').href = getCalendarUrl(launch);
@@ -1042,11 +1171,13 @@
         }
 
         function updateModalCountdown() {
-            if (currentSelectedLaunch?.isISS) {
+            if (currentSelectedLaunch?.isISS || currentSelectedLaunch?.isTiangong) {
                 const container = document.getElementById('modal-countdown-container');
                 const text = document.getElementById('modal-countdown');
-                container.className = "bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 mb-5 flex flex-col items-center";
-                text.className = "text-xl font-mono font-extrabold text-emerald-400";
+                const isTg = currentSelectedLaunch.isTiangong;
+
+                container.className = `bg-${isTg ? 'amber' : 'emerald'}-500/10 border border-${isTg ? 'amber' : 'emerald'}-500/20 rounded-xl p-3 mb-5 flex flex-col items-center`;
+                text.className = `text-xl font-mono font-extrabold text-${isTg ? 'amber' : 'emerald'}-400`;
                 text.innerText = "IN ORBIT";
                 return;
             }
@@ -1075,6 +1206,18 @@
 
         function followISS() {
             isFollowingISS = true;
+            isFollowingTiangong = false;
+            isLocked = false;
+            targetGlobeRotation = null;
+            settings.autoRotation = false;
+            document.getElementById('rotation-toggle').checked = false;
+            document.getElementById('launch-modal').classList.remove('active');
+            document.getElementById('modal-backdrop').classList.add('hidden');
+        }
+
+        function followTiangong() {
+            isFollowingTiangong = true;
+            isFollowingISS = false;
             isLocked = false;
             targetGlobeRotation = null;
             settings.autoRotation = false;
@@ -1088,7 +1231,7 @@
             document.getElementById('local-time').textContent = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
             document.getElementById('utc-time').textContent = `UTC ${now.getUTCHours().toString().padStart(2, '0')}:${now.getUTCMinutes().toString().padStart(2, '0')}:${now.getUTCSeconds().toString().padStart(2, '0')}`;
             updateSunPosition(); 
-            if (currentSelectedLaunch && !currentSelectedLaunch.isISS) updateModalCountdown();
+            if (currentSelectedLaunch && !currentSelectedLaunch.isISS && !currentSelectedLaunch.isTiangong) updateModalCountdown();
         }
 
         function init() {
@@ -1152,13 +1295,13 @@
             markerGroup.add(sunLight);
             markerGroup.add(sunLight.target);
 
-            // Inisialisasi ISS Marker (Warna Emerald)
+            // Inisialisasi ISS Marker (Warna Merah)
             const issGeo = new THREE.SphereGeometry(0.025, 16, 16);
-            const issMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.95 });
+            const issMat = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.95 });
             issMesh = new THREE.Mesh(issGeo, issMat);
             
             const issHaloGeo = new THREE.SphereGeometry(0.05, 16, 16);
-            const issHaloMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.3 });
+            const issHaloMat = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.3 });
             issHalo = new THREE.Mesh(issHaloGeo, issHaloMat);
 
             issMesh.userData = {
@@ -1170,21 +1313,39 @@
                 pulse: 0
             };
 
-            // Inisialisasi Garis Orbit Prediksi (Lingkaran Penuh memutari Bumi)
-            const trailMat = new THREE.LineBasicMaterial({ 
-                color: 0xff2222, // Warna diubah menjadi Merah menyala
-                transparent: true, 
-                opacity: 0.8 // Opacity dinaikkan agar lebih jelas saat di-zoom
-            });
-            const trailGeo = new THREE.BufferGeometry();
-            issTrailLine = new THREE.Line(trailGeo, trailMat);
-            
-            // FIXED: Mematikan frustum culling agar garis tidak hilang mendadak saat kamera di-zoom terlalu dekat
+            const issTrailMat = new THREE.LineBasicMaterial({ color: 0xff2222, transparent: true, opacity: 0.8 });
+            issTrailLine = new THREE.Line(new THREE.BufferGeometry(), issTrailMat);
             issTrailLine.frustumCulled = false; 
             
             markerGroup.add(issTrailLine);
             markerGroup.add(issMesh);
             markerGroup.add(issHalo);
+
+            // Inisialisasi Tiangong Marker (Warna Amber/Gold)
+            const tgGeo = new THREE.SphereGeometry(0.025, 16, 16);
+            const tgMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.95 });
+            tiangongMesh = new THREE.Mesh(tgGeo, tgMat);
+
+            const tgHaloGeo = new THREE.SphereGeometry(0.05, 16, 16);
+            const tgHaloMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.3 });
+            tiangongHalo = new THREE.Mesh(tgHaloGeo, tgHaloMat);
+
+            tiangongMesh.userData = {
+                isMarker: true,
+                isTiangong: true,
+                halo: tiangongHalo,
+                label: document.getElementById('tiangong-label'),
+                worldPosition: new THREE.Vector3(),
+                pulse: 0
+            };
+
+            const tgTrailMat = new THREE.LineBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.8 });
+            tiangongTrailLine = new THREE.Line(new THREE.BufferGeometry(), tgTrailMat);
+            tiangongTrailLine.frustumCulled = false;
+
+            markerGroup.add(tiangongTrailLine);
+            markerGroup.add(tiangongMesh);
+            markerGroup.add(tiangongHalo);
 
             setupControls();
             setupMobileInteractions();
@@ -1192,8 +1353,12 @@
             updateClock(); 
             
             fetchAstronauts(); 
+            
             fetchISSPosition();
-            setInterval(fetchISSPosition, 1000); // ISS tracker berjalan tiap 1 detik (Diperbarui)
+            setInterval(fetchISSPosition, 1000); // ISS tracker berjalan tiap 1 detik
+
+            fetchTiangongPosition();
+            setInterval(fetchTiangongPosition, 5000); // Tiangong berjalan tiap 5 detik
             
             document.getElementById('search-launch').addEventListener('input', filterLaunches);
             
@@ -1202,7 +1367,8 @@
             const handleStart = (x, y) => {
                 if (isLocked) return;
                 isDragging = true;
-                isFollowingISS = false; // Matikan auto-follow jika user menggeser manual
+                isFollowingISS = false; 
+                isFollowingTiangong = false;
                 targetGlobeRotation = null; 
                 previousMousePosition = { x, y };
             };
@@ -1287,6 +1453,38 @@
             document.getElementById('rotation-speed').addEventListener('input', (e) => settings.rotationSpeed = e.target.value / 10000);
             document.getElementById('exposure-control').addEventListener('input', (e) => renderer.toneMappingExposure = e.target.value / 10);
             
+            document.getElementById('iss-toggle').addEventListener('change', (e) => {
+                settings.showISS = e.target.checked;
+                if(issMesh) issMesh.visible = settings.showISS;
+                if(issHalo) issHalo.visible = settings.showISS;
+                if(issTrailLine) issTrailLine.visible = settings.showISS;
+                
+                if(!settings.showISS) {
+                    if(issMesh && issMesh.userData.label) issMesh.userData.label.style.opacity = '0';
+                    if(isFollowingISS) {
+                        isFollowingISS = false;
+                        settings.autoRotation = true;
+                        document.getElementById('rotation-toggle').checked = true;
+                    }
+                }
+            });
+
+            document.getElementById('tiangong-toggle').addEventListener('change', (e) => {
+                settings.showTiangong = e.target.checked;
+                if(tiangongMesh) tiangongMesh.visible = settings.showTiangong;
+                if(tiangongHalo) tiangongHalo.visible = settings.showTiangong;
+                if(tiangongTrailLine) tiangongTrailLine.visible = settings.showTiangong;
+                
+                if(!settings.showTiangong) {
+                    if(tiangongMesh && tiangongMesh.userData.label) tiangongMesh.userData.label.style.opacity = '0';
+                    if(isFollowingTiangong) {
+                        isFollowingTiangong = false;
+                        settings.autoRotation = true;
+                        document.getElementById('rotation-toggle').checked = true;
+                    }
+                }
+            });
+
             document.getElementById('reset-view').addEventListener('click', () => {
                 flyToLatLon(-0.7893, 113.9213);
             });
@@ -1330,10 +1528,13 @@
         function animate() {
             requestAnimationFrame(animate);
             
-            // Animasi mengikuti ISS atau Fly-To biasa
-            if (isFollowingISS && issMesh && issMesh.userData.launch) {
-                const lat = issMesh.userData.launch.pad.latitude;
-                const lon = issMesh.userData.launch.pad.longitude;
+            let targetMeshToFollow = null;
+            if (isFollowingISS && issMesh && issMesh.userData.launch) targetMeshToFollow = issMesh;
+            else if (isFollowingTiangong && tiangongMesh && tiangongMesh.userData.launch) targetMeshToFollow = tiangongMesh;
+
+            if (targetMeshToFollow) {
+                const lat = targetMeshToFollow.userData.launch.pad.latitude;
+                const lon = targetMeshToFollow.userData.launch.pad.longitude;
                 const targetX = lat * (Math.PI / 180);
                 const targetYAbsolute = -(lon + 90) * (Math.PI / 180);
 
@@ -1379,6 +1580,13 @@
                 const scale = 1 + Math.sin(issMesh.userData.pulse) * 0.4;
                 issMesh.userData.halo.scale.set(scale, scale, scale);
                 issMesh.userData.halo.material.opacity = 0.4 - (Math.sin(issMesh.userData.pulse) * 0.2);
+            }
+
+            if (tiangongMesh) {
+                tiangongMesh.userData.pulse += 0.05;
+                const scale = 1 + Math.sin(tiangongMesh.userData.pulse) * 0.4;
+                tiangongMesh.userData.halo.scale.set(scale, scale, scale);
+                tiangongMesh.userData.halo.material.opacity = 0.4 - (Math.sin(tiangongMesh.userData.pulse) * 0.2);
             }
 
             updateLabels();
