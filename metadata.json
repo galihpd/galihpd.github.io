@@ -1,20 +1,4 @@
 {
-  "main1.jpg": {
-    "caption": "jokowi love wowok",
-    "software": "Blender 3D, Photoshop986b897087y"
-  },
-  "artwork2.png": {
-    "caption": "Karakter orisinal: 'Elara'. Konsep art untuk project game indie pribadi.",
-    "software": "Procreate (iPad Pro)"
-  },
-  "sketsa-awal.webp": {
-    "caption": "Sketsa kasar sebelum masuk ke tahap lineart dan pewarnaan dasar.",
-    "software": "Clip Studio Paint"
-  },
-  "main3.jpg": {
-    "caption": "halo bandung",
-    "software": ""
-  },
   "earthNormalMap_8k-tig.png": {
     "caption": "tes tanpa token\n",
     "software": ""
@@ -22,5 +6,29 @@
   "hero.jpg": {
     "caption": "heroherohero",
     "software": "hahaha"
+  },
+  "main1.jpg": {
+    "caption": "jokowi love wowok",
+    "software": "Blender 3D, Photoshop986b897087y"
+  },
+  "main2.jpg": {
+    "caption": "",
+    "software": ""
+  },
+  "main3.jpg": {
+    "caption": "halo bandung",
+    "software": ""
+  },
+  "main4.jpg": {
+    "caption": "",
+    "software": ""
+  },
+  "main5.jpg": {
+    "caption": "",
+    "software": ""
+  },
+  "main6.jpg": {
+    "caption": "",
+    "software": ""
   }
 }
