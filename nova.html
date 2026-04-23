@@ -18,10 +18,10 @@
             background-color: #000;
             font-family: 'Plus Jakarta Sans', sans-serif;
             user-select: none;
-            touch-action: manipulation;
         }
         canvas {
             display: block;
+            touch-action: none; /* Mencegah bentrok sentuhan pada globe dengan gestur browser */
         }
         .glass {
             background: rgba(0, 0, 0, 0.75);
@@ -55,7 +55,10 @@
         #launch-modal.active {
             transform: scale(1) translateY(0);
             opacity: 1;
-            pointer-events: auto;
+            /* Menghilangkan pointer-events auto pada parent agar tidak memblokir background */
+        }
+        #launch-modal.active .glass {
+            pointer-events: auto; /* PERBAIKAN: Hanya aktifkan klik pada card JIKA modal sedang muncul */
         }
 
         /* Label Ikon Bendera Terintegrasi */
@@ -182,6 +185,7 @@
     <!-- Modal Info Peluncuran -->
     <div id="launch-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-6">
         <div id="modal-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm hidden" onclick="closeModal()"></div>
+        <!-- PERBAIKAN: Menghapus class 'pointer-events-auto' statis dari elemen ini -->
         <div class="glass w-full max-w-sm rounded-3xl p-6 relative overflow-hidden shadow-2xl border border-cyan-500/30">
             <div class="flex justify-between items-start mb-4">
                 <div class="flex items-center gap-3">
@@ -380,6 +384,8 @@
         let allLaunchesData = []; // Cache lokal untuk fitur Search
         let currentSelectedLaunch = null;
         let isDragging = false;
+        let hasDragged = false; // Penanda untuk membedakan antara klik dan geser layar
+        let dragDistance = 0; // Sensor jarak tarikan layar
         let isLocked = false; 
         let targetGlobeRotation = null; // Target rotasi untuk animasi Fly-to
         let previousMousePosition = { x: 0, y: 0 };
@@ -1079,7 +1085,7 @@
 
                 if (lock) {
                     isLocked = true;
-                    document.getElementById('modal-backdrop').classList.remove('hidden');
+                    document.getElementById('modal-backdrop').classList.add('hidden');
                     document.getElementById('close-btn').innerText = "Tutup Monitor";
                 } else {
                     document.getElementById('close-btn').innerText = "Klik Dot Untuk Detail";
@@ -1112,7 +1118,7 @@
 
                 if (lock) {
                     isLocked = true;
-                    document.getElementById('modal-backdrop').classList.remove('hidden');
+                    document.getElementById('modal-backdrop').classList.add('hidden');
                     document.getElementById('close-btn').innerText = "Tutup Monitor";
                 } else {
                     document.getElementById('close-btn').innerText = "Klik Dot Untuk Detail";
@@ -1163,7 +1169,7 @@
 
             if (lock) {
                 isLocked = true;
-                document.getElementById('modal-backdrop').classList.remove('hidden');
+                document.getElementById('modal-backdrop').classList.add('hidden');
                 document.getElementById('close-btn').innerText = "Tutup Monitor";
             } else {
                 document.getElementById('close-btn').innerText = "Klik Dot Untuk Detail";
@@ -1272,9 +1278,18 @@
             textureLoader.setCrossOrigin('anonymous');
 
             const earthTex = textureLoader.load('https://raw.githubusercontent.com/turban/webgl-earth/master/images/2_no_clouds_4k.jpg', () => resetToIndonesia());
+            // Menambahkan Bump Map (Height Map) untuk efek relief 3D
+            const bumpTex = textureLoader.load('https://asterweb.jpl.nasa.gov/images/GDEM-10km-BW.png');
+            
             earth = new THREE.Mesh(
                 new THREE.SphereGeometry(1, 64, 64),
-                new THREE.MeshPhongMaterial({ map: earthTex, specular: new THREE.Color('#222'), shininess: 15 })
+                new THREE.MeshPhongMaterial({ 
+                    map: earthTex, 
+                    bumpMap: bumpTex,
+                    bumpScale: 0.001, // PERBAIKAN: Value skala diubah menjadi 1 sesuai permintaan
+                    specular: new THREE.Color('#222'), 
+                    shininess: 15 
+                })
             );
             mainGroup.add(earth);
 
@@ -1316,6 +1331,7 @@
             const issTrailMat = new THREE.LineBasicMaterial({ color: 0xff2222, transparent: true, opacity: 0.8 });
             issTrailLine = new THREE.Line(new THREE.BufferGeometry(), issTrailMat);
             issTrailLine.frustumCulled = false; 
+            issTrailLine.raycast = function() {}; // Mematikan raycast pada garis untuk mencegah lag
             
             markerGroup.add(issTrailLine);
             markerGroup.add(issMesh);
@@ -1342,6 +1358,7 @@
             const tgTrailMat = new THREE.LineBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.8 });
             tiangongTrailLine = new THREE.Line(new THREE.BufferGeometry(), tgTrailMat);
             tiangongTrailLine.frustumCulled = false;
+            tiangongTrailLine.raycast = function() {}; // Mematikan raycast pada garis untuk mencegah lag
 
             markerGroup.add(tiangongTrailLine);
             markerGroup.add(tiangongMesh);
@@ -1364,46 +1381,60 @@
             
             window.addEventListener('resize', onWindowResize);
             
-            const handleStart = (x, y) => {
-                if (isLocked) return;
+            // PERBAIKAN: Mengunci interaksi Mouse & Touch khusus pada Canvas saja
+            // Mencegah spot-spot mati akibat lapisan UI transparan yang menutupi layar HP.
+            const canvasEl = renderer.domElement;
+            let activePointerId = null;
+
+            canvasEl.addEventListener('pointerdown', (e) => {
+                if (activePointerId !== null) return; // Hanya tangkap satu jari pertama untuk mencegah glitch multi-touch
+                activePointerId = e.pointerId;
+                canvasEl.setPointerCapture(e.pointerId); // Kunci sentuhan ke globe meski jari terpeleset keluar
+                
                 isDragging = true;
+                hasDragged = false;
+                dragDistance = 0; 
                 isFollowingISS = false; 
                 isFollowingTiangong = false;
                 targetGlobeRotation = null; 
-                previousMousePosition = { x, y };
-            };
-            const handleMove = (x, y) => {
-                if (isDragging) {
-                    const delta = { x: x - previousMousePosition.x, y: y - previousMousePosition.y };
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            canvasEl.addEventListener('pointermove', (e) => {
+                if (isDragging && e.pointerId === activePointerId) {
+                    const delta = { x: e.clientX - previousMousePosition.x, y: e.clientY - previousMousePosition.y };
+                    
+                    dragDistance += Math.abs(delta.x) + Math.abs(delta.y);
+                    if (dragDistance > 3) hasDragged = true;
+
                     earth.rotation.y += delta.x * 0.005;
                     clouds.rotation.y += delta.x * 0.005;
                     markerGroup.rotation.y += delta.x * 0.005;
                     mainGroup.rotation.x += delta.y * 0.005;
                     mainGroup.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, mainGroup.rotation.x));
-                    previousMousePosition = { x, y };
-                } else {
-                    onInteractiveMove(x, y);
+                    previousMousePosition = { x: e.clientX, y: e.clientY };
+                } else if (!isDragging) {
+                    onInteractiveMove(e.clientX, e.clientY);
+                }
+            });
+
+            const handlePointerUp = (e) => {
+                if (e.pointerId !== activePointerId) return;
+                isDragging = false;
+                activePointerId = null;
+                if (canvasEl.hasPointerCapture(e.pointerId)) {
+                    canvasEl.releasePointerCapture(e.pointerId);
                 }
             };
 
-            document.addEventListener('mousedown', (e) => {
-                if (e.target.closest('.glass') || e.target.closest('button')) return;
-                handleStart(e.clientX, e.clientY);
-            });
-            document.addEventListener('touchstart', (e) => {
-                if (e.target.closest('.glass') || e.target.closest('button')) return;
-                handleStart(e.touches[0].clientX, e.touches[0].clientY);
-            }, { passive: true });
+            canvasEl.addEventListener('pointerup', handlePointerUp);
+            canvasEl.addEventListener('pointercancel', handlePointerUp);
 
-            document.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
-            document.addEventListener('touchmove', (e) => handleMove(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
-
-            document.addEventListener('mouseup', () => isDragging = false);
-            document.addEventListener('touchend', () => isDragging = false);
-
-            document.addEventListener('click', onCanvasClick);
+            canvasEl.addEventListener('click', onCanvasClick);
             
+            // Mencegah scroll mouse ikut me-zoom kamera jika kursor ada di atas UI
             document.addEventListener('wheel', (e) => {
+                if (e.target.closest('.glass') || e.target.closest('button')) return;
                 camera.position.z = Math.min(Math.max(camera.position.z + e.deltaY * 0.002, 1.25), 6);
             }, { passive: false });
 
@@ -1415,11 +1446,20 @@
             mouse.x = (x / window.innerWidth) * 2 - 1;
             mouse.y = -(y / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(markerGroup.children);
+            
+            // Tambahkan earth ke dalam array pengecekan raycaster
+            const intersects = raycaster.intersectObjects([earth, ...markerGroup.children]);
             if (intersects.length > 0) {
-                const object = intersects.find(i => i.object.userData.isMarker)?.object;
-                if (object) {
-                    showLaunchDetail(object.userData.launch, false);
+                const earthHit = intersects.find(i => i.object === earth);
+                const markerHit = intersects.find(i => i.object.userData && i.object.userData.isMarker);
+                
+                if (markerHit) {
+                    // Jika bumi terkena raycast lebih dulu daripada marker, berarti marker ada di balik bumi!
+                    if (earthHit && earthHit.distance < markerHit.distance) {
+                        document.body.style.cursor = 'default';
+                        return;
+                    }
+                    showLaunchDetail(markerHit.object.userData.launch, false);
                     document.body.style.cursor = 'pointer';
                     return;
                 }
@@ -1428,15 +1468,36 @@
         }
 
         function onCanvasClick(event) {
-            if (event.target.closest('.glass') || event.target.closest('button') || isDragging) return;
+            // Mencegah aksi klik dijalankan jika pengguna sebenarnya berniat menggeser (drag) globe
+            if (hasDragged) {
+                hasDragged = false;
+                return;
+            }
+            
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(markerGroup.children);
+            
+            // Tambahkan earth ke dalam array pengecekan raycaster
+            const intersects = raycaster.intersectObjects([earth, ...markerGroup.children]);
+            
             if (intersects.length > 0) {
-                const object = intersects.find(i => i.object.userData.isMarker)?.object;
-                if (object) showLaunchDetail(object.userData.launch, true); 
+                const earthHit = intersects.find(i => i.object === earth);
+                const markerHit = intersects.find(i => i.object.userData && i.object.userData.isMarker);
+                
+                if (markerHit) {
+                    // Jika bumi terkena raycast lebih dulu daripada marker, abaikan kliknya!
+                    if (earthHit && earthHit.distance < markerHit.distance) {
+                        if (isLocked) closeModal();
+                        return;
+                    }
+                    showLaunchDetail(markerHit.object.userData.launch, true); 
+                    return;
+                }
             }
+            
+            // Menutup modal secara otomatis hanya jika benar-benar mengklik ruang angkasa/bumi yang kosong
+            if (isLocked) closeModal();
         }
 
         function setupControls() {
