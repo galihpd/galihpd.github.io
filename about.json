@@ -6,12 +6,28 @@
     "artstation": "https://artstation.com",
     "cvLink": "#",
     "location": "Depok, ID",
-    "statExp": "30 tahun+",
-    "statAssets": "500+",
-    "statProjects": "6+",
-    "statGPA": "3.8",
     "bioId": "Generalist 3D Artist ",
-    "bioEn": "Generalist 3D Artist "
+    "bioEn": "Generalist 3D Artist ",
+    "stats": [
+      {
+        "id": "s1",
+        "value": "30 +",
+        "labelId": "Tahun Pengalaman",
+        "labelEn": "Years Experience"
+      },
+      {
+        "id": "s2",
+        "value": "500+",
+        "labelId": "Aset 3D Dibuat",
+        "labelEn": "3D Assets Made"
+      },
+      {
+        "id": "s3",
+        "value": "6+",
+        "labelId": "Proyek Utama",
+        "labelEn": "Major Projects"
+      }
+    ]
   },
   "blocks": [
     {
