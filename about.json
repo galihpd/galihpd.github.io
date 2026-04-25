@@ -36,7 +36,7 @@
     {
       "id": "m3",
       "type": "tags",
-      "width": "half",
+      "width": "full",
       "icon": "SettingsIcon",
       "titleId": "Fokus Keahlian",
       "titleEn": "Core Expertise",
