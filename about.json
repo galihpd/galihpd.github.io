@@ -1,53 +1,115 @@
 {
-  "bioId": "Generalist 3D Artist dengan pengalaman 3+ tahun, berspesialisasi dalam pembuatan lingkungan (environment), hard-surface modeling, dan texturing PBR untuk industri game serta pengalaman interaktif.\n\nMemiliki rekam jejak terbukti dalam menghasilkan aset berkualitas tinggi yang teroptimasi dengan baik untuk berbagai proyek, termasuk simulasi VR, digitalisasi museum, dan gamifikasi.",
-  "bioEn": "Generalist 3D Artist with 3+ years of experience, specializing in environment creation, hard-surface modeling, and PBR texturing for the gaming industry and interactive experiences.\n\nProven track record in delivering high-quality, well-optimized assets for diverse projects, including VR simulations, museum digitalization, and gamification.",
-  "email": "galihpr@aol.com",
-  "phone": "087882880426",
-  "linkedin": "https://s.id/galihcv",
-  "artstation": "https://artstation.com",
-  "cvLink": "#",
-  "location": "Depok, ID",
-  "statExp": "30 tahun+",
-  "statAssets": "500+",
-  "statProjects": "6+",
-  "statGPA": "3.8",
-  "software": "Blender 3D, Substance Painter, Unity Engine (Certified), Unreal Engine 5, Adobe Photoshop, ZBrush",
-  "expertise": "Environment Design, Hard Surface Modeling, PBR Texturing Workflow, Real-Time Asset Optimization, Level Assembling, FDM 3D Printing",
-  "projects": "Projection Blending Museum Mandiri, Virtual Training Sim, Nordson VR Training, Smart Elearning, Interactive Map S. Mandala, Keychron 3D Asset",
-  "certifications": "Unity Certified Associate: Artist | 2024 · Unity Technologies\nSKKNI Desainer Multimedia Madya | 2024 · Nasional\nSKKNI Junior 3D Game Artist | 2023 · Nasional",
-  "experience": [
+  "profile": {
+    "email": "galihpr@aol.com",
+    "phone": "087882880426",
+    "linkedin": "https://s.id/galihcv",
+    "artstation": "https://artstation.com",
+    "cvLink": "#",
+    "location": "Depok, ID",
+    "statExp": "30 tahun+",
+    "statAssets": "500+",
+    "statProjects": "6+",
+    "statGPA": "3.8",
+    "bioId": "Generalist 3D Artist dengan pengalaman 3+ tahun, berspesialisasi dalam pembuatan lingkungan (environment), hard-surface modeling, dan texturing PBR untuk industri game serta pengalaman interaktif.\n\nMemiliki rekam jejak terbukti dalam menghasilkan aset berkualitas tinggi yang teroptimasi dengan baik untuk berbagai proyek, termasuk simulasi VR, digitalisasi museum, dan gamifikasi.",
+    "bioEn": "Generalist 3D Artist with 3+ years of experience, specializing in environment creation, hard-surface modeling, and PBR texturing for the gaming industry and interactive experiences.\n\nProven track record in delivering high-quality, well-optimized assets for diverse projects, including VR simulations, museum digitalization, and gamification."
+  },
+  "blocks": [
     {
-      "title": "Lead Environment Artist",
-      "company": "PT Inovasi Multimedia Indonesia · Jakarta",
-      "dateId": "Sep 2024 - Sekarang",
-      "dateEn": "Sep 2024 - Present",
-      "descId": "Memimpin desain environment dan memastikan aset 3D siap pakai untuk skenario real-time. Mengoptimasi pipeline menggunakan Nanite/Lumen.",
-      "descEn": "Leading environment design and ensuring 3D assets are real-time ready. Optimizing pipelines using Nanite/Lumen."
+      "id": "m2",
+      "type": "tags",
+      "width": "full",
+      "icon": "Cpu",
+      "titleId": "Software & Tools",
+      "titleEn": "Software & Tools",
+      "content": "Blender 3D, Substance Painter, Unity Engine (Certified), Unreal Engine 5, Adobe Photoshop, ZBrush"
     },
     {
-      "title": "Training Facilitator (Unity Artist)",
-      "company": "Google Play X Unity 2025 · Jakarta",
-      "dateId": "Jul 2025 - Jan 2026",
-      "dateEn": "Jul 2025 - Jan 2026",
-      "descId": "Mendampingi talenta muda melalui Discord & sesi online mingguan. Memberikan bimbingan teknis intensif mengenai UI/UX, tata cahaya, dan VFX.",
-      "descEn": "Mentored young talents via Discord & online sessions. Provided technical guidance on UI/UX, lighting, and VFX."
+      "id": "m1",
+      "type": "text",
+      "width": "full",
+      "icon": "Sparkles",
+      "titleId": "Biografi",
+      "titleEn": "Biography",
+      "contentId": "Generalist 3D Artist dengan pengalaman 3+ tahun, berspesialisasi dalam pembuatan lingkungan (environment), hard-surface modeling, dan texturing PBR untuk industri game serta pengalaman interaktif.\n\nMemiliki rekam jejak terbukti dalam menghasilkan aset berkualitas tinggi yang teroptimasi dengan baik untuk berbagai proyek, termasuk simulasi VR, digitalisasi museum, dan gamifikasi.",
+      "contentEn": "Generalist 3D Artist with 3+ years of experience, specializing in environment creation, hard-surface modeling, and PBR texturing for the gaming industry and interactive experiences.\n\nProven track record in delivering high-quality, well-optimized assets for diverse projects, including VR simulations, museum digitalization, and gamification."
     },
     {
-      "title": "Freelance 3D Artist",
-      "company": "Independent",
-      "dateId": "2022 - 2024",
-      "dateEn": "2022 - 2024",
-      "descId": "Mengerjakan komisi pembuatan aset 3D untuk berbagai studio game dan konferensi internasional IC2IE 2023.",
-      "descEn": "Executed 3D asset creation commissions for game studios and the IC2IE 2023 international conference."
-    }
-  ],
-  "education": [
+      "id": "m3",
+      "type": "tags",
+      "width": "half",
+      "icon": "SettingsIcon",
+      "titleId": "Fokus Keahlian",
+      "titleEn": "Core Expertise",
+      "content": "Environment Design, Hard Surface Modeling, PBR Texturing Workflow, Real-Time Asset Optimization, Level Assembling, FDM 3D Printing"
+    },
     {
-      "degree": "D4 Teknik Multimedia Digital",
-      "school": "Politeknik Negeri Jakarta",
-      "date": "2021 - 2025",
-      "descId": "Lulus dengan IPK 3.8. Fokus pada Pemodelan 3D, Animasi, dan Pemrograman Game 2D.",
-      "descEn": "Graduated with a 3.8 GPA. Focused on 3D Modeling, Animation, and 2D Game Programming."
+      "id": "m4",
+      "type": "timeline",
+      "width": "full",
+      "icon": "Briefcase",
+      "titleId": "Pengalaman Profesional",
+      "titleEn": "Professional Experience",
+      "items": [
+        {
+          "title": "Lead Environment Artist",
+          "company": "PT Inovasi Multimedia Indonesia · Jakarta",
+          "dateId": "Sep 2024 - Sekarang",
+          "dateEn": "Sep 2024 - Present",
+          "descId": "Memimpin desain environment dan memastikan aset 3D siap pakai untuk skenario real-time. Mengoptimasi pipeline menggunakan Nanite/Lumen.",
+          "descEn": "Leading environment design and ensuring 3D assets are real-time ready. Optimizing pipelines using Nanite/Lumen."
+        },
+        {
+          "title": "Training Facilitator (Unity Artist)",
+          "company": "Google Play X Unity 2025 · Jakarta",
+          "dateId": "Jul 2025 - Jan 2026",
+          "dateEn": "Jul 2025 - Jan 2026",
+          "descId": "Mendampingi talenta muda melalui Discord & sesi online mingguan. Memberikan bimbingan teknis intensif mengenai UI/UX, tata cahaya, dan VFX.",
+          "descEn": "Mentored young talents via Discord & online sessions. Provided technical guidance on UI/UX, lighting, and VFX."
+        },
+        {
+          "title": "Freelance 3D Artist",
+          "company": "Independent",
+          "dateId": "2022 - 2024",
+          "dateEn": "2022 - 2024",
+          "descId": "Mengerjakan komisi pembuatan aset 3D untuk berbagai studio game dan konferensi internasional IC2IE 2023.",
+          "descEn": "Executed 3D asset creation commissions for game studios and the IC2IE 2023 international conference."
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "type": "timeline",
+      "width": "half",
+      "icon": "BookOpen",
+      "titleId": "Pendidikan",
+      "titleEn": "Education",
+      "items": [
+        {
+          "degree": "D4 Teknik Multimedia Digital",
+          "school": "Politeknik Negeri Jakarta",
+          "date": "2021 - 2025",
+          "descId": "Lulus dengan IPK 3.8. Fokus pada Pemodelan 3D, Animasi, dan Pemrograman Game 2D.",
+          "descEn": "Graduated with a 3.8 GPA. Focused on 3D Modeling, Animation, and 2D Game Programming."
+        }
+      ]
+    },
+    {
+      "id": "m6",
+      "type": "cards",
+      "width": "half",
+      "icon": "Award",
+      "titleId": "Sertifikasi",
+      "titleEn": "Certifications",
+      "content": "Unity Certified Associate: Artist | 2024 · Unity Technologies\nSKKNI Desainer Multimedia Madya | 2024 · Nasional\nSKKNI Junior 3D Game Artist | 2023 · Nasional"
+    },
+    {
+      "id": "m7",
+      "type": "tags",
+      "width": "full",
+      "icon": "ImageIcon",
+      "titleId": "Proyek Sorotan",
+      "titleEn": "Projects Highlight",
+      "content": "Projection Blending Museum Mandiri, Virtual Training Sim, Nordson VR Training, Smart Elearning, Interactive Map S. Mandala, Keychron 3D Asset"
     }
   ]
 }
