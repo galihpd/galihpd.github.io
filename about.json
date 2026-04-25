@@ -34,7 +34,7 @@
       "id": "m2",
       "type": "tags",
       "width": "full",
-      "icon": "Cpu",
+      "icon": "ImageIcon",
       "titleId": "Software & Tools",
       "titleEn": "Software & Tools",
       "content": "Blender 3D, Substance Painter, Unity Engine (Certified), Unreal Engine 5, Adobe Photoshop, ZBrush"
