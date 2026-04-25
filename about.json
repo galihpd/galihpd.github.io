@@ -11,9 +11,9 @@
     "stats": [
       {
         "id": "s1",
-        "value": "30 tahun",
-        "labelId": "Pengalaman",
-        "labelEn": "Experience"
+        "value": "30+",
+        "labelId": "Exp",
+        "labelEn": "Exp"
       },
       {
         "id": "s2",
