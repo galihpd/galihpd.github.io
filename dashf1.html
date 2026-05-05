@@ -16,6 +16,9 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- PapaParse for CSV Processing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
   <!-- Tailwind Config -->
   <script>
     tailwind.config = {
@@ -28,7 +31,9 @@
             neutral: {
               850: '#1f1f1f',
               950: '#0a0a0a',
-            }
+            },
+            f1dark: '#15151e',
+            f1panel: '#1e1e24'
           }
         }
       }
@@ -42,11 +47,11 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #262626; border-radius: 10px; }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #dc2626; }
     
-    /* Smooth Transitions */
+    /* Smooth Transitions - Menghilangkan Transform biar fixed element ga collapse */
     .fade-in { animation: fadeIn 0.4s ease-out forwards; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: none; }
     }
     
     /* Glass Effect */
@@ -61,29 +66,35 @@
 <body class="bg-neutral-950 text-white font-sans flex flex-col h-screen overflow-hidden selection:bg-red-600 selection:text-white">
 
   <!-- Header Aplikasi -->
-  <header class="bg-black/80 backdrop-blur-md border-b border-red-700/50 px-6 py-4 flex flex-col md:flex-row justify-between items-center shrink-0 z-30 relative shadow-2xl">
-    <div class="flex items-center gap-4 mb-4 md:mb-0">
-      <div class="bg-gradient-to-br from-red-500 to-red-700 p-2.5 rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.4)]">
-        <i data-lucide="flag" class="text-white w-6 h-6"></i>
-      </div>
-      <div>
-        <h1 class="text-2xl font-black tracking-tight uppercase italic leading-none">
-          Open<span class="text-red-500">F1</span> Dash
-        </h1>
-        <p class="text-xs text-gray-400 mt-1 font-semibold tracking-widest uppercase">Real-Time & Historical</p>
+  <header class="bg-black/80 backdrop-blur-md border-b border-red-700/50 px-4 sm:px-6 py-3 sm:py-4 flex flex-col md:flex-row justify-between items-center shrink-0 z-30 relative shadow-2xl">
+    <div class="flex items-center gap-3 w-full md:w-auto mb-4 md:mb-0 justify-between md:justify-start">
+      <div class="flex items-center gap-3">
+        <!-- Mobile Sidebar Toggle -->
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-2 bg-neutral-900 border border-white/10 rounded-lg text-white hover:bg-neutral-800 transition-colors">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <div class="bg-gradient-to-br from-red-500 to-red-700 p-2 sm:p-2.5 rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.4)]">
+          <i data-lucide="flag" class="text-white w-5 h-5 sm:w-6 sm:h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight uppercase italic leading-none">
+            Open<span class="text-red-500">F1</span> Dash
+          </h1>
+          <p class="text-[10px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1 font-semibold tracking-widest uppercase">Real-Time & Historical</p>
+        </div>
       </div>
     </div>
     
-    <div class="flex flex-col md:flex-row items-center gap-4">
+    <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
       <!-- Navigation Tabs -->
-      <div class="flex items-center gap-1 glass-panel p-1.5 rounded-xl">
-        <button onclick="setTab('calendar')" id="tab-calendar" class="px-5 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-red-600 to-red-500 text-white shadow transition-all">Jadwal & Hasil</button>
-        <button onclick="setTab('standings')" id="tab-standings" class="px-5 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all">Klasemen</button>
+      <div class="flex items-center gap-1 glass-panel p-1.5 rounded-xl w-full sm:w-auto justify-center">
+        <button onclick="setTab('calendar')" id="tab-calendar" class="px-5 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-red-600 to-red-500 text-white shadow transition-all flex-1 sm:flex-none">Jadwal & Hasil</button>
+        <button onclick="setTab('standings')" id="tab-standings" class="px-5 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex-1 sm:flex-none">Klasemen</button>
       </div>
 
-      <div class="flex items-center gap-2 glass-panel p-1.5 rounded-xl">
-        <i data-lucide="calendar-days" class="w-5 h-5 text-gray-500 ml-2"></i>
-        <div id="year-selector" class="flex gap-1">
+      <div class="flex items-center justify-between glass-panel p-1.5 rounded-xl w-full sm:w-auto">
+        <i data-lucide="calendar-days" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 ml-2 hidden sm:block"></i>
+        <div id="year-selector" class="flex gap-1 overflow-x-auto custom-scrollbar w-full sm:w-auto">
           <!-- Year buttons generated by JS -->
         </div>
       </div>
@@ -93,55 +104,61 @@
   <!-- Main Layout -->
   <div class="flex flex-1 overflow-hidden relative">
     
-    <!-- Sidebar Kalender / Balapan -->
-    <aside class="w-full md:w-80 bg-neutral-900/50 border-r border-white/5 flex flex-col h-full z-20 shrink-0 hidden md:flex backdrop-blur-xl">
-      <div class="p-5 border-b border-white/5 bg-black/20">
+    <!-- Sidebar Kalender / Balapan (Responsive: Off-canvas on Mobile) -->
+    <aside id="main-sidebar" class="fixed inset-y-0 left-0 z-50 w-[80%] max-w-[320px] bg-neutral-900/95 backdrop-blur-2xl border-r border-white/5 flex flex-col h-full transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 md:w-80 md:bg-neutral-900/50 md:flex shadow-[20px_0_50px_rgba(0,0,0,0.5)] md:shadow-none shrink-0">
+      <div class="p-4 sm:p-5 border-b border-white/5 bg-black/20 flex justify-between items-center">
         <h2 id="sidebar-title" class="text-sm font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
           <i data-lucide="activity" class="w-4 h-4 text-red-500"></i>
           Kalender Balap
         </h2>
+        <button onclick="toggleMobileSidebar(false)" class="md:hidden p-1.5 text-gray-400 hover:text-white bg-white/5 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
       </div>
       <div id="meetings-list" class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1.5">
         <!-- Meetings generated by JS -->
       </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col bg-neutral-950 overflow-hidden relative">
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/70 z-40 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+
+    <!-- Main Content Area (Now Scrollable Naturally) -->
+    <main class="flex-1 flex flex-col bg-neutral-950 overflow-y-auto custom-scrollbar relative w-full">
       <!-- Watermark Logo -->
-      <div class="absolute -bottom-20 -right-20 opacity-[0.02] pointer-events-none text-white z-0">
-         <svg width="600" height="600" viewBox="0 0 100 100" fill="currentColor">
+      <div class="absolute -bottom-10 sm:-bottom-20 -right-10 sm:-right-20 opacity-[0.02] pointer-events-none text-white z-0">
+         <svg width="400" height="400" viewBox="0 0 100 100" fill="currentColor" class="sm:w-[600px] sm:h-[600px]">
            <path d="M22,38 l20,0 l-8,24 l-20,0 Z M46,38 l40,0 l-3,9 l-28,0 l-5,15 l-11,0 Z" />
          </svg>
       </div>
 
-      <div id="main-content" class="relative z-10 flex flex-col h-full w-full">
+      <div id="main-content" class="relative z-10 flex flex-col min-h-full w-full">
         <!-- Content generated by JS -->
       </div>
     </main>
   </div>
 
   <!-- Modal Layout Sirkuit Fullscreen -->
-  <div id="circuit-modal" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-6 md:p-12 backdrop-blur-md opacity-0 transition-opacity duration-300">
-    <button onclick="closeCircuitModal()" class="absolute top-6 right-6 text-white bg-white/10 hover:bg-red-600 p-3 rounded-full transition-all duration-300 z-10 shadow-lg">
-      <i data-lucide="x" class="w-6 h-6"></i>
+  <div id="circuit-modal" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-4 sm:p-6 md:p-12 backdrop-blur-md opacity-0 transition-opacity duration-300">
+    <button onclick="closeCircuitModal()" class="absolute top-4 right-4 sm:top-6 sm:right-6 text-white bg-white/10 hover:bg-red-600 p-2 sm:p-3 rounded-full transition-all duration-300 z-10 shadow-lg">
+      <i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6"></i>
     </button>
-    <h3 id="modal-circuit-name" class="text-white text-3xl md:text-5xl font-black italic uppercase tracking-widest mb-10 drop-shadow-2xl"></h3>
-    <img id="modal-circuit-img" src="" class="max-w-full max-h-[75vh] object-contain rounded-2xl drop-shadow-[0_0_40px_rgba(255,255,255,0.15)]" />
+    <h3 id="modal-circuit-name" class="text-white text-2xl sm:text-3xl md:text-5xl font-black italic uppercase tracking-widest mb-6 sm:mb-10 drop-shadow-2xl text-center"></h3>
+    <img id="modal-circuit-img" src="" class="max-w-full max-h-[60vh] sm:max-h-[75vh] object-contain rounded-xl sm:rounded-2xl drop-shadow-[0_0_40px_rgba(255,255,255,0.15)]" />
   </div>
 
   <!-- Modal Breakdown Poin -->
   <div id="breakdown-modal" class="fixed inset-0 z-[110] bg-black/80 hidden flex-col items-center justify-center p-4 md:p-8 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-    <div class="glass-panel w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative bg-neutral-900/90">
-      <button onclick="closeBreakdownModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white bg-white/5 hover:bg-red-600 p-2.5 rounded-full transition-all duration-300 z-20">
-        <i data-lucide="x" class="w-5 h-5"></i>
+    <div class="glass-panel w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative bg-neutral-900/90">
+      <button onclick="closeBreakdownModal()" class="absolute top-3 right-3 sm:top-5 sm:right-5 text-gray-400 hover:text-white bg-white/5 hover:bg-red-600 p-2 sm:p-2.5 rounded-full transition-all duration-300 z-20">
+        <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
       </button>
       
-      <div id="breakdown-header" class="p-6 md:p-8 border-b border-white/5 bg-gradient-to-r from-neutral-900 to-neutral-950 shrink-0 relative z-10">
+      <div id="breakdown-header" class="p-5 sm:p-6 md:p-8 border-b border-white/5 bg-gradient-to-r from-neutral-900 to-neutral-950 shrink-0 relative z-10">
         <!-- Generated via JS -->
       </div>
       
-      <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
+      <div class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8">
         <div id="breakdown-content">
           <!-- Generated via JS -->
         </div>
@@ -151,32 +168,136 @@
 
   <!-- Aplikasi Logic -->
   <script>
-    // --- CACHING SYSTEM (5 MINUTES) ---
-    const apiCache = new Map();
-    const CACHE_TTL = 5 * 60 * 1000; // 5 Menit dalam milidetik
+    // --- ADVANCED CACHING SYSTEM: INDEXEDDB (30 DAYS PERSISTENCE) ---
+    const CACHE_TTL = 30 * 24 * 60 * 60 * 1000; 
 
-    async function fetchCached(url) {
+    let dbInstance = null;
+    const initDB = () => {
+        return new Promise((resolve, reject) => {
+            if (dbInstance) return resolve(dbInstance);
+            const req = indexedDB.open('OpenF1CacheDB', 1);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('responses')) {
+                    db.createObjectStore('responses', { keyPath: 'url' });
+                }
+            };
+            req.onsuccess = (e) => {
+                dbInstance = e.target.result;
+                resolve(dbInstance);
+            };
+            req.onerror = (e) => {
+                console.warn('IndexedDB failed to open, fallback to RAM cache.', e);
+                resolve(null);
+            };
+        });
+    };
+
+    async function getCache(url) {
+        const db = await initDB();
+        if (!db) return null;
+        return new Promise((resolve) => {
+            try {
+                const tx = db.transaction('responses', 'readonly');
+                const store = tx.objectStore('responses');
+                const req = store.get(url);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => resolve(null);
+            } catch(e) { resolve(null); }
+        });
+    }
+
+    async function setCache(url, data) {
+        const db = await initDB();
+        if (!db) return;
+        return new Promise((resolve) => {
+            try {
+                const tx = db.transaction('responses', 'readwrite');
+                const store = tx.objectStore('responses');
+                store.put({ url, data, timestamp: Date.now() });
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+            } catch(e) { resolve(); }
+        });
+    }
+
+    const memoryCache = new Map(); 
+
+    // Helper Mobile Sidebar
+    function toggleMobileSidebar(forceState) {
+        const sidebar = document.getElementById('main-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (!sidebar || !backdrop) return;
+        
+        const isOpen = !sidebar.classList.contains('-translate-x-full');
+        const willOpen = forceState !== undefined ? forceState : !isOpen;
+        
+        if (willOpen) {
+            sidebar.classList.remove('-translate-x-full');
+            backdrop.classList.remove('hidden');
+            setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.add('opacity-0');
+            setTimeout(() => backdrop.classList.add('hidden'), 300);
+        }
+    }
+
+    // Helper Pembersihan DOM Zombie Replay
+    function cleanupReplayContainer() {
+      const zombieContainer = document.getElementById('replay-container');
+      if (zombieContainer && zombieContainer.parentNode === document.body) {
+          zombieContainer.remove();
+      }
+      document.body.style.overflow = '';
+      if (state.replay.animationId) {
+          cancelAnimationFrame(state.replay.animationId);
+          state.replay.animationId = null;
+      }
+    }
+
+    async function fetchCached(url, retries = 3, delay = 1500) {
       const now = Date.now();
       
-      // Cek apakah ada di cache dan belum expired
-      if (apiCache.has(url)) {
-        const cached = apiCache.get(url);
-        if (now - cached.timestamp < CACHE_TTL) {
-          return cached.data; // Kembalikan dari cache
-        }
+      if (memoryCache.has(url)) {
+        const cached = memoryCache.get(url);
+        if (now - cached.timestamp < CACHE_TTL) return cached.data;
+      }
+
+      const dbCached = await getCache(url);
+      if (dbCached && (now - dbCached.timestamp < CACHE_TTL)) {
+          memoryCache.set(url, { timestamp: dbCached.timestamp, data: dbCached.data }); 
+          return dbCached.data;
       }
       
-      // Jika tidak ada atau expired, fetch dari server
       try {
         const res = await fetch(url);
+        const isCsv = url.includes('csv=true');
+        
         if (!res.ok) {
-           if (res.status === 429) throw new Error("Terlalu banyak permintaan (Rate Limited). Harap tunggu beberapa saat.");
+           if (res.status === 404 || res.status === 204) return isCsv ? "" : []; 
+           if (res.status === 429) {
+               if (retries > 0) {
+                   console.warn(`Rate limited (429) on ${url}. Retrying in ${delay}ms...`);
+                   await new Promise(resolve => setTimeout(resolve, delay));
+                   return fetchCached(url, retries - 1, delay * 1.5); 
+               }
+               throw new Error("Terlalu banyak permintaan (Rate Limited). Server OpenF1 sedang sibuk.");
+           }
+           if (res.status === 422) {
+               throw new Error("Data terlalu besar (422 Unprocessable Entity).");
+           }
            throw new Error(`HTTP Error: ${res.status}`);
         }
-        const data = await res.json();
         
-        // Simpan ke dalam cache
-        apiCache.set(url, { timestamp: now, data });
+        const textData = await res.text();
+        if (!textData) return isCsv ? "" : [];
+        
+        const data = isCsv ? textData : JSON.parse(textData);
+        
+        memoryCache.set(url, { timestamp: now, data });
+        await setCache(url, data);
+
         return data;
       } catch (err) {
         throw err;
@@ -185,8 +306,8 @@
 
     // --- STATE MANAGEMENT ---
     const state = {
-      tab: 'calendar', // 'calendar' or 'standings'
-      standingsMode: 'drivers', // 'drivers' or 'constructors'
+      tab: 'calendar', 
+      standingsMode: 'drivers', 
       year: new Date().getFullYear(),
       meetings: [],
       selectedMeeting: null,
@@ -196,13 +317,17 @@
       positions: {},
       intervals: {},
       standings: {}, 
-      viewMode: 'grid', // 'grid', 'result', or 'replay'
+      viewMode: 'grid', 
       replay: {
          dataByDriver: {}, trackPoints: [], trackBgCanvas: null,
+         lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, totalLaps: 0,
          scale: 1, offsetX: 0, offsetY: 0,
+         zoom: 1, panX: 0, panY: 0,
          minX: 0, maxX: 0, minY: 0, maxY: 0, 
          startTime: 0, endTime: 0, currentTime: 0,
-         isPlaying: false, loading: false, error: null, animationId: null
+         loadedUntil: 0, isBuffering: false, 
+         isPlaying: false, loading: false, error: null, animationId: null,
+         playbackSpeed: 1, isFullscreen: false
       },
       loading: { meetings: false, sessions: false, drivers: false, positions: false, standings: false },
       error: null
@@ -217,6 +342,9 @@
     // --- UTILS ---
     const getTeamColor = (hex) => hex ? `#${hex}` : '#525252';
     
+    // Convert 1col small thumbnail to 2col HD image
+    const getHighResPhotoUrl = (url) => url ? url.replace('1col', '2col') : 'https://media.formula1.com/d_driver_fallback_image.png';
+
     const getCircuitLayoutUrl = (countryName) => {
       const formattedName = countryName.replace(/\s+/g, '_');
       return `https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/${formattedName}_Circuit.png.transform/8col/image.png`;
@@ -268,54 +396,56 @@
 
       headerEl.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6">
-          <div class="w-3 h-16 rounded-full shrink-0 hidden sm:block" style="background-color: ${teamColor}"></div>
-          <div class="flex-1">
-            <h3 class="text-3xl md:text-4xl font-black italic text-white drop-shadow-md leading-tight">${title}</h3>
-            <p class="text-gray-400 font-bold mt-1.5 text-sm tracking-widest uppercase">${subtitle}</p>
+          <div class="w-3 h-12 sm:h-16 rounded-full shrink-0 hidden sm:block" style="background-color: ${teamColor}"></div>
+          <div class="flex-1 text-center sm:text-left">
+            <h3 class="text-2xl sm:text-3xl md:text-4xl font-black italic text-white drop-shadow-md leading-tight">${title}</h3>
+            <p class="text-gray-400 font-bold mt-1.5 text-xs sm:text-sm tracking-widest uppercase">${subtitle}</p>
           </div>
-          <div class="sm:text-right bg-black/40 p-3 rounded-xl border border-white/5">
-            <div class="text-4xl font-black italic text-white leading-none">${data.points}</div>
-            <div class="text-xs text-red-500 font-black tracking-widest mt-1">TOTAL POINTS</div>
+          <div class="text-center sm:text-right bg-black/40 p-3 rounded-xl border border-white/5 w-full sm:w-auto">
+            <div class="text-3xl sm:text-4xl font-black italic text-white leading-none">${data.points}</div>
+            <div class="text-[10px] sm:text-xs text-red-500 font-black tracking-widest mt-1">TOTAL POINTS</div>
           </div>
         </div>
       `;
 
       if (!data.history || data.history.length === 0) {
-        contentEl.innerHTML = `<div class="text-center text-gray-500 py-10 font-medium text-lg">Belum ada poin yang dicetak musim ini.</div>`;
+        contentEl.innerHTML = `<div class="text-center text-gray-500 py-10 font-medium text-sm sm:text-lg">Belum ada poin yang dicetak musim ini.</div>`;
       } else {
         const sortedHistory = [...data.history].sort((a, b) => new Date(b.date) - new Date(a.date));
 
         contentEl.innerHTML = `
-          <table class="w-full text-left border-collapse min-w-[600px]">
-            <thead>
-              <tr class="bg-black/40 text-[10px] uppercase tracking-widest text-gray-500 border-b border-white/5">
-                <th class="p-4 font-bold">Grand Prix</th>
-                <th class="p-4 font-bold">Sesi</th>
-                ${type === 'constructor' ? '<th class="p-4 font-bold">Pembalap</th>' : ''}
-                <th class="p-4 text-center font-bold">Posisi Finish</th>
-                <th class="p-4 text-right font-bold text-red-400">Poin Didapat</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-white/5">
-              ${sortedHistory.map(h => `
-                <tr class="hover:bg-white/5 transition-colors">
-                  <td class="p-4 font-black text-gray-200 text-lg uppercase italic tracking-tight">${h.meeting_name}</td>
-                  <td class="p-4 text-sm font-bold text-gray-400">
-                    <span class="${h.session_name.includes('Sprint') ? 'text-blue-400 bg-blue-400/10' : 'text-green-400 bg-green-400/10'} px-2 py-1 rounded">
-                      ${h.session_name}
-                    </span>
-                  </td>
-                  ${type === 'constructor' ? `<td class="p-4 text-sm font-black text-gray-300 uppercase">${h.driver_name}</td>` : ''}
-                  <td class="p-4 text-center font-black text-white text-xl">P${h.position}</td>
-                  <td class="p-4 text-right">
-                    <span class="inline-block bg-red-500/10 border border-red-500/20 text-red-500 font-black px-3 py-1.5 rounded-lg text-lg">
-                      +${h.points}
-                    </span>
-                  </td>
+          <div class="overflow-x-auto custom-scrollbar -mx-4 sm:mx-0 px-4 sm:px-0">
+            <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-[600px]">
+              <thead>
+                <tr class="bg-black/40 text-[9px] sm:text-[10px] uppercase tracking-widest text-gray-500 border-b border-white/5">
+                  <th class="p-3 sm:p-4 font-bold">Grand Prix</th>
+                  <th class="p-3 sm:p-4 font-bold">Sesi</th>
+                  ${type === 'constructor' ? '<th class="p-3 sm:p-4 font-bold">Pembalap</th>' : ''}
+                  <th class="p-3 sm:p-4 text-center font-bold">Posisi</th>
+                  <th class="p-3 sm:p-4 text-right font-bold text-red-400">Poin Didapat</th>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
+              </thead>
+              <tbody class="divide-y divide-white/5">
+                ${sortedHistory.map(h => `
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-3 sm:p-4 font-black text-gray-200 text-base sm:text-lg uppercase italic tracking-tight">${h.meeting_name}</td>
+                    <td class="p-3 sm:p-4 text-xs sm:text-sm font-bold text-gray-400">
+                      <span class="${h.session_name.includes('Sprint') ? 'text-blue-400 bg-blue-400/10' : 'text-green-400 bg-green-400/10'} px-2 py-1 rounded">
+                        ${h.session_name}
+                      </span>
+                    </td>
+                    ${type === 'constructor' ? `<td class="p-3 sm:p-4 text-xs sm:text-sm font-black text-gray-300 uppercase">${h.driver_name}</td>` : ''}
+                    <td class="p-3 sm:p-4 text-center font-black text-white text-lg sm:text-xl">P${h.position}</td>
+                    <td class="p-3 sm:p-4 text-right">
+                      <span class="inline-block bg-red-500/10 border border-red-500/20 text-red-500 font-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-base sm:text-lg">
+                        +${h.points}
+                      </span>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
         `;
       }
 
@@ -334,7 +464,164 @@
       setTimeout(() => lucide.createIcons(), 0);
     };
 
-    // --- REPLAY SYSTEM LOGIC ---
+    // --- JSON PARSING LOGIC (FALLBACK FOR TELEMETRY) ---
+    async function handleJsonUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (state.replay.animationId) cancelAnimationFrame(state.replay.animationId);
+
+        state.replay.loading = true;
+        state.replay.error = null;
+        renderMain();
+
+        try {
+            const text = await file.text();
+            
+            if (file.name.endsWith('.csv')) {
+                Papa.parse(text, {
+                    header: true, dynamicTyping: true, skipEmptyLines: true,
+                    complete: function(results) {
+                        processCsvFallback(results.data);
+                    }
+                });
+                return;
+            }
+
+            const jsonData = JSON.parse(text);
+
+            if (!jsonData.tel || !jsonData.tel.x || !jsonData.tel.y || !jsonData.tel.time) {
+                throw new Error("Format JSON tidak valid. Pastikan memiliki objek 'tel' yang berisi array 'time', 'x', dan 'y'.");
+            }
+
+            const times = jsonData.tel.time;
+            const xs = jsonData.tel.x;
+            const ys = jsonData.tel.y;
+
+            let driverNum = "??";
+            if (jsonData.dataKey) {
+                const match = jsonData.dataKey.match(/-(\d+)$/);
+                if (match) driverNum = match[1];
+            }
+
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            const dataByDriver = {};
+            const trackPoints = [];
+
+            dataByDriver[driverNum] = [];
+
+            for (let i = 0; i < times.length; i++) {
+                let x = xs[i]; let y = ys[i]; let t = times[i];
+                if (x == null || y == null || t == null) continue;
+
+                if (x < minX) minX = x; if (x > maxX) maxX = x;
+                if (y < minY) minY = y; if (y > maxY) maxY = y;
+
+                let timeMs = t * 1000;
+                dataByDriver[driverNum].push({ time: timeMs, x: x, y: y });
+                
+                if (i % 8 === 0) trackPoints.push({ x: x, y: y, type: 'dot' });
+            }
+
+            if (dataByDriver[driverNum].length === 0) throw new Error("Data telemetri JSON kosong.");
+
+            let minTime = dataByDriver[driverNum][0].time;
+            let maxTime = dataByDriver[driverNum][dataByDriver[driverNum].length - 1].time;
+
+            state.replay = {
+                ...state.replay,
+                dataByDriver,
+                trackPoints, minX, maxX, minY, maxY,
+                startTime: minTime,
+                endTime: maxTime,
+                currentTime: minTime,
+                loadedUntil: maxTime, 
+                isBuffering: false,
+                isPlaying: false,
+                loading: false,
+                error: null,
+                zoom: 1, panX: 0, panY: 0,
+                lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, totalLaps: 0
+            };
+
+            renderMain();
+            setTimeout(initReplayCanvas, 100);
+
+        } catch(err) {
+            state.replay.error = err.message;
+            state.replay.loading = false;
+            renderMain();
+        }
+    }
+
+    function processCsvFallback(trackData) {
+        if (trackData.length === 0) {
+            state.replay.error = "File CSV Kosong.";
+            state.replay.loading = false;
+            renderMain();
+            return;
+        }
+
+        let timeKey = trackData[0].hasOwnProperty('Date') ? 'Date' : (trackData[0].hasOwnProperty('Time') ? 'Time' : 'date');
+        let driverKey = trackData[0].hasOwnProperty('Driver') ? 'Driver' : (trackData[0].hasOwnProperty('driver_number') ? 'driver_number' : null);
+        let xKey = trackData[0].hasOwnProperty('X') ? 'X' : 'x';
+        let yKey = trackData[0].hasOwnProperty('Y') ? 'Y' : 'y';
+
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        const dataByDriver = {};
+        const trackPoints = [];
+
+        trackData.forEach((d, i) => {
+            let x = d[xKey]; let y = d[yKey]; let drv = d[driverKey]; let t = d[timeKey];
+            if (x == null || y == null || drv == null || t == null) return;
+
+            if (x < minX) minX = x; if (x > maxX) maxX = x;
+            if (y < minY) minY = y; if (y > maxY) maxY = y;
+
+            if (!dataByDriver[drv]) dataByDriver[drv] = [];
+            
+            let timeMs;
+            if (typeof t === 'string' && t.includes('0 days')) {
+                const timeMatch = t.match(/(\d+):(\d+):(\d+\.?\d*)/);
+                if (timeMatch) timeMs = (parseInt(timeMatch[1])*3600 + parseInt(timeMatch[2])*60 + parseFloat(timeMatch[3])) * 1000;
+                else timeMs = new Date(t).getTime();
+            } else {
+                timeMs = new Date(t).getTime() || parseFloat(t) * 1000; 
+            }
+
+            dataByDriver[drv].push({ time: timeMs, x: x, y: y });
+            if (i % 8 === 0) trackPoints.push({ x: x, y: y, type: 'dot' });
+        });
+
+        let minTime = Infinity, maxTime = -Infinity;
+        Object.keys(dataByDriver).forEach(drv => {
+            dataByDriver[drv].sort((a,b) => a.time - b.time);
+            if (dataByDriver[drv].length > 0) {
+                if (dataByDriver[drv][0].time < minTime) minTime = dataByDriver[drv][0].time;
+                if (dataByDriver[drv][dataByDriver[drv].length-1].time > maxTime) maxTime = dataByDriver[drv][dataByDriver[drv].length-1].time;
+            }
+        });
+
+        state.replay = {
+            ...state.replay,
+            dataByDriver,
+            trackPoints, minX, maxX, minY, maxY,
+            startTime: minTime,
+            endTime: maxTime,
+            currentTime: minTime,
+            loadedUntil: maxTime,
+            isPlaying: false,
+            loading: false,
+            error: null,
+            zoom: 1, panX: 0, panY: 0,
+            lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, totalLaps: 0
+        };
+
+        renderMain();
+        setTimeout(initReplayCanvas, 100);
+    }
+
+    // --- REPLAY SYSTEM LOGIC (CHUNKED CSV FETCH) ---
     async function loadReplayData() {
       if (!state.selectedSession) return;
       
@@ -343,67 +630,176 @@
       renderMain(); 
 
       try {
-        // Mengambil semua data full sesi (tidak di limit 15 menit lagi)
-        const url = `https://api.openf1.org/v1/location?session_key=${state.selectedSession.session_key}`;
-        const data = await fetchCached(url);
-
-        if (!data || data.length === 0) {
-           state.replay.error = "Data telemetri lokasi (X/Y) tidak tersedia di API untuk sesi ini.";
-        } else {
-           let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-           const dataByDriver = {};
-           const trackPoints = [];
-           
-           // Loop 1: Ekstraksi batas Min/Max dan kelompokkan data per driver
-           data.forEach((d, i) => {
-              if (d.x < minX) minX = d.x;
-              if (d.x > maxX) maxX = d.x;
-              if (d.y < minY) minY = d.y;
-              if (d.y > maxY) maxY = d.y;
-              
-              if (!dataByDriver[d.driver_number]) dataByDriver[d.driver_number] = [];
-              dataByDriver[d.driver_number].push({ time: new Date(d.date).getTime(), x: d.x, y: d.y });
-
-              // Downsample points untuk menggambar outline lintasan secara otomatis
-              if (i % 15 === 0) trackPoints.push({ x: d.x, y: d.y }); 
-           });
-
-           // Loop 2: Pastikan data masing-masing driver terurut berdasar waktu (PENTING untuk Binary Search)
-           let overallMinTime = Infinity;
-           let overallMaxTime = -Infinity;
-           
-           Object.values(dataByDriver).forEach(arr => {
-               arr.sort((a, b) => a.time - b.time);
-               if (arr.length > 0) {
-                   if (arr[0].time < overallMinTime) overallMinTime = arr[0].time;
-                   if (arr[arr.length - 1].time > overallMaxTime) overallMaxTime = arr[arr.length - 1].time;
-               }
-           });
-
-           state.replay.dataByDriver = dataByDriver;
-           state.replay.trackPoints = trackPoints;
-           state.replay.minX = minX;
-           state.replay.maxX = maxX;
-           state.replay.minY = minY;
-           state.replay.maxY = maxY;
-           state.replay.startTime = overallMinTime;
-           state.replay.endTime = overallMaxTime;
-           state.replay.currentTime = overallMinTime;
+        const sessionKey = state.selectedSession.session_key;
+        
+        const startTimeMs = new Date(state.selectedSession.date_start).getTime();
+        let endTimeMs = startTimeMs + (2 * 60 * 60 * 1000); 
+        if (state.selectedSession.date_end) {
+            endTimeMs = new Date(state.selectedSession.date_end).getTime();
         }
+
+        let lapsData = [];
+        let totalLaps = 0;
+        let trackPoints = [];
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
+        try {
+            lapsData = await fetchCached(`https://api.openf1.org/v1/laps?session_key=${sessionKey}`);
+            const validLaps = lapsData.filter(l => l.lap_duration != null);
+            if (validLaps.length > 0) totalLaps = Math.max(...validLaps.map(l => l.lap_number));
+            
+            if (validLaps.length > 0) {
+                validLaps.sort((a,b) => a.lap_duration - b.lap_duration);
+                const fastestLap = validLaps[0];
+                const lapStartIso = new Date(fastestLap.date_start).toISOString();
+                const lapEndIso = new Date(new Date(fastestLap.date_start).getTime() + fastestLap.lap_duration * 1000).toISOString();
+                
+                const trackData = await fetchCached(`https://api.openf1.org/v1/location?session_key=${sessionKey}&driver_number=${fastestLap.driver_number}&date>=${lapStartIso}&date<=${lapEndIso}`);
+                
+                trackData.forEach(d => {
+                    if (d.x < minX) minX = d.x; if (d.x > maxX) maxX = d.x;
+                    if (d.y < minY) minY = d.y; if (d.y > maxY) maxY = d.y;
+                    trackPoints.push({ x: d.x, y: d.y, type: 'line' });
+                });
+            }
+        } catch (e) {}
+
+        const stintsRaw = await fetchCached(`https://api.openf1.org/v1/stints?session_key=${sessionKey}`);
+        const stintsData = {};
+        if (stintsRaw && stintsRaw.length > 0) {
+            stintsRaw.forEach(s => {
+                if(!stintsData[s.driver_number]) stintsData[s.driver_number] = [];
+                stintsData[s.driver_number].push(s);
+            });
+        }
+
+        const posRaw = await fetchCached(`https://api.openf1.org/v1/position?session_key=${sessionKey}`);
+        const positionsData = {};
+        if (posRaw && posRaw.length > 0) {
+            posRaw.forEach(p => {
+                if(!positionsData[p.driver_number]) positionsData[p.driver_number] = [];
+                positionsData[p.driver_number].push({ time: new Date(p.date).getTime(), position: p.position });
+            });
+            Object.values(positionsData).forEach(arr => arr.sort((a,b)=>a.time - b.time));
+        }
+
+        const intRaw = await fetchCached(`https://api.openf1.org/v1/intervals?session_key=${sessionKey}`);
+        const intervalsData = {};
+        if (intRaw && intRaw.length > 0) {
+            intRaw.forEach(i => {
+                if(!intervalsData[i.driver_number]) intervalsData[i.driver_number] = [];
+                intervalsData[i.driver_number].push({ 
+                    time: new Date(i.date).getTime(), 
+                    gap: i.gap_to_leader !== null ? `+${i.gap_to_leader}s` : (i.interval !== null ? `+${i.interval}s` : '')
+                });
+            });
+            Object.values(intervalsData).forEach(arr => arr.sort((a,b)=>a.time - b.time));
+        }
+
+        const chunkDuration = 15 * 60 * 1000; 
+        const dataByDriver = {};
+        let referenceDriverForTrack = null;
+        
+        const totalChunks = Math.ceil((endTimeMs - startTimeMs) / chunkDuration);
+        
+        for (let i = 0; i < totalChunks; i++) {
+            const cStart = startTimeMs + (i * chunkDuration);
+            const cEnd = Math.min(cStart + chunkDuration, endTimeMs);
+            const startIso = new Date(cStart).toISOString();
+            const endIso = new Date(cEnd).toISOString();
+            
+            const progressBar = document.getElementById('replay-loading-bar');
+            const progressText = document.getElementById('replay-loading-progress');
+            const pct = Math.round(((i + 1) / totalChunks) * 100);
+            
+            if (progressBar) progressBar.style.width = `${pct}%`;
+            if (progressText) progressText.innerText = `Menarik Potongan Data ${i + 1} dari ${totalChunks} (${pct}%)`;
+            
+            const csvUrl = `https://api.openf1.org/v1/location?session_key=${sessionKey}&date>=${startIso}&date<${endIso}&csv=true`;
+            
+            try {
+                const csvText = await fetchCached(csvUrl);
+                if (csvText && csvText.trim() !== '') {
+                    const results = Papa.parse(csvText, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true
+                    });
+                    
+                    results.data.forEach((d, idx) => {
+                        let x = d.x; let y = d.y; let drv = d.driver_number; let t = d.date;
+
+                        if (x == null || y == null || drv == null || t == null) return;
+
+                        if (x < minX) minX = x; if (x > maxX) maxX = x;
+                        if (y < minY) minY = y; if (y > maxY) maxY = y;
+                        
+                        if (!dataByDriver[drv]) dataByDriver[drv] = [];
+                        dataByDriver[drv].push({ time: new Date(t).getTime(), x: x, y: y });
+
+                        if (trackPoints.length === 0) {
+                            if (!referenceDriverForTrack) referenceDriverForTrack = drv;
+                            if (drv === referenceDriverForTrack && idx % 8 === 0) {
+                                trackPoints.push({ x: x, y: y, type: 'dot' });
+                            }
+                        }
+                    });
+                }
+            } catch(e) {
+                console.warn(`Chunk ${i} gagal dimuat:`, e);
+            }
+        }
+        
+        if (Object.keys(dataByDriver).length === 0) {
+            throw new Error("Data telemetri CSV kosong atau belum tersedia dari FIA.");
+        }
+
+        let globalStart = Infinity;
+        let globalEnd = -Infinity;
+
+        Object.keys(dataByDriver).forEach(drv => {
+            dataByDriver[drv].sort((a,b) => a.time - b.time);
+            if (dataByDriver[drv].length > 0) {
+                if (dataByDriver[drv][0].time < globalStart) globalStart = dataByDriver[drv][0].time;
+                if (dataByDriver[drv][dataByDriver[drv].length - 1].time > globalEnd) globalEnd = dataByDriver[drv][dataByDriver[drv].length - 1].time;
+            }
+        });
+
+        state.replay = {
+            ...state.replay,
+            dataByDriver,
+            trackPoints, minX, maxX, minY, maxY,
+            lapsData, positionsData, stintsData, intervalsData, totalLaps,
+            startTime: globalStart,
+            endTime: globalEnd,
+            currentTime: globalStart,
+            isPlaying: false,
+            loading: false,
+            error: null,
+            zoom: 1, panX: 0, panY: 0
+        };
+
+        renderMain();
+        setTimeout(initReplayCanvas, 100);
+
       } catch (err) {
          state.replay.error = err.message;
-      } finally {
          state.replay.loading = false;
-         if (state.viewMode === 'replay') {
-            renderMain();
-            if (!state.replay.error) setTimeout(initReplayCanvas, 100);
-         }
+         renderMain();
       }
     }
 
     function initReplayCanvas() {
       const canvas = document.getElementById('replay-canvas');
-      if (!canvas) return;
+      const container = document.getElementById('replay-container');
+      if (!canvas || !container) return;
+
+      if (state.replay.isFullscreen && container.parentNode !== document.body) {
+          const placeholder = document.createElement('div');
+          placeholder.id = 'replay-placeholder';
+          container.parentNode.insertBefore(placeholder, container);
+          document.body.appendChild(container);
+      }
 
       canvas.width = canvas.parentElement.clientWidth;
       canvas.height = canvas.parentElement.clientHeight || 500;
@@ -411,41 +807,166 @@
       const ctx = canvas.getContext('2d');
       const rState = state.replay;
 
-      const padding = 40;
-      const width = canvas.width - padding * 2;
+      const padding = window.innerWidth > 640 ? 60 : 30;
+      const lbOffset = window.innerWidth > 640 ? 270 : 160; 
+      const width = canvas.width - padding * 2 - lbOffset;
       const height = canvas.height - padding * 2;
       
       const trackWidth = rState.maxX - rState.minX;
       const trackHeight = rState.maxY - rState.minY;
       
-      // Skala seragam
       const scale = Math.min(width / trackWidth, height / trackHeight);
-      const offsetX = padding + (width - trackWidth * scale) / 2;
+      const offsetX = padding + lbOffset + (width - trackWidth * scale) / 2;
       const offsetY = padding + (height - trackHeight * scale) / 2;
 
-      // --- MEMBUAT BACKGROUND TRACK (GHOST MAPPING) ---
-      // Daripada kosong, kita cat pergerakan mobil jadi lintasan dengan offscreen canvas
       const trackBg = document.createElement('canvas');
       trackBg.width = canvas.width;
       trackBg.height = canvas.height;
       const bgCtx = trackBg.getContext('2d');
       
-      bgCtx.fillStyle = '#404040';
-      bgCtx.globalAlpha = 0.2; // Opacity kecil agar overlap memunculkan racing line yang nyata
+      bgCtx.strokeStyle = '#52525b';
+      bgCtx.fillStyle = '#52525b';
+      bgCtx.lineWidth = window.innerWidth > 640 ? 4 : 2;
+      bgCtx.lineCap = 'round';
+      bgCtx.lineJoin = 'round';
       
-      for(let i = 0; i < rState.trackPoints.length; i++) {
-         const pos = rState.trackPoints[i];
-         const cx = offsetX + (pos.x - rState.minX) * scale;
-         const cy = offsetY + (rState.maxY - pos.y) * scale;
-         bgCtx.beginPath();
-         bgCtx.arc(cx, cy, 3, 0, Math.PI * 2);
-         bgCtx.fill();
+      if (rState.trackPoints.length > 0) {
+          if (rState.trackPoints[0].type === 'line') {
+              bgCtx.beginPath();
+              rState.trackPoints.forEach((pos, i) => {
+                  const cx = offsetX + (pos.x - rState.minX) * scale;
+                  const cy = offsetY + (rState.maxY - pos.y) * scale;
+                  if (i === 0) bgCtx.moveTo(cx, cy);
+                  else bgCtx.lineTo(cx, cy);
+              });
+              bgCtx.stroke();
+          } else {
+              rState.trackPoints.forEach((pos) => {
+                  const cx = offsetX + (pos.x - rState.minX) * scale;
+                  const cy = offsetY + (rState.maxY - pos.y) * scale;
+                  bgCtx.beginPath();
+                  bgCtx.arc(cx, cy, 2, 0, Math.PI * 2);
+                  bgCtx.fill();
+              });
+          }
       }
 
       rState.trackBgCanvas = trackBg;
       rState.scale = scale;
       rState.offsetX = offsetX;
       rState.offsetY = offsetY;
+
+      // Event Listeners for Pan & Zoom (Mouse & Touch)
+      canvas.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          const rect = canvas.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+
+          const zoomIntensity = 0.1;
+          const delta = e.deltaY < 0 ? 1 + zoomIntensity : 1 - zoomIntensity;
+          
+          let newZoom = rState.zoom * delta;
+          newZoom = Math.max(0.5, Math.min(newZoom, 15)); // Limit zoom dari 0.5x sampai 15x
+
+          const canvasX = (mouseX - rState.panX) / rState.zoom;
+          const canvasY = (mouseY - rState.panY) / rState.zoom;
+
+          rState.panX = mouseX - canvasX * newZoom;
+          rState.panY = mouseY - canvasY * newZoom;
+          rState.zoom = newZoom;
+
+          if (!rState.isPlaying) drawCanvas(ctx, canvas);
+      }, { passive: false });
+
+      let isDragging = false;
+      let lastX = 0;
+      let lastY = 0;
+      let initialPinchDist = 0;
+      let initialZoom = 1;
+      let pinchCenterX = 0;
+      let pinchCenterY = 0;
+
+      canvas.addEventListener('mousedown', (e) => {
+          if (e.button === 1 || e.button === 0) { // Middle click atau Left Click buat geser
+              isDragging = true;
+              lastX = e.clientX;
+              lastY = e.clientY;
+              canvas.style.cursor = 'grabbing';
+          }
+      });
+
+      canvas.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          rState.panX += e.clientX - lastX;
+          rState.panY += e.clientY - lastY;
+          lastX = e.clientX;
+          lastY = e.clientY;
+          if (!rState.isPlaying) drawCanvas(ctx, canvas);
+      });
+
+      const stopDrag = () => { 
+          isDragging = false; 
+          canvas.style.cursor = 'grab';
+      };
+      canvas.addEventListener('mouseup', stopDrag);
+      canvas.addEventListener('mouseleave', stopDrag);
+
+      canvas.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+              isDragging = true;
+              lastX = e.touches[0].clientX;
+              lastY = e.touches[0].clientY;
+          } else if (e.touches.length === 2) {
+              isDragging = false;
+              const t1 = e.touches[0];
+              const t2 = e.touches[1];
+              initialPinchDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+              initialZoom = rState.zoom;
+              pinchCenterX = (t1.clientX + t2.clientX) / 2;
+              pinchCenterY = (t1.clientY + t2.clientY) / 2;
+          }
+      }, { passive: false });
+
+      canvas.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          if (e.touches.length === 1 && isDragging) {
+              rState.panX += e.touches[0].clientX - lastX;
+              rState.panY += e.touches[0].clientY - lastY;
+              lastX = e.touches[0].clientX;
+              lastY = e.touches[0].clientY;
+          } else if (e.touches.length === 2) {
+              const t1 = e.touches[0];
+              const t2 = e.touches[1];
+              const currentDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+              
+              let newZoom = initialZoom * (currentDist / initialPinchDist);
+              newZoom = Math.max(0.5, Math.min(newZoom, 15));
+
+              const rect = canvas.getBoundingClientRect();
+              const mouseX = pinchCenterX - rect.left;
+              const mouseY = pinchCenterY - rect.top;
+
+              const canvasX = (mouseX - rState.panX) / rState.zoom;
+              const canvasY = (mouseY - rState.panY) / rState.zoom;
+
+              rState.panX = mouseX - canvasX * newZoom;
+              rState.panY = mouseY - canvasY * newZoom;
+              rState.zoom = newZoom;
+          }
+          if (!rState.isPlaying) drawCanvas(ctx, canvas);
+      }, { passive: false });
+
+      canvas.addEventListener('touchend', (e) => {
+          if (e.touches.length === 0) isDragging = false;
+          else if (e.touches.length === 1) {
+              lastX = e.touches[0].clientX;
+              lastY = e.touches[0].clientY;
+              isDragging = true;
+          }
+      });
+      canvas.addEventListener('touchcancel', () => isDragging = false);
+      canvas.style.cursor = 'grab';
 
       let lastDrawTime = performance.now();
 
@@ -458,27 +979,25 @@
          const dt = time - lastDrawTime;
          lastDrawTime = time;
 
-         // Full sesi itu panjang (2 jam). Kita lipat gandakan speednya 120x lipat
-         // Jadi balapan 2 jam bisa ditonton dalam 1 menit doang.
-         rState.currentTime += dt * 120;
+         rState.currentTime += dt * rState.playbackSpeed;
 
-         if (rState.currentTime > rState.endTime) {
+         if (rState.currentTime >= rState.endTime) {
              rState.isPlaying = false; 
              rState.currentTime = rState.endTime;
              const btn = document.getElementById('btn-play-pause');
              if(btn) {
-                 btn.innerHTML = '<i data-lucide="play" class="w-5 h-5"></i>';
+                 btn.innerHTML = '<i data-lucide="play" class="w-5 h-5 fill-current"></i>';
                  lucide.createIcons();
              }
          }
 
          drawCanvas(ctx, canvas);
-         updateReplayUI();
+         updateReplayUI(time);
          state.replay.animationId = requestAnimationFrame(drawLoop);
       }
 
-      // Draw first frame
       drawCanvas(ctx, canvas);
+      updateReplayUI(performance.now(), true);
       state.replay.animationId = requestAnimationFrame(drawLoop);
     }
 
@@ -486,57 +1005,79 @@
       const rState = state.replay;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 1. Gambar Lintasan Otomatis
       if (rState.trackBgCanvas) {
+          ctx.save();
+          ctx.translate(rState.panX, rState.panY);
+          ctx.scale(rState.zoom, rState.zoom);
           ctx.drawImage(rState.trackBgCanvas, 0, 0);
+          ctx.restore();
       }
 
-      // 2. Binary Search untuk mencari posisi paling presisi tanpa bikin nge-lag
       const latestPos = {};
       Object.keys(rState.dataByDriver).forEach(driverNum => {
          const driverData = rState.dataByDriver[driverNum];
+         if (driverData.length === 0) return;
+
          let left = 0; 
          let right = driverData.length - 1; 
-         let bestMatch = null;
+         let prevMatch = null;
+         let idx = -1;
          
          while (left <= right) {
             let mid = Math.floor((left + right) / 2);
             if (driverData[mid].time <= rState.currentTime) {
-               bestMatch = driverData[mid]; // Ini titik terdekat di bawah atau sama dgn current time
+               prevMatch = driverData[mid];
+               idx = mid;
                left = mid + 1;
             } else {
                right = mid - 1;
             }
          }
          
-         if (bestMatch) latestPos[driverNum] = bestMatch;
+         // Interpolasi Linear (Lerp) untuk 60FPS Mulus
+         if (prevMatch) {
+             const nextMatch = driverData[idx + 1];
+             if (nextMatch && (nextMatch.time - prevMatch.time) < 5000) { 
+                 const dt = nextMatch.time - prevMatch.time;
+                 const ratio = dt > 0 ? (rState.currentTime - prevMatch.time) / dt : 0;
+                 latestPos[driverNum] = {
+                     x: prevMatch.x + (nextMatch.x - prevMatch.x) * ratio,
+                     y: prevMatch.y + (nextMatch.y - prevMatch.y) * ratio
+                 };
+             } else {
+                 latestPos[driverNum] = prevMatch;
+             }
+         }
       });
 
-      // 3. Render Dot Pembalap
+      const dotRadius = window.innerWidth > 640 ? 7 : 4;
+
       Object.entries(latestPos).forEach(([driverNum, pos]) => {
          if (pos.x == null || pos.y == null) return;
 
          const driver = state.drivers.find(d => d.driver_number == driverNum);
          const teamColor = driver ? getTeamColor(driver.team_colour) : '#ffffff';
+         const labelText = driver ? `${driver.name_acronym} ${driverNum}` : driverNum;
 
-         const cx = rState.offsetX + (pos.x - rState.minX) * rState.scale;
-         const cy = rState.offsetY + (rState.maxY - pos.y) * rState.scale;
+         const baseCx = rState.offsetX + (pos.x - rState.minX) * rState.scale;
+         const baseCy = rState.offsetY + (rState.maxY - pos.y) * rState.scale;
+         
+         const cx = baseCx * rState.zoom + rState.panX;
+         const cy = baseCy * rState.zoom + rState.panY;
 
-         // Dot Pembalap
          ctx.beginPath();
-         ctx.arc(cx, cy, 7, 0, 2 * Math.PI);
+         ctx.arc(cx, cy, dotRadius, 0, 2 * Math.PI);
          ctx.fillStyle = teamColor;
          ctx.fill();
          ctx.strokeStyle = '#ffffff';
-         ctx.lineWidth = 1.5;
+         ctx.lineWidth = window.innerWidth > 640 ? 1.5 : 1;
          ctx.stroke();
 
-         // Nomor Mobil
          ctx.fillStyle = '#ffffff';
-         ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+         ctx.font = `bold ${window.innerWidth > 640 ? '11px' : '9px'} "Plus Jakarta Sans", sans-serif`;
          ctx.shadowColor = 'rgba(0,0,0,0.8)';
          ctx.shadowBlur = 4;
-         ctx.fillText(driverNum, cx + 10, cy + 4);
+         ctx.fillText(labelText, cx + (window.innerWidth > 640 ? 10 : 6), cy + (window.innerWidth > 640 ? 4 : 3));
          ctx.shadowBlur = 0; 
       });
     }
@@ -545,29 +1086,85 @@
       state.replay.isPlaying = !state.replay.isPlaying;
       const btn = document.getElementById('btn-play-pause');
       if (btn) {
-          btn.innerHTML = `<i data-lucide="${state.replay.isPlaying ? 'pause' : 'play'}" class="w-5 h-5"></i>`;
+          btn.innerHTML = `<i data-lucide="${state.replay.isPlaying ? 'pause' : 'play'}" class="w-4 h-4 sm:w-5 sm:h-5 fill-current"></i>`;
           lucide.createIcons();
       }
     }
 
-    function seekReplay(percent) {
+    function resetReplayView() {
+        state.replay.zoom = 1;
+        state.replay.panX = 0;
+        state.replay.panY = 0;
+        const canvas = document.getElementById('replay-canvas');
+        if (canvas) {
+            drawCanvas(canvas.getContext('2d'), canvas);
+        }
+    }
+
+    function toggleFullscreenReplay() {
+        const container = document.getElementById('replay-container');
+        const closeBtn = document.getElementById('replay-close-fullscreen');
+        const maximizeBtn = document.getElementById('replay-maximize-btn');
+        const minimizeBtn = document.getElementById('replay-minimize-btn');
+        const topControls = document.getElementById('replay-top-controls');
+        
+        if (!container) return;
+        
+        state.replay.isFullscreen = !state.replay.isFullscreen;
+        
+        if (state.replay.isFullscreen) {
+            if (container.parentNode !== document.body) {
+                const placeholder = document.createElement('div');
+                placeholder.id = 'replay-placeholder';
+                container.parentNode.insertBefore(placeholder, container);
+                document.body.appendChild(container);
+            }
+            container.classList.remove('relative', 'rounded-3xl', 'mb-8', 'h-[60vh]', 'sm:h-[600px]', 'shadow-[0_10px_50px_rgba(0,0,0,0.5)]', 'border');
+            container.classList.add('fixed', 'inset-0', 'z-[200]', 'bg-f1dark');
+            document.body.style.overflow = 'hidden';
+            if(closeBtn) closeBtn.classList.remove('hidden');
+            if(maximizeBtn) maximizeBtn.classList.add('hidden');
+            if(minimizeBtn) minimizeBtn.classList.remove('hidden');
+            if(topControls) topControls.classList.add('pr-12', 'md:pr-16'); 
+        } else {
+            const placeholder = document.getElementById('replay-placeholder');
+            if (placeholder) {
+                placeholder.parentNode.insertBefore(container, placeholder);
+                placeholder.remove();
+            }
+            container.classList.add('relative', 'rounded-3xl', 'mb-8', 'h-[60vh]', 'sm:h-[600px]', 'shadow-[0_10px_50px_rgba(0,0,0,0.5)]', 'border');
+            container.classList.remove('fixed', 'inset-0', 'z-[200]', 'bg-f1dark');
+            document.body.style.overflow = '';
+            if(closeBtn) closeBtn.classList.add('hidden');
+            if(maximizeBtn) maximizeBtn.classList.remove('hidden');
+            if(minimizeBtn) minimizeBtn.classList.add('hidden');
+            if(topControls) topControls.classList.remove('pr-12', 'md:pr-16');
+        }
+
+        if (state.replay.animationId) cancelAnimationFrame(state.replay.animationId);
+        setTimeout(initReplayCanvas, 50);
+    }
+
+    async function seekReplay(percent) {
       if (!state.replay.startTime) return;
       const rState = state.replay;
       const totalDuration = rState.endTime - rState.startTime;
-      rState.currentTime = rState.startTime + (totalDuration * (percent / 100));
+      const targetTime = rState.startTime + (totalDuration * (percent / 100));
       
+      rState.currentTime = targetTime;
+
       const canvas = document.getElementById('replay-canvas');
       if (canvas) {
           drawCanvas(canvas.getContext('2d'), canvas);
-          updateReplayUI();
+          updateReplayUI(performance.now(), true);
       }
     }
 
-    function updateReplayUI() {
+    let lastUiUpdateTime = 0;
+    function updateReplayUI(time = 0, force = false) {
       const rState = state.replay;
+
       const elapsed = rState.currentTime - rState.startTime;
-      
-      // Hitung dalam durasi simulasi (bukan durasi asli) untuk UI jam balapan
       const hours = Math.floor(elapsed / 3600000).toString().padStart(2, '0');
       const mins = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0');
       const secs = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
@@ -579,10 +1176,151 @@
       if(slider && rState.endTime > rState.startTime) {
           slider.value = ((rState.currentTime - rState.startTime) / (rState.endTime - rState.startTime)) * 100;
       }
+
+      // Animasi Leaderboard di throttle tiap 500ms biar sinkron dengan CSS transition 500ms
+      if (!force && time - lastUiUpdateTime < 500) return;
+      lastUiUpdateTime = time;
+
+      const lbContainer = document.getElementById('replay-leaderboard-content');
+      const lapInfoElTower = document.getElementById('replay-lap-info-tower');
+      const lapInfoElTop = document.getElementById('replay-lap-info');
+
+      if (!rState.positionsData || Object.keys(rState.positionsData).length === 0) return;
+
+      const currentBoard = [];
+      let currentMaxLap = 1;
+
+      state.drivers.forEach(d => {
+         const dNum = d.driver_number;
+         let livePos = 99;
+         let startPos = 99;
+         
+         if (rState.positionsData[dNum] && rState.positionsData[dNum].length > 0) {
+            const pArr = rState.positionsData[dNum];
+            startPos = pArr[0].position; 
+            
+            let left = 0; let right = pArr.length - 1; let bestP = pArr[0]?.position || 99;
+            while(left <= right){
+                let mid = Math.floor((left+right)/2);
+                if(pArr[mid].time <= rState.currentTime){
+                    bestP = pArr[mid].position;
+                    left = mid+1;
+                }else{
+                    right = mid-1;
+                }
+            }
+            livePos = bestP;
+         }
+
+         let liveLap = 1;
+         if (rState.lapsData) {
+            const lArr = rState.lapsData.filter(l => l.driver_number == dNum);
+            for(let i=0; i<lArr.length; i++) {
+                const lTime = new Date(lArr[i].date_start).getTime();
+                if (lTime <= rState.currentTime) liveLap = lArr[i].lap_number;
+            }
+         }
+         if (liveLap > currentMaxLap && liveLap < 100) currentMaxLap = liveLap; 
+
+         let tyreHistory = [];
+         if (rState.stintsData[dNum]) {
+            const sArr = rState.stintsData[dNum];
+            tyreHistory = sArr.filter(s => s.lap_start <= liveLap).map(s => s.compound);
+         }
+         
+         let liveGap = '';
+         if (rState.intervalsData && rState.intervalsData[dNum]) {
+            const iArr = rState.intervalsData[dNum];
+            let left = 0; let right = iArr.length - 1; let bestGap = '';
+            while(left <= right){
+                let mid = Math.floor((left+right)/2);
+                if(iArr[mid].time <= rState.currentTime){
+                    bestGap = iArr[mid].gap;
+                    left = mid+1;
+                }else{
+                    right = mid-1;
+                }
+            }
+            liveGap = bestGap;
+         }
+         if (livePos === 1) liveGap = 'Leader'; 
+
+         currentBoard.push({ driver: d, pos: livePos, startPos: startPos, tyres: tyreHistory, gap: liveGap });
+      });
+
+      if (lapInfoElTower) lapInfoElTower.innerText = `Lap ${currentMaxLap} / ${rState.totalLaps ? rState.totalLaps : '?'}`;
+      if (lapInfoElTop) lapInfoElTop.innerText = `LAP ${currentMaxLap} / ${rState.totalLaps ? rState.totalLaps : '?'}`;
+
+      currentBoard.sort((a,b) => a.pos - b.pos);
+      
+      if (lbContainer) {
+         currentBoard.forEach((c, index) => {
+            const rowEl = document.getElementById(`lb-row-${c.driver.driver_number}`);
+            if (rowEl) {
+                const displayIndex = index; 
+                rowEl.style.transform = `translateY(${displayIndex * 40}px)`; 
+                
+                const posEl = document.getElementById(`lb-pos-${c.driver.driver_number}`);
+                if (posEl) posEl.innerText = c.pos < 99 ? c.pos : '-';
+
+                const diffEl = document.getElementById(`lb-pos-diff-${c.driver.driver_number}`);
+                if (diffEl && c.pos < 99 && c.startPos < 99) {
+                    const diff = c.startPos - c.pos;
+                    if (diff > 0) diffEl.innerHTML = `<span class="text-green-500">▲${diff}</span>`;
+                    else if (diff < 0) diffEl.innerHTML = `<span class="text-red-500">▼${Math.abs(diff)}</span>`;
+                    else diffEl.innerHTML = `<span class="text-gray-600">-</span>`;
+                } else if (diffEl) {
+                    diffEl.innerHTML = '';
+                }
+
+                const gapEl = document.getElementById(`lb-gap-${c.driver.driver_number}`);
+                if (gapEl) gapEl.innerText = c.gap || '';
+
+                const tyreHistoryEl = document.getElementById(`lb-tyre-history-${c.driver.driver_number}`);
+                const tyreCurrentEl = document.getElementById(`lb-tyre-current-${c.driver.driver_number}`);
+                
+                let tyColor = 'text-gray-500';
+                let tyText = '?';
+                if (c.tyres && c.tyres.length > 0) {
+                    const currentTyre = c.tyres[c.tyres.length - 1];
+                    if (currentTyre) {
+                        tyText = currentTyre.substring(0,1).toUpperCase();
+                        if(currentTyre === 'SOFT') tyColor = 'text-red-500';
+                        else if(currentTyre === 'MEDIUM') tyColor = 'text-yellow-400';
+                        else if(currentTyre === 'HARD') tyColor = 'text-white';
+                        else if(currentTyre === 'INTERMEDIATE') tyColor = 'text-green-500';
+                        else if(currentTyre === 'WET') tyColor = 'text-blue-500';
+                    }
+                }
+
+                if (tyreCurrentEl) {
+                    tyreCurrentEl.className = `sm:hidden w-4 text-right text-[10px] font-black shrink-0 ${tyColor}`;
+                    tyreCurrentEl.innerText = tyText;
+                }
+
+                if (tyreHistoryEl) {
+                    tyreHistoryEl.innerHTML = c.tyres.map(tyre => {
+                        let hColor = 'text-gray-500';
+                        let hText = '?';
+                        if (tyre) {
+                            hText = tyre.substring(0,1).toUpperCase();
+                            if(tyre === 'SOFT') hColor = 'text-red-500';
+                            else if(tyre === 'MEDIUM') hColor = 'text-yellow-400';
+                            else if(tyre === 'HARD') hColor = 'text-white';
+                            else if(tyre === 'INTERMEDIATE') hColor = 'text-green-500';
+                            else if(tyre === 'WET') hColor = 'text-blue-500';
+                        }
+                        return `<span class="text-[11px] font-black ${hColor}" title="${tyre}">${hText}</span>`;
+                    }).join('<span class="text-gray-600 text-[8px] mx-0.5 opacity-50">›</span>');
+                }
+            }
+         });
+      }
     }
 
     // --- FETCH DATA (MENGGUNAKAN CACHE) ---
     async function loadMeetings(year) {
+      cleanupReplayContainer();
       state.year = year;
       state.loading.meetings = true;
       state.error = null;
@@ -596,8 +1334,12 @@
         
         if (data.length > 0) {
           const now = new Date();
-          const upcoming = data.find(m => new Date(m.date_start) > now) || data[data.length - 1];
-          selectMeeting(upcoming);
+          const pastMeetings = data.filter(m => new Date(m.date_start) <= now);
+          if (pastMeetings.length > 0) {
+             selectMeeting(pastMeetings[pastMeetings.length - 1]); 
+          } else {
+             selectMeeting(data[0]); 
+          }
         } else {
           selectMeeting(null);
         }
@@ -689,9 +1431,11 @@
       try {
         const data = await fetchCached(`https://api.openf1.org/v1/position?session_key=${state.selectedSession.session_key}`);
         const latestPos = {};
-        data.forEach(p => {
-          latestPos[p.driver_number] = p.position;
-        });
+        if (data && data.length > 0) {
+           data.forEach(p => {
+             latestPos[p.driver_number] = p.position;
+           });
+        }
         state.positions = latestPos;
       } catch (err) {
         console.error(err);
@@ -709,10 +1453,12 @@
       try {
         const data = await fetchCached(`https://api.openf1.org/v1/intervals?session_key=${state.selectedSession.session_key}`);
         const latestIntervals = {};
-        data.forEach(i => {
-          if (i.gap_to_leader !== null) latestIntervals[i.driver_number] = `+${i.gap_to_leader}s`;
-          else if (i.interval !== null) latestIntervals[i.driver_number] = `+${i.interval}s`;
-        });
+        if (data && data.length > 0) {
+           data.forEach(i => {
+             if (i.gap_to_leader !== null) latestIntervals[i.driver_number] = `+${i.gap_to_leader}s`;
+             else if (i.interval !== null) latestIntervals[i.driver_number] = `+${i.interval}s`;
+           });
+        }
         state.intervals = latestIntervals;
         renderMain(); 
       } catch (err) {
@@ -746,7 +1492,8 @@
         for (const s of validSessions) {
           try {
             const positions = await fetchCached(`https://api.openf1.org/v1/position?session_key=${s.session_key}`);
-            
+            if (!positions || positions.length === 0) continue;
+
             const meeting = state.meetings.find(m => m.meeting_key === s.meeting_key) || { meeting_name: 'Unknown GP', country_name: 'Unknown' };
             const mName = meeting.meeting_name || meeting.country_name;
 
@@ -767,7 +1514,7 @@
                  });
               }
             });
-            await new Promise(r => setTimeout(r, 100)); // Delay antar request tetap perlu biarpun ada cache
+            await new Promise(r => setTimeout(r, 100)); 
           } catch (e) {}
         }
         
@@ -776,13 +1523,13 @@
           const latestSession = validSessions[validSessions.length - 1];
           try {
               const driverData = await fetchCached(`https://api.openf1.org/v1/drivers?meeting_key=${latestSession.meeting_key}`);
-              driverData.forEach(d => { driverDetailsMap[d.driver_number] = d; });
+              if(driverData && driverData.length > 0) driverData.forEach(d => { driverDetailsMap[d.driver_number] = d; });
           } catch(e) {}
           
           const firstSession = validSessions[0];
           try {
               const driverData = await fetchCached(`https://api.openf1.org/v1/drivers?meeting_key=${firstSession.meeting_key}`);
-              driverData.forEach(d => { 
+              if(driverData && driverData.length > 0) driverData.forEach(d => { 
                   if (!driverDetailsMap[d.driver_number]) driverDetailsMap[d.driver_number] = d; 
               });
           } catch(e) {}
@@ -831,6 +1578,7 @@
     // --- ACTIONS ---
     function selectYear(y) {
       if (state.year === y) return;
+      cleanupReplayContainer();
       state.year = y;
       
       if (state.tab === 'calendar') {
@@ -842,22 +1590,26 @@
     }
 
     function selectMeeting(meeting) {
+      cleanupReplayContainer();
       state.selectedMeeting = meeting;
+      toggleMobileSidebar(false); // Close sidebar on mobile after selection
       renderSidebar();
       loadSessions();
     }
 
     function selectSession(session) {
+      cleanupReplayContainer();
       state.selectedSession = session;
       state.positions = {};
       state.intervals = {};
       
-      // Matikan animasi replay lama jika ada
-      if (state.replay.animationId) cancelAnimationFrame(state.replay.animationId);
       state.replay = { 
         dataByDriver: {}, trackPoints: [], trackBgCanvas: null,
+        lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, totalLaps: 0,
         scale: 1, offsetX: 0, offsetY: 0, minX: 0, maxX: 0, minY: 0, maxY: 0, 
-        startTime: 0, endTime: 0, currentTime: 0, isPlaying: false, loading: false, error: null, animationId: null 
+        zoom: 1, panX: 0, panY: 0,
+        startTime: 0, endTime: 0, currentTime: 0, loadedUntil: 0, isBuffering: false, 
+        isPlaying: false, loading: false, error: null, animationId: null, playbackSpeed: 1, isFullscreen: false 
       };
       
       loadDrivers();
@@ -867,11 +1619,16 @@
     }
 
     function setViewMode(mode) {
-      if(state.viewMode === 'replay' && state.replay.animationId) {
-          cancelAnimationFrame(state.replay.animationId);
-      }
-      
+      cleanupReplayContainer();
       state.viewMode = mode;
+      
+      if (mode === 'replay') {
+          state.replay.isFullscreen = true;
+          document.body.style.overflow = 'hidden';
+      } else {
+          state.replay.isFullscreen = false;
+          document.body.style.overflow = '';
+      }
       
       if(mode === 'replay' && Object.keys(state.replay.dataByDriver).length === 0) {
           loadReplayData();
@@ -883,29 +1640,40 @@
 
     function setTab(tab) {
       if (state.tab === tab) return;
+      cleanupReplayContainer();
       state.tab = tab;
-      
-      if(state.viewMode === 'replay' && state.replay.animationId) {
-          cancelAnimationFrame(state.replay.animationId);
-      }
       
       const btnCal = document.getElementById('tab-calendar');
       const btnStd = document.getElementById('tab-standings');
+      const sidebar = document.getElementById('main-sidebar');
       
       if (tab === 'calendar') {
-        btnCal.className = 'px-5 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-red-600 to-red-500 text-white shadow transition-all';
-        btnStd.className = 'px-5 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all';
-        document.querySelector('aside').classList.remove('md:hidden');
+        btnCal.className = 'px-5 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-red-600 to-red-500 text-white shadow transition-all flex-1 sm:flex-none';
+        btnStd.className = 'px-5 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex-1 sm:flex-none';
+        
+        if (sidebar) {
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('md:flex');
+        }
         
         if (state.meetings.length === 0) loadMeetings(state.year);
         else {
            renderMain();
            if(state.viewMode === 'replay') setTimeout(initReplayCanvas, 50);
+           // On mobile, if returning to calendar without selection, auto open sidebar
+           if (!state.selectedMeeting && window.innerWidth < 768) {
+               toggleMobileSidebar(true);
+           }
         }
       } else {
-        btnCal.className = 'px-5 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all';
-        btnStd.className = 'px-5 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-red-600 to-red-500 text-white shadow transition-all';
-        document.querySelector('aside').classList.add('md:hidden');
+        btnCal.className = 'px-5 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all flex-1 sm:flex-none';
+        btnStd.className = 'px-5 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-red-600 to-red-500 text-white shadow transition-all flex-1 sm:flex-none';
+        
+        if (sidebar) {
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('md:flex');
+            toggleMobileSidebar(false);
+        }
         
         loadStandingsData();
       }
@@ -922,7 +1690,7 @@
       elYearSelector.innerHTML = years.map(y => `
         <button 
           onclick="selectYear(${y})"
-          class="px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-300 ${
+          class="px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-300 shrink-0 ${
             state.year === y 
               ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-[0_4px_12px_rgba(220,38,38,0.3)]' 
               : 'text-gray-400 hover:bg-white/5 hover:text-white'
@@ -959,24 +1727,27 @@
         return;
       }
 
+      const now = new Date();
       elMeetingsList.innerHTML = state.meetings.map(m => {
         const isSelected = state.selectedMeeting?.meeting_key === m.meeting_key;
         const startDate = new Date(m.date_start);
+        const isFuture = startDate > now;
         const dateStr = startDate.toLocaleDateString('id-ID', { month: 'short', day: 'numeric' });
         
         return `
           <button
-            onclick='selectMeeting(${JSON.stringify(m).replace(/'/g, "&#39;")})'
+            ${isFuture ? 'disabled title="Balapan Belum Dimulai"' : `onclick='selectMeeting(${JSON.stringify(m).replace(/'/g, "&#39;")})'`}
             class="w-full text-left p-3.5 flex gap-3.5 rounded-xl transition-all duration-300 group ${
+              isFuture ? 'opacity-30 cursor-not-allowed grayscale' :
               isSelected 
                 ? 'bg-neutral-800/80 shadow-lg border border-white/10' 
                 : 'hover:bg-white/5 border border-transparent'
             }"
           >
-            <div class="w-1 rounded-full shrink-0 transition-all duration-300 ${isSelected ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'bg-neutral-700 group-hover:bg-neutral-500'}"></div>
+            <div class="w-1 rounded-full shrink-0 transition-all duration-300 ${isSelected && !isFuture ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'bg-neutral-700 group-hover:bg-neutral-500'}"></div>
             <div class="flex flex-col min-w-0">
               <span class="text-[11px] text-red-400 font-bold uppercase tracking-widest mb-1">${dateStr}</span>
-              <span class="font-bold truncate text-[15px] transition-colors duration-300 ${isSelected ? 'text-white' : 'text-gray-300'}">
+              <span class="font-bold truncate text-[15px] transition-colors duration-300 ${isSelected && !isFuture ? 'text-white' : 'text-gray-300'}">
                 ${m.meeting_name}
               </span>
               <span class="text-xs text-gray-500 flex items-center gap-1.5 mt-1 truncate font-medium">
@@ -993,9 +1764,12 @@
     function renderMain() {
       if (!state.selectedMeeting) {
         elMainContent.innerHTML = `
-          <div class="flex-1 flex items-center justify-center text-neutral-600 flex-col gap-5 fade-in">
+          <div class="flex-1 flex items-center justify-center text-neutral-600 flex-col gap-5 fade-in px-4 text-center mt-20">
             <i data-lucide="flag" class="w-16 h-16 opacity-30"></i>
-            <p class="font-medium text-lg tracking-wide">Pilih balapan dari panel kalender</p>
+            <p class="font-medium text-lg tracking-wide">Pilih balapan dari kalender</p>
+            <button onclick="toggleMobileSidebar(true)" class="md:hidden mt-4 px-6 py-3 bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-red-600/20 active:scale-95 transition-transform">
+              Buka Kalender
+            </button>
           </div>
         `;
         refreshIcons();
@@ -1006,10 +1780,10 @@
       const circuitLayoutImg = getCircuitLayoutUrl(m.country_name);
 
       let html = `
-        <div class="flex-1 flex flex-col h-full overflow-hidden">
+        <div class="flex flex-col min-h-full">
           
           <!-- Header Informasi Grand Prix dengan Background Layout Sirkuit -->
-          <div class="relative shrink-0 border-b border-white/5">
+          <div class="relative shrink-0 border-b border-white/5 ${state.replay.isFullscreen && state.viewMode === 'replay' ? 'hidden' : ''}">
             <!-- Background Image Area (Layout) -->
             <div class="absolute inset-0 z-0 bg-neutral-900 overflow-hidden">
                <img 
@@ -1022,56 +1796,59 @@
                <div class="absolute inset-0 bg-gradient-to-t from-neutral-950 to-transparent"></div>
             </div>
 
-            <div class="relative z-10 p-8 md:p-14 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
-              <div class="flex-1">
-                <div class="inline-block px-3 py-1.5 glass-panel text-red-400 rounded-lg text-xs font-black uppercase tracking-widest mb-6 shadow-sm border-red-500/20">
-                  Ronde Resmi
-                </div>
-                <h2 class="text-4xl md:text-6xl font-black uppercase italic tracking-tight text-white drop-shadow-2xl leading-normal mb-8">
+            <div class="relative z-10 p-6 sm:p-8 md:p-14 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 sm:gap-8">
+              <div class="flex-1 min-w-0">
+                <div class="inline-block px-3 py-1.5 glass-panel text-red-400 rounded-lg text-[10px] sm:text-[11px] font-bold tracking-wider mb-3 sm:mb-4 shadow-sm border-red-500/20 truncate max-w-full">
                   ${m.meeting_official_name}
+                </div>
+                <h2 class="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white drop-shadow-2xl leading-tight mb-6 sm:mb-8">
+                  ${m.meeting_name}
                 </h2>
-                <div class="flex flex-wrap items-center gap-3">
-                  <p class="text-gray-300 flex items-center gap-2 text-sm font-semibold glass-panel px-4 py-2 rounded-lg">
-                    <i data-lucide="map-pin" class="w-4 h-4 text-red-500"></i> 
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <p class="text-gray-300 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold glass-panel px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500"></i> 
                     ${m.location}, ${m.country_name}
                   </p>
-                  <p class="text-gray-400 flex items-center gap-2 text-sm font-semibold glass-panel px-4 py-2 rounded-lg">
-                     <i data-lucide="info" class="w-4 h-4 text-blue-400"></i>
+                  <p class="text-gray-400 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold glass-panel px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg">
+                     <i data-lucide="info" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400"></i>
                      Sirkuit Key: ${m.circuit_short_name || m.circuit_key}
                   </p>
                 </div>
               </div>
 
               <!-- Layout Sirkuit Card -->
-              <div onclick="openCircuitModal('${circuitLayoutImg}', '${m.location}')" class="w-full lg:w-80 shrink-0 glass-panel p-6 rounded-3xl border border-white/10 flex flex-col items-center gap-4 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] bg-neutral-900/80 cursor-pointer group hover:border-red-500/50 hover:shadow-[0_10px_40px_-10px_rgba(220,38,38,0.3)] transition-all duration-300">
+              <div onclick="openCircuitModal('${circuitLayoutImg}', '${m.location}')" class="w-full lg:w-80 shrink-0 glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 flex flex-col items-center gap-4 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] bg-neutral-900/80 cursor-pointer group hover:border-red-500/50 hover:shadow-[0_10px_40px_-10px_rgba(220,38,38,0.3)] transition-all duration-300">
                  <div class="w-full flex items-center justify-between">
-                   <span class="text-xs font-black text-gray-500 uppercase tracking-widest group-hover:text-red-400 transition-colors">Layout Sirkuit</span>
-                   <i data-lucide="maximize-2" class="w-4 h-4 text-gray-600 group-hover:text-red-400 transition-colors"></i>
+                   <span class="text-[10px] sm:text-xs font-black text-gray-500 uppercase tracking-widest group-hover:text-red-400 transition-colors">Layout Sirkuit</span>
+                   <i data-lucide="maximize-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600 group-hover:text-red-400 transition-colors"></i>
                  </div>
                  <img 
                    src="${circuitLayoutImg}" 
                    alt="Layout Sirkuit ${m.location}"
-                   class="w-full h-auto max-h-32 object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500"
+                   class="w-full h-auto max-h-24 sm:max-h-32 object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500"
                    onerror="this.parentElement.style.display='none'"
                  />
               </div>
             </div>
             
             <!-- Tabs Sesi -->
-            <div class="relative z-10 px-8 md:px-14 pb-2 flex overflow-x-auto custom-scrollbar gap-2.5 mt-2">
+            <div class="relative z-10 px-4 sm:px-8 md:px-14 pb-2 flex overflow-x-auto custom-scrollbar gap-2 sm:gap-2.5 mt-2">
       `;
 
       if (state.loading.sessions) {
-        html += Array(4).fill(0).map(() => `<div class="w-28 h-11 bg-white/5 rounded-xl animate-pulse"></div>`).join('');
+        html += Array(4).fill(0).map(() => `<div class="w-24 sm:w-28 h-10 sm:h-11 bg-white/5 rounded-xl animate-pulse shrink-0"></div>`).join('');
       } else if (state.sessions.length === 0) {
         html += `<span class="text-gray-500 text-sm italic font-medium">Belum ada data sesi untuk balapan ini.</span>`;
       } else {
+        const now = new Date();
         html += state.sessions.map(s => {
           const isSelected = state.selectedSession?.session_key === s.session_key;
+          const isFuture = new Date(s.date_start) > now;
           return `
             <button
-              onclick='selectSession(${JSON.stringify(s).replace(/'/g, "&#39;")})'
-              class="px-5 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap border ${
+              ${isFuture ? 'disabled title="Sesi belum dimulai"' : `onclick='selectSession(${JSON.stringify(s).replace(/'/g, "&#39;")})'`}
+              class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-[13px] font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap border shrink-0 ${
+                isFuture ? 'bg-neutral-900/50 text-neutral-600 border-white/5 cursor-not-allowed opacity-50' :
                 isSelected 
                   ? 'bg-gradient-to-r from-red-600 to-red-500 border-transparent text-white shadow-[0_4px_15px_rgba(220,38,38,0.4)]' 
                   : 'glass-panel text-gray-400 hover:bg-white/10 hover:text-white'
@@ -1086,43 +1863,42 @@
       html += `
               </div>
             </div>
-          </div>
 
           <!-- Tampilan Konten Dinamis -->
-          <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 pt-6">
+          <div class="${state.replay.isFullscreen && state.viewMode === 'replay' ? 'p-0' : 'p-4 sm:p-6 md:p-10 pt-6'} flex-1">
       `;
 
       if (state.selectedSession) {
         const sessionDate = new Date(state.selectedSession.date_start).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
         
         html += `
-            <div class="fade-in">
-              <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-8">
-                <div class="flex items-center gap-4">
-                  <div class="p-3 bg-neutral-900 rounded-2xl border border-white/5 shadow-lg">
-                    <i data-lucide="users" class="w-6 h-6 text-white"></i>
+            <div class="fade-in flex flex-col h-full">
+              <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-5 sm:gap-6 mb-6 sm:mb-8 shrink-0 ${state.replay.isFullscreen && state.viewMode === 'replay' ? 'hidden' : ''}">
+                <div class="flex items-center gap-3 sm:gap-4">
+                  <div class="p-2.5 sm:p-3 bg-neutral-900 rounded-xl sm:rounded-2xl border border-white/5 shadow-lg shrink-0">
+                    <i data-lucide="users" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
                   </div>
                   <div>
-                    <h3 class="text-2xl font-black uppercase tracking-tight">Data Live Sesi</h3>
-                    <p class="text-sm text-gray-400 font-medium mt-1">Data telemetri dan pembalap untuk sesi terpilih</p>
+                    <h3 class="text-xl sm:text-2xl font-black uppercase tracking-tight">Data Live Sesi</h3>
+                    <p class="text-xs sm:text-sm text-gray-400 font-medium mt-0.5 sm:mt-1">Data telemetri dan pembalap</p>
                   </div>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row items-end gap-3">
-                  <div class="text-sm text-gray-300 font-bold flex items-center gap-2 glass-panel px-5 py-2.5 rounded-xl whitespace-nowrap">
-                    <i data-lucide="clock" class="w-4 h-4 text-red-500"></i>
+                <div class="flex flex-col sm:flex-row items-start sm:items-end gap-3 overflow-x-auto w-full xl:w-auto custom-scrollbar pb-2 sm:pb-0">
+                  <div class="text-xs sm:text-sm text-gray-300 font-bold flex items-center gap-2 glass-panel px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl whitespace-nowrap shrink-0">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500"></i>
                     ${sessionDate} WIB
                   </div>
                   
-                  <div class="flex glass-panel rounded-xl p-1 shadow-inner overflow-x-auto max-w-[90vw] shrink-0">
-                    <button onclick="setViewMode('grid')" class="px-5 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-300 ${state.viewMode === 'grid' ? 'bg-white/10 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
-                      Grid Card
+                  <div class="flex glass-panel rounded-xl p-1 shadow-inner shrink-0">
+                    <button onclick="setViewMode('grid')" class="px-3 sm:px-5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-300 ${state.viewMode === 'grid' ? 'bg-white/10 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
+                      Grid
                     </button>
-                    <button onclick="setViewMode('result')" class="px-5 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-300 ${state.viewMode === 'result' ? 'bg-white/10 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
-                      Hasil Sesi & Tim
+                    <button onclick="setViewMode('result')" class="px-3 sm:px-5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-300 ${state.viewMode === 'result' ? 'bg-white/10 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
+                      Hasil Sesi
                     </button>
-                    <button onclick="setViewMode('replay')" class="px-5 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-300 ${state.viewMode === 'replay' ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
-                      <div class="flex items-center gap-2"><i data-lucide="play-circle" class="w-4 h-4"></i> 2D Replay</div>
+                    <button onclick="setViewMode('replay')" class="px-3 sm:px-5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-300 ${state.viewMode === 'replay' ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
+                      <div class="flex items-center gap-1.5 sm:gap-2"><i data-lucide="play-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i> Full Replay</div>
                     </button>
                   </div>
                 </div>
@@ -1130,100 +1906,210 @@
         `;
 
         if (state.viewMode === 'replay') {
-          // --- REPLAY VIEW ---
-          html += `
-            <div class="glass-panel rounded-3xl border border-white/5 shadow-[0_10px_50px_rgba(0,0,0,0.5)] p-6 md:p-8 flex flex-col mb-8 h-[600px] relative">
-              ${state.replay.loading ? `
-                <div class="absolute inset-0 flex flex-col items-center justify-center bg-neutral-950/80 backdrop-blur-md z-20 rounded-3xl border border-white/10">
-                  <i data-lucide="loader-2" class="w-10 h-10 animate-spin text-red-500 mb-4"></i>
-                  <p class="font-bold text-gray-300">Memuat dan Menghitung Rute F1 (Full Sesi)...</p>
-                  <p class="text-sm text-gray-500 mt-2 max-w-sm text-center">Proses ini menarik ratusan ribu baris data sekaligus. Harap tunggu sebentar.</p>
-                </div>
-              ` : ''}
-              ${state.replay.error ? `
-                <div class="absolute inset-0 flex flex-col items-center justify-center bg-neutral-950/80 backdrop-blur-md z-20 rounded-3xl border border-white/10 text-red-400">
-                  <i data-lucide="alert-triangle" class="w-10 h-10 mb-4"></i>
-                  <p class="font-bold text-lg">${state.replay.error}</p>
-                </div>
-              ` : ''}
+          // --- REPLAY VIEW INITIALIZATION ---
+          let initialLeaderboardHtml = '';
+          state.drivers.forEach((d, i) => {
+              const tColor = getTeamColor(d.team_colour);
+              const photoUrl = getHighResPhotoUrl(d.headshot_url);
               
-              <div class="flex items-center justify-between mb-6 shrink-0">
-                  <h4 class="font-black text-2xl uppercase italic text-gray-200">Track Tracker <span class="text-sm font-bold tracking-widest text-red-500 ml-2">LIVE DATA MAP</span></h4>
-                  <div class="flex items-center gap-4 bg-black/50 px-4 py-2 rounded-2xl border border-white/5">
-                      <button onclick="toggleReplay()" id="btn-play-pause" class="bg-gradient-to-br from-red-500 to-red-700 hover:from-red-400 hover:to-red-600 text-white p-2.5 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.5)] transition-all transform hover:scale-110">
-                          <i data-lucide="${state.replay.isPlaying ? 'pause' : 'play'}" class="w-5 h-5"></i>
+              initialLeaderboardHtml += `
+                 <div id="lb-row-${d.driver_number}" class="absolute left-0 right-0 flex items-center gap-1.5 sm:gap-2.5 p-1 sm:p-1.5 px-2 sm:px-3 border-b border-white/5 bg-black/40 hover:bg-white/10 transition-transform duration-500 ease-in-out" style="transform: translateY(${i * 40}px); height: 40px;">
+                    <div id="lb-pos-${d.driver_number}" class="w-3 sm:w-4 text-center text-[10px] sm:text-[11px] font-black text-white shrink-0">-</div>
+                    <div id="lb-pos-diff-${d.driver_number}" class="hidden sm:block w-5 text-center text-[9px] font-bold shrink-0"></div>
+                    <div class="w-1 h-4 sm:h-5 rounded-sm shadow-sm shrink-0" style="background-color: ${tColor}"></div>
+                    <img src="${photoUrl}" class="hidden sm:block w-7 h-7 rounded-full object-cover bg-white/10 shrink-0 border border-white/5" onerror="this.onerror=null; this.src='https://media.formula1.com/d_driver_fallback_image.png';" />
+                    <div class="flex-1 min-w-0 flex flex-col justify-center pl-0.5 sm:pl-0">
+                        <div class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-white truncate leading-tight">${d.last_name}</div>
+                        <div id="lb-gap-${d.driver_number}" class="text-[8.5px] sm:text-[9px] font-mono text-gray-400 truncate leading-tight mt-0.5"></div>
+                    </div>
+                    <div id="lb-tyre-history-${d.driver_number}" class="hidden sm:flex items-center justify-end shrink-0 min-w-[20px]"></div>
+                    <div id="lb-tyre-current-${d.driver_number}" class="sm:hidden w-4 text-right text-[10px] font-black text-gray-500 shrink-0">?</div>
+                 </div>
+              `;
+          });
+
+          html += `
+            <div id="replay-container" class="${state.replay.isFullscreen ? 'fixed inset-0 z-[200] bg-f1dark p-2 sm:p-4 md:p-8 backdrop-blur-md' : 'relative rounded-2xl sm:rounded-3xl border border-white/5 shadow-[0_10px_50px_rgba(0,0,0,0.5)] mb-8 h-[60vh] sm:h-[600px] bg-f1dark'} flex flex-col overflow-hidden transition-all duration-300">
+              
+              <!-- Fullscreen Close Button (Kembali ke Grid) -->
+              <button id="replay-close-fullscreen" onclick="setViewMode('grid')" class="${state.replay.isFullscreen ? '' : 'hidden'} absolute top-4 right-4 sm:top-6 sm:right-6 text-white bg-white/10 hover:bg-red-600 p-2 sm:p-3 rounded-full transition-all duration-300 z-[250] shadow-lg">
+                 <i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              </button>
+
+              <!-- Top Overlay (Info, Lap, Screen, Speed) -->
+              <div class="absolute top-0 left-0 right-0 p-3 sm:p-4 flex justify-between items-start sm:items-center z-20 bg-gradient-to-b from-black/90 to-transparent gap-2 sm:gap-4 pointer-events-none">
+                  <div class="flex items-center gap-2 sm:gap-4 pointer-events-auto">
+                      <h4 class="font-black text-lg sm:text-xl uppercase italic text-gray-200 hidden sm:block">Track Tracker <span class="text-[10px] sm:text-xs font-bold tracking-widest text-red-500 ml-2 border border-red-500/50 bg-red-500/10 px-1.5 sm:px-2 py-0.5 rounded">LIVE MAP</span></h4>
+                      <div id="replay-lap-info" class="bg-red-600 text-white text-[10px] sm:text-sm font-black italic tracking-widest px-2 sm:px-3 py-1 rounded shadow-lg border border-red-500">LAP 1</div>
+                  </div>
+                  
+                  <div class="flex items-center gap-1.5 sm:gap-2 ${state.replay.isFullscreen ? 'pr-10 sm:pr-16' : ''} pointer-events-auto" id="replay-top-controls">
+                      <!-- Buffering Indicator Pill -->
+                      <div id="replay-buffering" class="hidden items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-black/60 border border-white/10 rounded-full backdrop-blur-sm shadow-lg mr-1 sm:mr-2">
+                         <i data-lucide="loader-2" class="w-3 h-3 animate-spin text-red-500"></i>
+                         <span class="text-[9px] sm:text-[10px] font-bold text-gray-300 uppercase tracking-widest">Buffering</span>
+                      </div>
+                      
+                      <!-- Tombol Muat JSON/CSV -->
+                      <label for="json-upload" class="cursor-pointer bg-[#1e1e24]/80 hover:bg-white/20 text-[10px] sm:text-[11px] font-bold px-2 sm:px-4 py-1.5 sm:py-2 rounded-full transition-colors shadow flex items-center gap-1.5 sm:gap-2 text-gray-300 border border-white/10 backdrop-blur-sm" title="Muat Data Offline">
+                          <i data-lucide="upload" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i> <span class="hidden sm:inline">CSV / JSON</span>
+                      </label>
+                      <input type="file" id="json-upload" accept=".json,.csv" class="hidden" onchange="handleJsonUpload(event)">
+                      
+                      <!-- Reset View/Focus Target Button -->
+                      <button onclick="resetReplayView()" class="bg-[#1e1e24]/80 hover:bg-white/20 p-1.5 sm:p-2 rounded-full border border-white/10 transition-colors text-white backdrop-blur-sm" title="Reset View & Scale">
+                          <i data-lucide="focus" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                       </button>
-                      <div class="text-xl font-black italic text-gray-300 w-[100px] text-right font-mono" id="replay-time">00:00:00</div>
+
+                      <!-- Kecepatan -->
+                      <select id="speed-selector" onchange="state.replay.playbackSpeed = parseFloat(this.value)" class="bg-[#1e1e24]/80 text-white text-[10px] sm:text-[11px] font-bold px-2 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10 outline-none cursor-pointer appearance-none text-center min-w-[60px] sm:min-w-[80px] backdrop-blur-sm">
+                          <option value="0.5" ${state.replay.playbackSpeed === 0.5 ? 'selected' : ''}>0.5x</option>
+                          <option value="1" ${state.replay.playbackSpeed === 1 ? 'selected' : ''}>1x</option>
+                          <option value="2" ${state.replay.playbackSpeed === 2 ? 'selected' : ''}>2x</option>
+                          <option value="4" ${state.replay.playbackSpeed === 4 ? 'selected' : ''}>4x</option>
+                          <option value="10" ${state.replay.playbackSpeed === 10 ? 'selected' : ''}>10x</option>
+                          <option value="20" ${state.replay.playbackSpeed === 20 ? 'selected' : ''}>20x</option>
+                      </select>
+
+                      <!-- Fullscreen Toggle -->
+                      <button id="replay-maximize-btn" onclick="toggleFullscreenReplay()" class="${state.replay.isFullscreen ? 'hidden' : ''} bg-[#1e1e24]/80 hover:bg-white/20 p-1.5 sm:p-2 rounded-full border border-white/10 transition-colors text-white backdrop-blur-sm" title="Maximize">
+                          <i data-lucide="maximize" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                      </button>
+                      <button id="replay-minimize-btn" onclick="toggleFullscreenReplay()" class="${!state.replay.isFullscreen ? 'hidden' : ''} bg-[#1e1e24]/80 hover:bg-white/20 p-1.5 sm:p-2 rounded-full border border-white/10 transition-colors text-white backdrop-blur-sm" title="Minimize">
+                          <i data-lucide="minimize" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                      </button>
                   </div>
               </div>
+
+              <!-- TIMING TOWER (Leaderboard Kiri Style Broadcast F1) -->
+              <div class="absolute top-[50px] sm:top-[70px] left-2 sm:left-4 bottom-20 sm:bottom-24 w-[140px] sm:w-[280px] bg-[#15151e]/95 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 flex flex-col overflow-hidden z-20 shadow-2xl pointer-events-auto">
+                 
+                 <!-- Header Tower -->
+                 <div class="p-2 sm:p-4 border-b border-white/5 flex flex-col gap-2 sm:gap-3 relative z-10 shrink-0 bg-gradient-to-br from-[#1e1e24] to-[#15151e]">
+                     <div class="flex justify-between items-center">
+                         <span class="font-black italic text-white tracking-tighter text-sm sm:text-lg leading-none">F1<span class="text-red-600">®</span></span>
+                         <span class="text-[8px] sm:text-[10px] font-bold tracking-widest text-white uppercase">${state.selectedSession?.session_name || 'RACE'}</span>
+                     </div>
+                     <div class="flex justify-between items-end gap-2 mt-0.5 sm:mt-1">
+                         <span class="text-[10px] sm:text-sm font-medium text-white truncate flex-1">${m.meeting_official_name || m.meeting_name}</span>
+                         <span class="text-[9px] sm:text-[11px] text-gray-400 font-medium shrink-0" id="replay-lap-info-tower">Lap 1</span>
+                     </div>
+                 </div>
+                 
+                 <!-- List Pembalap -->
+                 <div class="flex-1 overflow-y-auto custom-scrollbar relative bg-[#15151e]">
+                    <div id="replay-leaderboard-content" class="relative w-full" style="height: ${state.drivers.length * 40}px;">
+                       ${initialLeaderboardHtml}
+                    </div>
+                 </div>
+              </div>
+
+              <!-- Main Loading Overlay -->
+              ${state.replay.loading ? `
+                <div class="absolute inset-0 flex flex-col items-center justify-center bg-[#15151e]/90 backdrop-blur-md z-40" id="replay-loading-overlay">
+                  <i data-lucide="loader-2" class="w-10 h-10 sm:w-12 sm:h-12 animate-spin text-red-600 mb-4"></i>
+                  <h3 class="text-lg sm:text-xl font-black text-white uppercase tracking-widest mb-2 text-center px-4">Memuat Telemetri</h3>
+                  <p id="replay-loading-progress" class="text-gray-400 font-medium text-xs sm:text-sm text-center px-4">Menghubungkan ke API OpenF1...</p>
+                  <div class="w-48 sm:w-64 h-1.5 bg-white/10 rounded-full mt-4 overflow-hidden">
+                     <div id="replay-loading-bar" class="h-full bg-red-600 transition-all duration-300" style="width: 0%"></div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Error Fallback Message -->
+              ${state.replay.error ? `
+                <div class="absolute inset-0 flex flex-col items-center justify-center bg-neutral-950/80 backdrop-blur-md z-30 text-red-400 p-6 sm:p-8 text-center">
+                  <i data-lucide="alert-triangle" class="w-8 h-8 sm:w-10 sm:h-10 mb-3 sm:mb-4"></i>
+                  <p class="font-bold text-base sm:text-lg mb-2">${state.replay.error}</p>
+                  <p class="text-xs sm:text-sm text-gray-400 max-w-md mb-6">Sesi ini mungkin belum ada telemetri. Lo bisa upload raw data CSV/JSON secara offline.</p>
+                  
+                  <label for="json-upload-error" class="cursor-pointer bg-white text-black hover:bg-red-500 hover:text-white font-bold px-4 sm:px-6 py-2 sm:py-3 rounded-xl transition-colors shadow-lg inline-flex items-center gap-2 text-sm sm:text-base">
+                      <i data-lucide="upload-cloud" class="w-4 h-4 sm:w-5 sm:h-5"></i> CSV/JSON Lokal
+                  </label>
+                  <input type="file" id="json-upload-error" accept=".json,.csv" class="hidden" onchange="handleJsonUpload(event)">
+                </div>
+              ` : ''}
               
-              <div class="flex-1 w-full bg-neutral-900 rounded-2xl border border-white/10 relative overflow-hidden shadow-inner">
+              <!-- Area Render Lintasan -->
+              <div class="flex-1 w-full bg-[#15151e] relative overflow-hidden shadow-inner cursor-grab" id="replay-canvas-wrapper">
                   <canvas id="replay-canvas" class="w-full h-full absolute inset-0"></canvas>
               </div>
               
-              <div class="mt-6 flex items-center gap-5 shrink-0 bg-white/5 p-4 rounded-xl border border-white/5">
-                  <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest shrink-0"><i data-lucide="clock-3" class="w-4 h-4 inline mb-0.5"></i> TIMELINE</span>
-                  <input type="range" id="replay-slider" min="0" max="100" value="0" step="0.01" class="w-full h-2.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-red-600 outline-none" oninput="seekReplay(this.value)">
+              <!-- Bottom Player Controls -->
+              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-3 sm:p-4 pt-8 sm:pt-12 flex items-center gap-3 sm:gap-4 z-20">
+                  <button onclick="toggleReplay()" id="btn-play-pause" class="bg-white text-black hover:bg-red-600 hover:text-white p-2 sm:p-3 rounded-full shadow-lg transition-all transform hover:scale-105 shrink-0">
+                      <i data-lucide="${state.replay.isPlaying ? 'pause' : 'play'}" class="w-4 h-4 sm:w-5 sm:h-5 fill-current"></i>
+                  </button>
+                  <input type="range" id="replay-slider" min="0" max="100" value="0" step="0.01" class="w-full h-1.5 sm:h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-red-600 outline-none backdrop-blur-sm" oninput="seekReplay(this.value)">
+                  <div class="text-sm sm:text-lg font-black italic text-white w-[60px] sm:w-[80px] text-right font-mono drop-shadow-md shrink-0" id="replay-time">00:00:00</div>
               </div>
             </div>
           `;
         } 
         else if (state.loading.drivers) {
           // LOADING STATE
-          html += `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">`;
-          html += Array(20).fill(0).map(() => `<div class="aspect-[3/4] bg-white/5 rounded-2xl animate-pulse"></div>`).join('');
+          html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pb-8">`;
+          html += Array(20).fill(0).map(() => `<div class="h-32 sm:h-36 bg-white/5 rounded-[1.25rem] sm:rounded-[1.5rem] animate-pulse"></div>`).join('');
           html += `</div>`;
         } 
         else if (state.drivers.length === 0) {
           // EMPTY STATE
           html += `
-            <div class="text-center py-16 glass-panel rounded-2xl border-dashed border-white/10">
-              <p class="text-gray-500 font-medium text-lg">Data pembalap belum tersedia untuk sesi ini.</p>
+            <div class="text-center py-16 glass-panel rounded-2xl border-dashed border-white/10 mx-4">
+              <p class="text-gray-500 font-medium text-sm sm:text-lg">Data pembalap belum tersedia untuk sesi ini.</p>
             </div>
           `;
         } 
         else if (state.viewMode === 'grid') {
-          // --- GRID VIEW ---
-          html += `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 pb-8">`;
+          // --- GRID VIEW (Broadcast Style) ---
+          html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pb-8">`;
           html += state.drivers.map(d => {
             const teamColor = getTeamColor(d.team_colour);
+            
+            let driverPoints = 0;
+            if (state.standings[state.year] && state.standings[state.year].drivers) {
+                const stdDr = state.standings[state.year].drivers.find(std => std.driver_number == d.driver_number);
+                if (stdDr) driverPoints = stdDr.points;
+            } else if (state.positions && state.positions[d.driver_number]) {
+                driverPoints = getPoints(state.positions[d.driver_number], state.selectedSession?.session_name) || 0;
+            }
+
             return `
-              <div class="glass-panel rounded-2xl overflow-hidden relative group hover:-translate-y-2 transition-all duration-300 hover:shadow-2xl"
-                   style="border-bottom: 4px solid ${teamColor}; box-shadow: 0 10px 30px -10px ${teamColor}30;">
+              <div class="relative overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] h-32 sm:h-36 group hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 shadow-lg mx-1 sm:mx-0"
+                   style="background-color: ${teamColor}; box-shadow: 0 10px 20px -5px ${teamColor}80;">
                 
-                <div class="absolute top-2 -right-3 font-black text-7xl italic opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-300 select-none z-0">
+                <!-- Background Number -->
+                <div class="absolute right-8 sm:right-12 top-1/2 -translate-y-1/2 font-black text-6xl sm:text-8xl italic opacity-20 select-none z-0 mix-blend-overlay text-white leading-none pointer-events-none">
                   ${d.driver_number}
                 </div>
                 
-                <div class="p-5 flex flex-col h-full relative z-10">
-                  <div class="flex justify-between items-start w-full mb-3">
-                    <span class="text-xl font-black italic bg-white text-black px-2.5 rounded shadow-sm leading-none py-1.5">
-                      ${d.driver_number}
-                    </span>
-                    <span class="text-[11px] font-bold uppercase tracking-widest text-gray-400 bg-black/50 px-2 py-1 rounded">
-                      ${d.name_acronym}
-                    </span>
+                <!-- Content Left -->
+                <div class="relative z-10 p-4 sm:p-5 flex flex-col justify-between h-full w-[65%]">
+                  <div>
+                    <div class="flex items-center gap-1.5 mb-1 sm:mb-1.5 opacity-90">
+                      <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-white/20 flex items-center justify-center shadow-inner overflow-hidden shrink-0">
+                         <span class="text-[7px] sm:text-[8px] font-black text-white">${d.team_name ? d.team_name.charAt(0) : '?'}</span>
+                      </div>
+                      <span class="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-white truncate drop-shadow-sm">${d.team_name || 'Unknown'}</span>
+                    </div>
+                    <div class="font-medium text-white/90 text-[10px] sm:text-xs leading-tight drop-shadow-sm">${d.first_name}</div>
+                    <div class="font-black text-white text-base sm:text-lg uppercase tracking-tight leading-none drop-shadow-md mt-0.5">${d.last_name}</div>
                   </div>
                   
-                  <div class="flex-1 flex flex-col justify-end items-center mt-2 mb-4">
-                    <img 
-                      src="${d.headshot_url || 'https://media.formula1.com/d_driver_fallback_image.png'}" 
-                      alt="${d.full_name}" 
-                      class="w-28 h-28 object-contain drop-shadow-2xl transform group-hover:scale-110 transition-transform duration-500 ease-out"
-                      onerror="this.onerror=null; this.src='https://media.formula1.com/d_driver_fallback_image.png';"
-                    />
+                  <div class="flex items-baseline gap-1 mt-auto">
+                    <span class="text-2xl sm:text-3xl font-black text-white drop-shadow-md leading-none">${driverPoints}</span>
+                    <span class="text-[9px] sm:text-[10px] font-bold text-white/80 tracking-widest mb-0.5 sm:mb-1 ml-1 drop-shadow-sm">PTS</span>
                   </div>
-                  
-                  <div class="mt-auto text-center pt-3 border-t border-white/5">
-                    <h4 class="font-bold text-base leading-tight">
-                      <span class="font-medium text-gray-400 block text-xs mb-0.5">${d.first_name}</span> 
-                      <span class="uppercase font-black tracking-wider">${d.last_name}</span>
-                    </h4>
-                    <p class="text-[10px] mt-2 font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg bg-black/40 truncate shadow-inner" 
-                       style="color: ${teamColor}; border: 1px solid ${teamColor}20;">
-                      ${d.team_name || 'Tim Tidak Diketahui'}
-                    </p>
-                  </div>
+                </div>
+                
+                <!-- Driver Photo Right -->
+                <div class="absolute bottom-0 right-0 w-[45%] h-[115%] z-10 flex justify-end items-end pr-2 pointer-events-none">
+                  <img 
+                    src="${getHighResPhotoUrl(d.headshot_url)}" 
+                    alt="${d.full_name}" 
+                    class="h-[95%] w-auto object-contain object-bottom drop-shadow-[0_10px_10px_rgba(0,0,0,0.4)] transform group-hover:scale-110 transition-transform duration-500 ease-out origin-bottom"
+                    onerror="this.onerror=null; this.src='https://media.formula1.com/d_driver_fallback_image.png';"
+                  />
                 </div>
               </div>
             `;
@@ -1239,24 +2125,24 @@
           });
 
           html += `
-            <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 shadow-2xl pb-8 mb-8">
+            <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 shadow-2xl pb-8 mb-8 mx-1 sm:mx-0">
               <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse min-w-[600px]">
+                <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-[600px]">
                   <thead>
-                    <tr class="bg-black/40 text-xs uppercase tracking-widest text-gray-400 border-b border-white/10">
-                      <th class="p-5 w-20 text-center font-bold">Pos</th>
-                      <th class="p-5 font-bold">Pembalap</th>
-                      <th class="p-5 font-bold">Tim</th>
-                      <th class="p-5 text-center font-bold">Waktu/Gap</th>
-                      <th class="p-5 text-center font-bold text-red-400">Poin</th>
-                      <th class="p-5 w-24 text-center font-bold">No</th>
+                    <tr class="bg-black/40 text-[10px] sm:text-xs uppercase tracking-widest text-gray-400 border-b border-white/10">
+                      <th class="p-3 sm:p-5 w-16 sm:w-20 text-center font-bold">Pos</th>
+                      <th class="p-3 sm:p-5 font-bold">Pembalap</th>
+                      <th class="p-3 sm:p-5 font-bold">Tim</th>
+                      <th class="p-3 sm:p-5 text-center font-bold">Waktu/Gap</th>
+                      <th class="p-3 sm:p-5 text-center font-bold text-red-400">Poin</th>
+                      <th class="p-3 sm:p-5 w-16 sm:w-24 text-center font-bold">No</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-white/5">
           `;
 
           if (state.loading.positions) {
-             html += `<tr><td colspan="6" class="p-12 text-center text-gray-500 font-medium"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-3 text-red-500"></i> Menghitung klasemen sesi...</td></tr>`;
+             html += `<tr><td colspan="6" class="p-8 sm:p-12 text-center text-gray-500 font-medium text-sm sm:text-base"><i data-lucide="loader-2" class="w-5 h-5 sm:w-6 sm:h-6 animate-spin mx-auto mb-2 sm:mb-3 text-red-500"></i> Menghitung klasemen sesi...</td></tr>`;
           } else {
              html += sorted.map(d => {
                 const pos = state.positions[d.driver_number] || '-';
@@ -1272,26 +2158,26 @@
                 
                 return `
                   <tr class="hover:bg-white/5 transition-colors group">
-                    <td class="p-5 text-center font-black text-2xl ${posStyle}">${pos}</td>
-                    <td class="p-5">
-                      <div class="flex items-center gap-4">
-                        <img src="${d.headshot_url || 'https://media.formula1.com/d_driver_fallback_image.png'}" class="w-12 h-12 object-cover rounded-full bg-black/20 border border-white/10" onerror="this.onerror=null; this.src='https://media.formula1.com/d_driver_fallback_image.png';" />
-                        <div>
-                          <div class="font-bold text-lg text-white group-hover:text-red-400 transition-colors">${d.first_name} <span class="uppercase font-black">${d.last_name}</span></div>
-                          <div class="text-[11px] font-bold uppercase tracking-widest text-gray-500">${d.name_acronym}</div>
+                    <td class="p-3 sm:p-5 text-center font-black text-xl sm:text-2xl ${posStyle}">${pos}</td>
+                    <td class="p-3 sm:p-5">
+                      <div class="flex items-center gap-3 sm:gap-4">
+                        <img src="${getHighResPhotoUrl(d.headshot_url)}" class="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-full bg-black/20 border border-white/10 shrink-0" onerror="this.onerror=null; this.src='https://media.formula1.com/d_driver_fallback_image.png';" />
+                        <div class="min-w-0">
+                          <div class="font-bold text-base sm:text-lg text-white group-hover:text-red-400 transition-colors truncate">${d.first_name} <span class="uppercase font-black">${d.last_name}</span></div>
+                          <div class="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 mt-0.5">${d.name_acronym}</div>
                         </div>
                       </div>
                     </td>
-                    <td class="p-5">
-                      <div class="flex items-center gap-3 glass-panel px-3 py-1.5 rounded-lg inline-flex">
-                        <div class="w-3.5 h-3.5 rounded-full shadow-sm" style="background-color: ${teamColor}"></div>
-                        <span class="text-sm font-bold text-gray-300">${d.team_name || 'Tim Tidak Diketahui'}</span>
+                    <td class="p-3 sm:p-5">
+                      <div class="flex items-center gap-2 sm:gap-3 glass-panel px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg inline-flex">
+                        <div class="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full shadow-sm shrink-0" style="background-color: ${teamColor}"></div>
+                        <span class="text-xs sm:text-sm font-bold text-gray-300 truncate max-w-[80px] sm:max-w-none">${d.team_name || 'Tim Tidak Diketahui'}</span>
                       </div>
                     </td>
-                    <td class="p-5 text-center font-mono text-sm text-gray-300">${gap}</td>
-                    <td class="p-5 text-center font-black text-lg text-red-500 bg-red-900/10 rounded">${points > 0 ? '+'+points : '-'}</td>
-                    <td class="p-5 text-center">
-                      <span class="text-lg font-black italic bg-white text-black px-3 py-1.5 rounded shadow-sm">${d.driver_number}</span>
+                    <td class="p-3 sm:p-5 text-center font-mono text-xs sm:text-sm text-gray-300">${gap}</td>
+                    <td class="p-3 sm:p-5 text-center font-black text-base sm:text-lg text-red-500 bg-red-900/10 rounded">${points > 0 ? '+'+points : '-'}</td>
+                    <td class="p-3 sm:p-5 text-center">
+                      <span class="text-base sm:text-lg font-black italic bg-white text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded shadow-sm">${d.driver_number}</span>
                     </td>
                   </tr>
                 `;
@@ -1317,57 +2203,57 @@
 
     function renderStandings() {
       let html = `
-        <div class="flex-1 flex flex-col h-full overflow-hidden bg-neutral-950 fade-in">
-          <div class="p-8 md:p-14 border-b border-white/5 shrink-0 bg-gradient-to-b from-neutral-900 to-neutral-950">
-             <div class="flex items-center gap-5 mb-6">
-                <div class="p-4 bg-gradient-to-br from-red-600/30 to-red-900/30 rounded-2xl border border-red-500/30 shadow-[0_0_20px_rgba(220,38,38,0.2)]">
-                  <i data-lucide="trophy" class="w-10 h-10 text-red-500"></i>
+        <div class="flex flex-col min-h-full bg-neutral-950 fade-in">
+          <div class="p-6 sm:p-8 md:p-14 border-b border-white/5 shrink-0 bg-gradient-to-b from-neutral-900 to-neutral-950">
+             <div class="flex items-center gap-4 sm:gap-5 mb-5 sm:mb-6">
+                <div class="p-3 sm:p-4 bg-gradient-to-br from-red-600/30 to-red-900/30 rounded-xl sm:rounded-2xl border border-red-500/30 shadow-[0_0_20px_rgba(220,38,38,0.2)]">
+                  <i data-lucide="trophy" class="w-8 h-8 sm:w-10 sm:h-10 text-red-500"></i>
                 </div>
                 <div>
-                  <h2 class="text-4xl md:text-5xl font-black uppercase italic tracking-tight text-white drop-shadow-2xl">Klasemen</h2>
-                  <p class="text-gray-400 font-medium mt-2 text-lg">Akumulasi Poin Championship Musim <span class="text-white font-bold">${state.year}</span></p>
+                  <h2 class="text-3xl sm:text-4xl md:text-5xl font-black uppercase italic tracking-tight text-white drop-shadow-2xl leading-none">Klasemen</h2>
+                  <p class="text-gray-400 font-medium mt-1 sm:mt-2 text-sm sm:text-lg">Akumulasi Poin Musim <span class="text-white font-bold">${state.year}</span></p>
                 </div>
              </div>
              
              <!-- Toggle Driver vs Constructor -->
-             <div class="flex glass-panel rounded-xl p-1 shadow-inner inline-flex border border-white/10">
-                <button onclick="setStandingsMode('drivers')" class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${state.standingsMode === 'drivers' ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
+             <div class="flex glass-panel rounded-xl p-1 shadow-inner inline-flex border border-white/10 w-full sm:w-auto">
+                <button onclick="setStandingsMode('drivers')" class="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 ${state.standingsMode === 'drivers' ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
                   Pembalap
                 </button>
-                <button onclick="setStandingsMode('constructors')" class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${state.standingsMode === 'constructors' ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
+                <button onclick="setStandingsMode('constructors')" class="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 ${state.standingsMode === 'constructors' ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow' : 'text-gray-500 hover:text-white hover:bg-white/5'}">
                   Konstruktor
                 </button>
              </div>
           </div>
           
-          <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-14 pt-8">
+          <div class="p-4 sm:p-6 md:p-14 pt-6 sm:pt-8">
       `;
       
       if (state.loading.standings) {
         html += `
-            <div class="flex flex-col items-center justify-center h-[50vh] gap-6 text-gray-400">
-              <i data-lucide="loader-2" class="w-12 h-12 animate-spin text-red-500"></i>
-              <p class="font-medium text-lg animate-pulse">Menghitung akumulasi poin dari semua balapan ${state.year}...</p>
-              <p class="text-sm opacity-50 max-w-md text-center">Proses ini mengambil data setiap sesi yang sudah berlalu, harap tunggu sebentar.</p>
+            <div class="flex flex-col items-center justify-center h-[50vh] gap-4 sm:gap-6 text-gray-400 px-4 text-center">
+              <i data-lucide="loader-2" class="w-10 h-10 sm:w-12 sm:h-12 animate-spin text-red-500"></i>
+              <p class="font-medium text-base sm:text-lg animate-pulse">Menghitung akumulasi poin dari semua balapan ${state.year}...</p>
+              <p class="text-xs sm:text-sm opacity-50 max-w-md">Proses ini mengambil data setiap sesi yang sudah berlalu, harap tunggu sebentar.</p>
             </div>
         `;
       } else if (!state.standings[state.year] || state.standings[state.year].drivers.length === 0) {
         html += `
-            <div class="text-center py-16 glass-panel rounded-2xl border-dashed border-white/10 max-w-4xl mx-auto">
-              <p class="text-gray-500 font-medium text-lg">Belum ada data klasemen / balapan untuk tahun ${state.year}.</p>
+            <div class="text-center py-12 sm:py-16 glass-panel rounded-2xl border-dashed border-white/10 max-w-4xl mx-auto">
+              <p class="text-gray-500 font-medium text-sm sm:text-lg">Belum ada data klasemen / balapan untuk tahun ${state.year}.</p>
             </div>
         `;
       } else {
         html += `
-            <div class="glass-panel rounded-3xl overflow-hidden border border-white/5 shadow-2xl max-w-5xl mx-auto mb-10">
+            <div class="glass-panel rounded-2xl sm:rounded-3xl overflow-hidden border border-white/5 shadow-2xl max-w-5xl mx-auto mb-10">
               <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse min-w-[600px]">
+                <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-[600px]">
                   <thead>
-                    <tr class="bg-black/80 text-xs uppercase tracking-widest text-gray-400 border-b border-white/10">
-                      <th class="p-6 w-24 text-center font-bold">Pos</th>
-                      <th class="p-6 font-bold">${state.standingsMode === 'drivers' ? 'Pembalap' : 'Tim / Konstruktor'}</th>
-                      <th class="p-6 font-bold">${state.standingsMode === 'drivers' ? 'Tim' : 'Daftar Pembalap'}</th>
-                      <th class="p-6 text-center font-bold text-red-400">Total Poin</th>
+                    <tr class="bg-black/80 text-[10px] sm:text-xs uppercase tracking-widest text-gray-400 border-b border-white/10">
+                      <th class="p-4 sm:p-6 w-16 sm:w-24 text-center font-bold">Pos</th>
+                      <th class="p-4 sm:p-6 font-bold">${state.standingsMode === 'drivers' ? 'Pembalap' : 'Tim / Konstruktor'}</th>
+                      <th class="p-4 sm:p-6 font-bold">${state.standingsMode === 'drivers' ? 'Tim' : 'Daftar Pembalap'}</th>
+                      <th class="p-4 sm:p-6 text-center font-bold text-red-400">Total Poin</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-white/5">
@@ -1380,33 +2266,33 @@
               const teamColor = getTeamColor(d.team_colour);
               
               let posStyle = 'text-white font-black';
-              if (pos === 1) posStyle = 'text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)] text-4xl font-black';
-              else if (pos === 2) posStyle = 'text-gray-300 drop-shadow-[0_0_10px_rgba(209,213,219,0.5)] text-3xl font-black';
-              else if (pos === 3) posStyle = 'text-amber-600 drop-shadow-[0_0_10px_rgba(217,119,6,0.5)] text-3xl font-black';
-              else posStyle += ' text-2xl';
+              if (pos === 1) posStyle = 'text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)] text-3xl sm:text-4xl font-black';
+              else if (pos === 2) posStyle = 'text-gray-300 drop-shadow-[0_0_10px_rgba(209,213,219,0.5)] text-2xl sm:text-3xl font-black';
+              else if (pos === 3) posStyle = 'text-amber-600 drop-shadow-[0_0_10px_rgba(217,119,6,0.5)] text-2xl sm:text-3xl font-black';
+              else posStyle += ' text-xl sm:text-2xl';
               
               html += `
                 <tr onclick="openBreakdownModal('driver', '${d.driver_number}')" class="hover:bg-white/5 transition-colors group cursor-pointer relative">
-                  <td class="p-6 text-center ${posStyle}">${pos}</td>
-                  <td class="p-6">
-                    <div class="flex items-center gap-5">
-                      <img src="${d.headshot_url || 'https://media.formula1.com/d_driver_fallback_image.png'}" class="w-16 h-16 object-cover rounded-full bg-black/40 border-[3px]" style="border-color: ${teamColor}80;" onerror="this.onerror=null; this.src='https://media.formula1.com/d_driver_fallback_image.png';" />
-                      <div>
-                        <div class="font-bold text-2xl text-white group-hover:text-red-400 transition-colors">${d.first_name} <span class="uppercase font-black">${d.last_name}</span></div>
-                        <div class="text-xs font-bold uppercase tracking-widest text-gray-500 mt-1">${d.name_acronym} <span class="opacity-50 mx-1">•</span> No. ${d.driver_number}</div>
+                  <td class="p-4 sm:p-6 text-center ${posStyle}">${pos}</td>
+                  <td class="p-4 sm:p-6">
+                    <div class="flex items-center gap-3 sm:gap-5">
+                      <img src="${getHighResPhotoUrl(d.headshot_url)}" class="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-full bg-black/40 border-[2px] sm:border-[3px] shrink-0" style="border-color: ${teamColor}80;" onerror="this.onerror=null; this.src='https://media.formula1.com/d_driver_fallback_image.png';" />
+                      <div class="min-w-0">
+                        <div class="font-bold text-lg sm:text-2xl text-white group-hover:text-red-400 transition-colors truncate">${d.first_name} <span class="uppercase font-black">${d.last_name}</span></div>
+                        <div class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 mt-0.5 sm:mt-1">${d.name_acronym} <span class="opacity-50 mx-1">•</span> No. ${d.driver_number}</div>
                       </div>
                     </div>
                   </td>
-                  <td class="p-6">
-                    <div class="flex items-center gap-3 glass-panel px-4 py-2 rounded-xl inline-flex shadow-inner">
-                      <div class="w-4 h-4 rounded-full shadow-sm" style="background-color: ${teamColor}"></div>
-                      <span class="text-sm font-bold text-gray-300">${d.team_name || 'Tim Tidak Diketahui'}</span>
+                  <td class="p-4 sm:p-6">
+                    <div class="flex items-center gap-2 sm:gap-3 glass-panel px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl inline-flex shadow-inner">
+                      <div class="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-sm shrink-0" style="background-color: ${teamColor}"></div>
+                      <span class="text-xs sm:text-sm font-bold text-gray-300 truncate max-w-[100px] sm:max-w-none">${d.team_name || 'Tim Tidak Diketahui'}</span>
                     </div>
                   </td>
-                  <td class="p-6 text-center relative">
-                    <div class="bg-red-500/10 border border-red-500/20 py-2 rounded-xl inline-block min-w-[100px] group-hover:bg-red-500/20 transition-colors">
-                      <span class="text-4xl font-black italic text-white drop-shadow-md">${st.points}</span>
-                      <span class="text-xs text-red-500 font-bold ml-1">PTS</span>
+                  <td class="p-4 sm:p-6 text-center relative">
+                    <div class="bg-red-500/10 border border-red-500/20 py-1.5 sm:py-2 px-2 sm:px-0 rounded-xl sm:inline-block sm:min-w-[100px] group-hover:bg-red-500/20 transition-colors">
+                      <span class="text-2xl sm:text-4xl font-black italic text-white drop-shadow-md">${st.points}</span>
+                      <span class="text-[10px] sm:text-xs text-red-500 font-bold ml-1">PTS</span>
                     </div>
                   </td>
                 </tr>
@@ -1419,29 +2305,29 @@
               const teamColor = getTeamColor(c.team_colour);
               
               let posStyle = 'text-white font-black';
-              if (pos === 1) posStyle = 'text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)] text-4xl font-black';
-              else if (pos === 2) posStyle = 'text-gray-300 drop-shadow-[0_0_10px_rgba(209,213,219,0.5)] text-3xl font-black';
-              else if (pos === 3) posStyle = 'text-amber-600 drop-shadow-[0_0_10px_rgba(217,119,6,0.5)] text-3xl font-black';
-              else posStyle += ' text-2xl';
+              if (pos === 1) posStyle = 'text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)] text-3xl sm:text-4xl font-black';
+              else if (pos === 2) posStyle = 'text-gray-300 drop-shadow-[0_0_10px_rgba(209,213,219,0.5)] text-2xl sm:text-3xl font-black';
+              else if (pos === 3) posStyle = 'text-amber-600 drop-shadow-[0_0_10px_rgba(217,119,6,0.5)] text-2xl sm:text-3xl font-black';
+              else posStyle += ' text-xl sm:text-2xl';
               
               html += `
                 <tr onclick="openBreakdownModal('constructor', '${c.team_name}')" class="hover:bg-white/5 transition-colors group cursor-pointer">
-                  <td class="p-6 text-center ${posStyle}">${pos}</td>
-                  <td class="p-6">
-                    <div class="flex items-center gap-5">
-                      <div class="w-3 h-14 rounded-full shadow-sm" style="background-color: ${teamColor}"></div>
-                      <div>
-                        <div class="font-black text-2xl uppercase italic text-white group-hover:text-red-400 transition-colors">${c.team_name}</div>
+                  <td class="p-4 sm:p-6 text-center ${posStyle}">${pos}</td>
+                  <td class="p-4 sm:p-6">
+                    <div class="flex items-center gap-3 sm:gap-5">
+                      <div class="w-2.5 sm:w-3 h-10 sm:h-14 rounded-full shadow-sm shrink-0" style="background-color: ${teamColor}"></div>
+                      <div class="min-w-0">
+                        <div class="font-black text-lg sm:text-2xl uppercase italic text-white group-hover:text-red-400 transition-colors truncate">${c.team_name}</div>
                       </div>
                     </div>
                   </td>
-                  <td class="p-6">
-                    <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">${c.drivers.join(', ')}</span>
+                  <td class="p-4 sm:p-6">
+                    <span class="text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-widest truncate block max-w-[120px] sm:max-w-none">${c.drivers.join(', ')}</span>
                   </td>
-                  <td class="p-6 text-center">
-                    <div class="bg-red-500/10 border border-red-500/20 py-2 rounded-xl inline-block min-w-[100px] group-hover:bg-red-500/20 transition-colors">
-                      <span class="text-4xl font-black italic text-white drop-shadow-md">${c.points}</span>
-                      <span class="text-xs text-red-500 font-bold ml-1">PTS</span>
+                  <td class="p-4 sm:p-6 text-center">
+                    <div class="bg-red-500/10 border border-red-500/20 py-1.5 sm:py-2 px-2 sm:px-0 rounded-xl sm:inline-block sm:min-w-[100px] group-hover:bg-red-500/20 transition-colors">
+                      <span class="text-2xl sm:text-4xl font-black italic text-white drop-shadow-md">${c.points}</span>
+                      <span class="text-[10px] sm:text-xs text-red-500 font-bold ml-1">PTS</span>
                     </div>
                   </td>
                 </tr>
