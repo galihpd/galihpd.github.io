@@ -1,1048 +1,1472 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>AutoTrack Expense Workspace</title>
-    
-    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    }
-                }
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', 'sans-serif'],
             }
+          }
         }
+      }
     </script>
-    
-    <!-- Lucide Icons -->
+    <!-- Script Tema di Head agar tidak berkedip putih saat reload -->
+    <script>
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style>
-        /* Custom scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        
-        /* Tab Transitions */
-        .tab-active { border-bottom-width: 2px; border-color: #4f46e5; color: #4f46e5; font-weight: 700; background-color: #e0e7ff; }
-        .tab-inactive { color: #64748b; font-weight: 600; background-color: transparent; }
-        .tab-inactive:hover { background-color: #f1f5f9; color: #334155; }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-200 selection:text-blue-900">
+    <style type="text/tailwindcss"> @layer utilities {
 
+            .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+
+            .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 4px; }
+
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
+
+            
+
+            .dark .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+
+            .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); }
+
+            
+
+            /* Tab Transitions with Dark Mode Support */
+
+            .tab-active { @apply border-b-2 border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30; }
+
+            .tab-inactive { @apply text-slate-500 dark:text-slate-400 font-semibold bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-700 dark:hover:text-slate-200; }
+
+        }
+
+        
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    </style>
+  </head>
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased selection:bg-indigo-200 dark:selection:bg-indigo-900 selection:text-indigo-900 dark:selection:text-indigo-100 transition-colors duration-300">
     <!-- LOGIN VIEW -->
     <div id="login-view" class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
-        <!-- Background decoration -->
-        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-teal-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-
-        <div class="max-w-md w-full bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden z-10 relative">
-            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-10 text-center">
-                <div class="bg-white/20 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm shadow-inner shadow-white/20 rotate-3 hover:rotate-0 transition-transform">
-                    <i data-lucide="mail-search" class="text-white w-10 h-10"></i>
-                </div>
-                <h1 class="text-3xl font-extrabold text-white mb-2 tracking-tight">AutoTrack</h1>
-                <p class="text-blue-100/90 font-medium text-sm">Automasi pencatatan pengeluaran dari e-Receipt Gmail.</p>
-            </div>
-            
-            <div class="p-8">
-                <div class="space-y-4 mb-8">
-                    <div class="flex items-start space-x-3 text-slate-600 bg-slate-50 p-3 rounded-xl">
-                        <i data-lucide="layers" class="w-5 h-5 text-indigo-500 mt-0.5 flex-shrink-0"></i>
-                        <p class="text-sm font-medium">Multi-Account Workspace untuk pantau semua email sekaligus.</p>
-                    </div>
-                    <div class="flex items-start space-x-3 text-slate-600 bg-slate-50 p-3 rounded-xl">
-                        <i data-lucide="shield-check" class="w-5 h-5 text-teal-500 mt-0.5 flex-shrink-0"></i>
-                        <p class="text-sm font-medium">Anti-Promo Engine & Deduplikasi Transaksi cerdas.</p>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Google Client ID <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <i data-lucide="key" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400"></i>
-                        <input type="text" id="client-id-input" value="96175959772-e7l980iti17c4mbn599l1bkdu4tjg2q6.apps.googleusercontent.com" placeholder="Paste Client ID di sini..." class="w-full text-sm font-medium border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white shadow-sm placeholder:font-normal">
-                    </div>
-                </div>
-
-                <button id="btn-login" class="w-full bg-slate-900 text-white font-semibold py-4 px-4 rounded-xl flex items-center justify-center space-x-3 hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                    <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 bg-white rounded-full p-0.5" />
-                    <span>Mulai Workspace</span>
-                </button>
-            </div>
+      <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400 dark:bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10"></div>
+      <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-teal-400 dark:bg-teal-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10"></div>
+      <div class="max-w-md w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-slate-800 overflow-hidden z-10 relative">
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-10 text-center">
+          <div class="bg-white/20 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm shadow-inner shadow-white/20 rotate-3 hover:rotate-0 transition-transform">
+            <i data-lucide="mail-search" class="text-white w-10 h-10"></i>
+          </div>
+          <h1 class="text-3xl font-extrabold text-white mb-2 tracking-tight">AutoTrack</h1>
+          <p class="text-blue-100/90 font-medium text-sm">Automasi pencatatan pengeluaran dari e-Receipt Gmail.</p>
         </div>
+        <div class="p-8">
+          <div class="space-y-4 mb-8">
+            <div class="flex items-start space-x-3 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl">
+              <i data-lucide="layers" class="w-5 h-5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0"></i>
+              <p class="text-sm font-medium">Multi-Account Workspace untuk pantau semua email sekaligus.</p>
+            </div>
+            <div class="flex items-start space-x-3 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl">
+              <i data-lucide="shield-check" class="w-5 h-5 text-teal-500 dark:text-teal-400 mt-0.5 flex-shrink-0"></i>
+              <p class="text-sm font-medium">Anti-Promo Engine & Deduplikasi Transaksi cerdas.</p>
+            </div>
+          </div>
+          <div class="mb-6">
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Google Client ID <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <i data-lucide="key" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400 dark:text-slate-500"></i>
+              <input type="text" id="client-id-input" value="96175959772-e7l980iti17c4mbn599l1bkdu4tjg2q6.apps.googleusercontent.com" placeholder="Paste Client ID di sini..." class="w-full text-sm font-medium border border-slate-200 dark:border-slate-700 rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white dark:bg-slate-900 shadow-sm placeholder:font-normal dark:placeholder:text-slate-600 dark:text-slate-200">
+            </div>
+          </div>
+          <button id="btn-login" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold py-4 px-4 rounded-xl flex items-center justify-center space-x-3 hover:bg-slate-800 dark:hover:bg-slate-100 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+            <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 bg-white rounded-full p-0.5" />
+            <span>Mulai Workspace</span>
+          </button>
+        </div>
+      </div>
     </div>
-
     <!-- DASHBOARD VIEW -->
-    <div id="dashboard-view" class="min-h-screen bg-slate-50 hidden flex-col">
-        <!-- Header -->
-        <header class="bg-white border-b border-slate-200 z-20 shadow-sm flex-shrink-0">
-            <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-indigo-600 p-1.5 rounded-lg">
-                        <i data-lucide="mail-search" class="w-5 h-5 text-white"></i>
-                    </div>
-                    <span class="font-bold text-xl text-slate-800 tracking-tight hidden sm:block">AutoTrack Workspace</span>
-                    <span class="font-bold text-xl text-slate-800 tracking-tight sm:hidden">Workspace</span>
-                </div>
-                
-                <div class="flex items-center space-x-3 sm:space-x-4">
-                    <!-- Global Info (Active Account/Global) -->
-                    <div id="active-profile-info" class="flex items-center space-x-2.5 text-right">
-                        <div class="hidden sm:block">
-                            <p id="header-user-name" class="text-sm font-bold text-slate-800 leading-none mb-1">Global View</p>
-                            <p id="header-user-email" class="text-[11px] font-medium text-slate-500 leading-none">Semua Akun Digabungkan</p>
-                        </div>
-                        <div id="header-avatar" class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-600 border border-slate-200 shadow-sm flex items-center justify-center">
-                            <i data-lucide="globe" class="w-5 h-5"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
-                    
-                    <button id="btn-logout" class="flex items-center space-x-2 text-sm font-semibold text-slate-500 hover:text-red-500 transition-colors bg-slate-50 px-3 py-2 rounded-lg hover:bg-red-50">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">Keluar</span>
-                    </button>
-                </div>
+    <div id="dashboard-view" class="min-h-screen bg-slate-50 dark:bg-slate-950 hidden flex-col transition-colors duration-300">
+      <!-- Header -->
+      <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-20 shadow-sm flex-shrink-0 transition-colors">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="bg-indigo-600 p-1.5 rounded-lg">
+              <i data-lucide="mail-search" class="w-5 h-5 text-white"></i>
             </div>
-            
-            <!-- Workspace Tabs Bar -->
-            <div class="bg-slate-50/80 backdrop-blur-sm border-t border-slate-200">
-                <div class="max-w-5xl mx-auto px-4">
-                    <div id="workspace-tabs" class="flex items-end space-x-1 overflow-x-auto custom-scrollbar pt-2 pb-0">
-                        <!-- Tabs will be rendered here dynamically -->
-                    </div>
-                </div>
+            <span class="font-bold text-xl text-slate-800 dark:text-slate-100 tracking-tight hidden sm:block">AutoTrack Workspace</span>
+            <span class="font-bold text-xl text-slate-800 dark:text-slate-100 tracking-tight sm:hidden">Workspace</span>
+          </div>
+          <div class="flex items-center space-x-3 sm:space-x-4">
+            <!-- Global Info (Active Account/Global) -->
+            <div id="active-profile-info" class="flex items-center space-x-2.5 text-right">
+              <div class="hidden sm:block">
+                <p id="header-user-name" class="text-sm font-bold text-slate-800 dark:text-slate-100 leading-none mb-1">Global View</p>
+                <p id="header-user-email" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-none">Semua Akun Digabungkan</p>
+              </div>
+              <div id="header-avatar" class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center">
+                <i data-lucide="globe" class="w-5 h-5"></i>
+              </div>
             </div>
-        </header>
-
-        <main class="max-w-5xl mx-auto w-full px-4 py-8 space-y-6 flex-grow">
-            
-            <!-- Top Controls (Filters & Scan Action) -->
-            <div class="flex flex-col sm:flex-row gap-4 items-end justify-between">
-                
-                <!-- Filters -->
-                <div class="flex items-center space-x-3 w-full sm:w-auto bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center space-x-2 px-3 py-1 border-r border-slate-100">
-                        <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
-                        <select id="filter-month" class="bg-transparent text-sm font-semibold text-slate-700 focus:outline-none cursor-pointer">
-                            <option value="all">Semua Bulan</option>
-                            <!-- Bulan generated by JS -->
-                        </select>
-                    </div>
-                    <div class="flex items-center space-x-2 px-2 py-1">
-                        <select id="filter-year" class="bg-transparent text-sm font-semibold text-slate-700 focus:outline-none cursor-pointer">
-                            <option value="all">Semua Tahun</option>
-                            <!-- Tahun generated by JS -->
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Scan Button -->
-                <button id="btn-scan" class="w-full sm:w-auto py-3 px-6 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg shadow-indigo-600/20 active:scale-95">
-                    <i id="scan-icon" data-lucide="refresh-cw" class="w-5 h-5"></i>
-                    <span id="scan-text">Sinkronisasi Gmail</span>
-                </button>
+            <div class="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+            <!-- Theme Toggle -->
+            <button id="btn-theme-toggle" class="flex items-center justify-center w-9 h-9 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-800 rounded-lg transition-colors" title="Ubah Tema">
+              <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+              <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+            </button>
+            <button id="btn-logout" class="flex items-center space-x-2 text-sm font-semibold text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 transition-colors bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Keluar</span>
+            </button>
+          </div>
+        </div>
+        <!-- Workspace Tabs Bar -->
+        <div class="bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-sm border-t border-slate-200 dark:border-slate-800">
+          <div class="max-w-5xl mx-auto px-4">
+            <div id="workspace-tabs" class="flex items-end space-x-1 overflow-x-auto custom-scrollbar pt-2 pb-0">
+              <!-- Tabs will be rendered here dynamically -->
             </div>
-
-            <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Total Card -->
-                <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 shadow-xl text-white col-span-1 md:col-span-2 relative overflow-hidden">
-                    <div class="absolute right-[-5%] top-[-10%] w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
-                    <p class="text-slate-300 text-sm font-medium mb-2 flex items-center">
-                        <i data-lucide="wallet" class="w-4 h-4 mr-2"></i> 
-                        <span id="overview-title">Pengeluaran Terfilter</span>
-                    </p>
-                    <h2 id="total-expense" class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2">Rp 0</h2>
-                    <p id="filter-summary-text" class="text-xs text-slate-400 font-medium">Menampilkan transaksi dari Semua Waktu</p>
-                </div>
-                
-                <!-- Transaksi Count Card -->
-                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-center text-center">
-                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-3">
-                        <i data-lucide="receipt" class="w-6 h-6"></i>
-                    </div>
-                    <h3 id="tx-count" class="text-3xl font-extrabold text-slate-800 mb-1">0</h3>
-                    <p class="text-sm font-medium text-slate-500">Total Transaksi Valid</p>
-                </div>
+          </div>
+        </div>
+      </header>
+      <main class="max-w-5xl mx-auto w-full px-4 py-8 space-y-6 flex-grow">
+        <div class="flex flex-col md:flex-row gap-4 items-end justify-between">
+          <!-- Filters & Search -->
+          <div class="flex flex-wrap md:flex-nowrap items-center gap-3 w-full md:w-auto">
+            <!-- Date Filters -->
+            <div class="flex items-center space-x-2 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm w-full md:w-auto">
+              <div class="flex items-center space-x-2 px-3 py-1 border-r border-slate-100 dark:border-slate-800">
+                <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
+                <select id="filter-month" class="bg-transparent text-sm font-semibold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer">
+                  <option value="all">Semua Bulan</option>
+                </select>
+              </div>
+              <div class="flex items-center space-x-2 px-2 py-1">
+                <select id="filter-year" class="bg-transparent text-sm font-semibold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer">
+                  <option value="all">Semua Tahun</option>
+                </select>
+              </div>
             </div>
-
-            <!-- Chart Container -->
-            <div id="chart-container" class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 hidden">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-bold text-slate-800 flex items-center">
-                        <i data-lucide="bar-chart-3" class="w-5 h-5 mr-2 text-indigo-500"></i> Analisis Pengeluaran
-                    </h3>
-                    <select id="chart-mode" class="bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer transition-all">
-                        <option value="category">Per Kategori</option>
-                        <option value="date">Per Tanggal</option>
-                    </select>
-                </div>
-                <div class="h-64 w-full relative">
-                    <canvas id="expense-chart"></canvas>
-                </div>
+            <!-- Sorting Filter (NEW) -->
+            <div class="relative bg-white dark:bg-slate-900 w-full md:w-44 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center">
+              <i data-lucide="arrow-up-down" class="absolute left-3 w-4 h-4 text-slate-400"></i>
+              <select id="filter-sort" class="w-full text-sm font-medium bg-transparent border-none pl-9 pr-4 py-3 focus:outline-none focus:ring-0 cursor-pointer dark:text-slate-100 appearance-none">
+                <option value="date-desc">Terbaru</option>
+                <option value="date-asc">Terlama</option>
+                <option value="amount-desc">Tertinggi</option>
+                <option value="amount-asc">Terendah</option>
+              </select>
             </div>
-
-            <!-- Scanning Process Terminal -->
-            <div id="scan-container" class="bg-slate-900 rounded-3xl p-6 shadow-2xl text-emerald-400 font-mono text-sm hidden relative overflow-hidden border border-slate-800">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500"></div>
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-white font-semibold flex items-center tracking-wider text-xs">
-                        <i data-lucide="terminal" class="w-4 h-4 mr-2"></i> SYSTEM.PARSER 
-                        <span id="terminal-account-label" class="ml-2 text-slate-400"></span>
-                    </span>
-                    <span id="scan-percentage" class="text-emerald-300 font-bold">0%</span>
-                </div>
-                
-                <div class="w-full bg-slate-800 rounded-full h-2 mb-6 shadow-inner">
-                    <div id="scan-progress-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500 ease-out relative">
-                        <div class="absolute right-0 top-0 bottom-0 w-4 bg-white/30 rounded-full blur-[2px]"></div>
-                    </div>
-                </div>
-
-                <div id="scan-logs" class="space-y-1.5 h-40 overflow-y-auto custom-scrollbar pr-2 text-xs leading-relaxed">
-                    <!-- Logs will be appended here -->
-                </div>
+            <!-- Unified Search -->
+            <div class="relative bg-white dark:bg-slate-900 w-full md:w-64 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center">
+              <i data-lucide="search" class="absolute left-3 w-4 h-4 text-slate-400"></i>
+              <input type="text" id="search-input" placeholder="Cari transaksi, merchant..." class="w-full text-sm font-medium bg-transparent border-none pl-9 pr-4 py-3 focus:outline-none focus:ring-0 placeholder:font-normal dark:text-slate-100 dark:placeholder-slate-500">
             </div>
-
-            <!-- Expense List -->
-            <div id="expense-container" class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden hidden">
-                <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <h3 class="font-bold text-slate-800 flex items-center">
-                        <i data-lucide="list" class="w-5 h-5 mr-2 text-indigo-500"></i> Riwayat Transaksi
-                    </h3>
-                    <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md">Klik untuk Rincian</span>
-                </div>
-                <div id="expense-list" class="divide-y divide-slate-100">
-                    <!-- Expenses will be appended here -->
-                </div>
+          </div>
+          <button id="btn-scan" class="w-full md:w-auto py-3 px-6 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg shadow-indigo-600/20 active:scale-95">
+            <i id="scan-icon" data-lucide="refresh-cw" class="w-5 h-5"></i>
+            <span id="scan-text">Sinkronisasi Gmail</span>
+          </button>
+        </div>
+        <!-- Insights / Analytics Engine Display -->
+        <div id="insights-container" class="bg-indigo-50 dark:bg-indigo-900/20 rounded-3xl p-5 md:p-6 shadow-sm border border-indigo-100 dark:border-indigo-900/50 hidden">
+          <div class="flex items-center mb-3 text-indigo-900 dark:text-indigo-200">
+            <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400"></i>
+            <h3 class="font-bold">Algorithmic Insights</h3>
+          </div>
+          <div id="insights-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <!-- Generated via JS AnalyticsEngine -->
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Total Card -->
+          <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 shadow-xl text-white col-span-1 md:col-span-2 relative overflow-hidden">
+            <div class="absolute right-[-5%] top-[-10%] w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+            <p class="text-slate-300 text-sm font-medium mb-2 flex items-center">
+              <i data-lucide="wallet" class="w-4 h-4 mr-2"></i>
+              <span id="overview-title">Pengeluaran Terfilter</span>
+            </p>
+            <h2 id="total-expense" class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2">Rp 0</h2>
+            <p id="filter-summary-text" class="text-xs text-slate-400 font-medium">Menampilkan transaksi dari Semua Waktu</p>
+          </div>
+          <!-- Transaksi Count Card -->
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center items-center text-center">
+            <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-3">
+              <i data-lucide="receipt" class="w-6 h-6"></i>
             </div>
-
-            <!-- Empty State -->
-            <div id="empty-state" class="text-center py-20 text-slate-500 bg-white rounded-3xl border border-slate-200 border-dashed">
-                <div class="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="inbox" class="w-10 h-10 text-slate-300"></i>
-                </div>
-                <h3 id="empty-state-title" class="text-lg font-bold text-slate-700 mb-1">Belum Ada Data</h3>
-                <p id="empty-state-desc" class="text-sm font-medium">Klik tombol "Sinkronisasi Gmail" untuk mulai menarik struk.</p>
+            <h3 id="tx-count" class="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mb-1">0</h3>
+            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Transaksi Valid</p>
+          </div>
+        </div>
+        <!-- Chart Container -->
+        <div id="chart-container" class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800 dark:text-slate-100 flex items-center">
+              <i data-lucide="bar-chart-3" class="w-5 h-5 mr-2 text-indigo-500 dark:text-indigo-400"></i> Analisis Pengeluaran
+            </h3>
+            <select id="chart-mode" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer transition-all">
+              <option value="category">Per Kategori</option>
+              <option value="date">Per Tanggal</option>
+            </select>
+          </div>
+          <div class="h-64 w-full relative">
+            <canvas id="expense-chart"></canvas>
+          </div>
+        </div>
+        <!-- Scanning Process Terminal -->
+        <div id="scan-container" class="bg-slate-900 dark:bg-slate-950 rounded-3xl p-6 shadow-2xl text-emerald-400 font-mono text-sm hidden relative overflow-hidden border border-slate-800">
+          <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500"></div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-white font-semibold flex items-center tracking-wider text-xs">
+              <i data-lucide="terminal" class="w-4 h-4 mr-2"></i> SYSTEM.PARSER <span id="terminal-account-label" class="ml-2 text-slate-400"></span>
+            </span>
+            <span id="scan-percentage" class="text-emerald-300 font-bold">0%</span>
+          </div>
+          <div class="w-full bg-slate-800 dark:bg-slate-900 rounded-full h-2 mb-6 shadow-inner">
+            <div id="scan-progress-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500 ease-out relative">
+              <div class="absolute right-0 top-0 bottom-0 w-4 bg-white/30 rounded-full blur-[2px]"></div>
             </div>
-
-        </main>
+          </div>
+          <div id="scan-logs" class="space-y-1.5 h-40 overflow-y-auto custom-scrollbar pr-2 text-xs leading-relaxed">
+            <!-- Logs will be appended here -->
+          </div>
+        </div>
+        <!-- Expense List -->
+        <div id="expense-container" class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden hidden">
+          <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+            <h3 class="font-bold text-slate-800 dark:text-slate-100 flex items-center">
+              <i data-lucide="list" class="w-5 h-5 mr-2 text-indigo-500 dark:text-indigo-400"></i> Riwayat Transaksi
+            </h3>
+            <span class="text-xs font-semibold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md">Klik untuk Rincian</span>
+          </div>
+          <div id="expense-list" class="divide-y divide-slate-100 dark:divide-slate-800">
+            <!-- Expenses will be appended here -->
+          </div>
+        </div>
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-20 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 border-dashed">
+          <div class="bg-slate-50 dark:bg-slate-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="inbox" class="w-10 h-10 text-slate-300 dark:text-slate-600"></i>
+          </div>
+          <h3 id="empty-state-title" class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-1">Belum Ada Data</h3>
+          <p id="empty-state-desc" class="text-sm font-medium">Klik tombol "Sinkronisasi Gmail" atau perbarui pencarian.</p>
+        </div>
+      </main>
     </div>
-
     <!-- DETAIL MODAL -->
     <div id="detail-modal" class="fixed inset-0 z-50 hidden">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" id="modal-backdrop"></div>
-        
-        <!-- Modal Content -->
-        <div class="absolute inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 flex flex-col max-h-[90vh]">
-                <!-- Header Modal -->
-                <div class="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-start relative">
-                    <div class="flex items-center space-x-4">
-                        <div id="modal-icon-container" class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center shadow-inner">
-                            <!-- Icon disisipkan JS -->
-                        </div>
-                        <div>
-                            <h3 id="modal-merchant" class="font-extrabold text-xl text-slate-800 tracking-tight">Merchant Name</h3>
-                            <p id="modal-date" class="text-sm font-medium text-slate-500 mt-0.5">Tanggal Transaksi</p>
-                            <p id="modal-account" class="text-[10px] font-bold text-indigo-500 mt-1 uppercase tracking-wider hidden"></p>
-                        </div>
-                    </div>
-                    <button id="btn-close-modal" class="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-2 rounded-full transition-colors">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-                
-                <!-- Body Modal (Struk) -->
-                <div class="p-6 overflow-y-auto custom-scrollbar flex-grow bg-white relative">
-                    <!-- Garis potong struk (dekorasi) -->
-                    <div class="absolute top-0 left-4 right-4 h-[1px] border-t-2 border-dashed border-slate-200"></div>
-                    
-                    <div class="flex justify-between items-center mb-4 mt-2">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Rincian Pembelian</h4>
-                        <div id="modal-confidence" class="text-[10px] font-bold px-2 py-0.5 rounded-full" title="Confidence Score Validasi"></div>
-                    </div>
-                    
-                    <ul id="modal-items-list" class="space-y-3 mb-6">
-                        <!-- Items disisipkan JS -->
-                    </ul>
-
-                    <div class="border-t border-slate-200 pt-4 space-y-2">
-                        <div class="flex justify-between text-sm font-medium text-slate-500">
-                            <span>Subtotal</span>
-                            <span id="modal-subtotal">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between text-sm font-medium text-slate-500">
-                            <span>Pajak / Ongkir / Biaya Layanan</span>
-                            <span id="modal-fees">Rp 0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer Modal -->
-                <div class="bg-slate-800 p-6 text-white flex justify-between items-center rounded-b-3xl">
-                    <span class="font-semibold text-slate-300">Total Dibayar</span>
-                    <span id="modal-total" class="font-extrabold text-2xl">Rp 0</span>
-                </div>
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm transition-opacity" id="modal-backdrop"></div>
+      <!-- Modal Content -->
+      <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 flex flex-col max-h-[90vh]">
+          <!-- Header Modal -->
+          <div class="bg-slate-50 dark:bg-slate-800/50 p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start relative">
+            <div class="flex items-center space-x-4">
+              <div id="modal-icon-container" class="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center shadow-inner">
+                <!-- Icon disisipkan JS -->
+              </div>
+              <div>
+                <h3 id="modal-merchant" class="font-extrabold text-xl text-slate-800 dark:text-slate-100 tracking-tight">Merchant Name</h3>
+                <p id="modal-date" class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">Tanggal Transaksi</p>
+                <p id="modal-account" class="text-[10px] font-bold text-indigo-500 dark:text-indigo-400 mt-1 uppercase tracking-wider hidden"></p>
+              </div>
             </div>
+            <button id="btn-close-modal" class="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 p-2 rounded-full transition-colors">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <!-- Body Modal (Struk) -->
+          <div class="p-6 overflow-y-auto custom-scrollbar flex-grow bg-white dark:bg-slate-900 relative">
+            <!-- Garis potong struk -->
+            <div class="absolute top-0 left-4 right-4 h-[1px] border-t-2 border-dashed border-slate-200 dark:border-slate-700"></div>
+            <div class="flex justify-between items-center mb-4 mt-2">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Rincian Pembelian</h4>
+              <div id="modal-confidence" class="text-[10px] font-bold px-2 py-0.5 rounded-full" title="Confidence Score Validasi"></div>
+            </div>
+            <ul id="modal-items-list" class="space-y-3 mb-6">
+              <!-- Items disisipkan JS -->
+            </ul>
+            <div class="border-t border-slate-200 dark:border-slate-700 pt-4 space-y-2">
+              <div class="flex justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
+                <span>Subtotal</span>
+                <span id="modal-subtotal">Rp 0</span>
+              </div>
+              <div class="flex justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
+                <span>Pajak / Ongkir / Biaya Layanan</span>
+                <span id="modal-fees">Rp 0</span>
+              </div>
+            </div>
+          </div>
+          <!-- Footer Modal -->
+          <div class="bg-slate-800 dark:bg-slate-950 p-6 text-white flex justify-between items-center rounded-b-3xl border-t border-slate-700 dark:border-slate-800">
+            <span class="font-semibold text-slate-300">Total Dibayar</span>
+            <span id="modal-total" class="font-extrabold text-2xl">Rp 0</span>
+          </div>
         </div>
+      </div>
     </div>
-
     <!-- Application Architecture & Logic -->
     <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
-
-        // ==========================================
-        // 1. STATE MANAGEMENT & ARCHITECTURE
-        // ==========================================
-        const Workspace = {
-            activeTab: 'global', // 'global' or email string
-            accounts: new Map(), // email => AccountState
-            globalAnalytics: {
-                expenses: [],
-                trends: {}
-            },
-            filters: {
-                month: new Date().getMonth().toString(),
-                year: new Date().getFullYear().toString()
-            }
-        };
-
-        class AccountState {
-            constructor(email, token, profile) {
-                this.email = email;
-                this.token = token;
-                this.profile = profile; // { name, picture }
-                this.expenses = [];
-                this.logs = [];
-                this.syncProgress = 0;
-                this.isScanning = false;
-            }
+      // Initialize Lucide Icons
+      lucide.createIcons();
+      // Theme Toggle Logic
+      document.getElementById('btn-theme-toggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        const isDark = document.documentElement.classList.contains('dark');
+        localStorage.theme = isDark ? 'dark' : 'light';
+        UI.renderChart(); // Trigger chart update for colors
+      });
+      // ==========================================
+      // 1. STATE MANAGEMENT & ARCHITECTURE
+      // ==========================================
+      const Workspace = {
+        activeTab: 'global', // 'global' or email string
+        accounts: new Map(), // email => AccountState
+        globalAnalytics: {
+          expenses: [],
+          trends: {}
+        },
+        filters: {
+          month: new Date().getMonth().toString(),
+          year: new Date().getFullYear().toString(),
+          searchQuery: '',
+          sort: 'date-desc' // New state: Sort Order
         }
-
-        // ==========================================
-        // 2. INTELLIGENT PARSER ENGINE
-        // ==========================================
-        const ParserEngine = {
-            decodeBase64URL: (str) => {
-                try {
-                    return decodeURIComponent(atob(str.replace(/-/g, '+').replace(/_/g, '/')).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-                } catch (e) { return ""; }
-            },
-
-            getBodyText: (part) => {
-                if (part.body && part.body.data) return part.body.data;
-                if (part.parts) {
-                    for (let p of part.parts) if (p.mimeType === 'text/plain') return p.body.data; 
-                    for (let p of part.parts) {
-                        if (p.mimeType === 'text/html') return p.body.data;
-                        if (p.parts) return ParserEngine.getBodyText(p);
-                    }
-                }
-                return '';
-            },
-
-            normalizeMerchant: (fromHeader) => {
-                const from = fromHeader.toLowerCase();
-                if (from.includes('gojek') || from.includes('gopay')) return { merchant: 'Gojek', icon: 'car-taxi-front', category: 'Transport/Food' };
-                if (from.includes('grab')) return { merchant: 'Grab', icon: 'car', category: 'Transport/Food' };
-                if (from.includes('tokopedia')) return { merchant: 'Tokopedia', icon: 'shopping-bag', category: 'Shopping' };
-                if (from.includes('shopee')) return { merchant: 'Shopee', icon: 'shopping-bag', category: 'Shopping' };
-                if (from.includes('blibli')) return { merchant: 'Blibli', icon: 'shopping-bag', category: 'Shopping' };
-                if (from.includes('traveloka')) return { merchant: 'Traveloka', icon: 'plane', category: 'Travel' };
-                if (from.includes('apple') || from.includes('itunes')) return { merchant: 'Apple', icon: 'monitor-play', category: 'Digital' };
-                if (from.includes('netflix')) return { merchant: 'Netflix', icon: 'monitor-play', category: 'Digital' };
-                if (from.includes('spotify')) return { merchant: 'Spotify', icon: 'monitor-play', category: 'Digital' };
-                if (from.includes('google')) return { merchant: 'Google', icon: 'monitor-play', category: 'Digital' };
-                if (from.includes('steampowered') || from.includes('steam')) return { merchant: 'Steam', icon: 'gamepad-2', category: 'Digital' };
-                if (from.includes('pln')) return { merchant: 'PLN', icon: 'zap', category: 'Utilities' };
-                
-                let extractedName = fromHeader.split('<')[0].replace(/"/g, '').trim();
-                return { merchant: extractedName || 'Merchant Lain', icon: 'credit-card', category: 'Lainnya' };
-            },
-
-            processEmail: (payload, headers, accountEmail, msgData) => {
-                const fromHeader = headers.find(h => h.name === 'From')?.value || '';
-                const subjectHeader = headers.find(h => h.name === 'Subject')?.value || '';
-                const dateStr = headers.find(h => h.name === 'Date')?.value || '';
-                const listUnsubscribe = headers.find(h => h.name === 'List-Unsubscribe')?.value;
-                
-                const subject = subjectHeader.toLowerCase();
-                const { merchant, icon, category } = ParserEngine.normalizeMerchant(fromHeader);
-                
-                const formattedDate = !isNaN(new Date(dateStr)) ? new Date(dateStr).toISOString().split('T')[0] : dateStr;
-                const internalTimestamp = parseInt(msgData.internalDate) || new Date(dateStr).getTime() || Date.now();
-                const threadId = msgData.threadId;
-
-                let textContent = ParserEngine.decodeBase64URL(ParserEngine.getBodyText(payload));
-                let cleanText = textContent.replace(/<[^>]*>?/gm, '\n').replace(/&nbsp;/g, ' ');
-
-                // --- 1. SECTION TRUNCATION (ANTI-REKOMENDASI & TUTORIAL) ---
-                // Buang semua teks setelah keywords di bawah ini agar parser tidak membaca harga produk promo/tutorial bayar
-                const cutoffRegex = /kamu mungkin suka|rekomendasi untukmu|produk terkait|pilihan lainnya|cara pembayaran|instruksi pembayaran|metode pembayaran alternatif|daftar channel pembayaran|biaya layanan per channel|sponsor|flash sale|best seller/i;
-                const cutoffMatch = cleanText.match(cutoffRegex);
-                if (cutoffMatch) {
-                    cleanText = cleanText.substring(0, cutoffMatch.index);
-                }
-
-                const cleanTextLower = cleanText.toLowerCase();
-
-                // --- 2. ADVANCED CONFIDENCE SCORING ENGINE ---
-                let confidence = 0.5;
-                const promoKeywords = /promo|diskon|cashback|sale|spesial|penawaran|newsletter|voucher|hemat|beli sekarang|shop now|rekomendasi|wishlist|jangan lewatkan/i;
-                const validKeywords = /invoice|receipt|pembayaran|tagihan|order|pesanan|struk|berhasil|payment|confirmed|lunas|paid|charged/i;
-                
-                // Indikator Transaksi Belum Selesai (SANGAT FATAL)
-                const pendingKeywords = /menunggu pembayaran|cara bayar|instruksi pembayaran|virtual account|pay before|unpaid|pending payment|menunggu/i;
-                // Indikator Transaksi Final (SANGAT BAIK)
-                const successKeywords = /pembayaran berhasil|paid|payment successful|transaksi berhasil|order completed|invoice paid/i;
-
-                if (promoKeywords.test(subject)) confidence -= 0.6;
-                if (validKeywords.test(subject)) confidence += 0.4;
-                if (listUnsubscribe) confidence -= 0.5; // Email valid sangat jarang punya Unsubscribe
-                
-                // Bunuh skor jika ini cuma email instruksi pembayaran
-                if (pendingKeywords.test(subject) || pendingKeywords.test(cleanTextLower)) confidence -= 0.6;
-                if (successKeywords.test(subject) || successKeywords.test(cleanTextLower)) confidence += 0.5;
-
-                if (/invoice|order id|no pesanan|nomor resi|trx id|transaction id/i.test(cleanTextLower)) confidence += 0.3;
-
-                // --- 3. SMART AMOUNT PARSING ---
-                const lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                const priceRegex = /Rp\s?([0-9]{1,3}(?:[.,][0-9]{3})*)/i;
-
-                let bestAmount = 0;
-                let bestScore = -999;
-                let items = [];
-
-                const strongPositiveWords = ['total dibayar', 'total pembayaran', 'amount paid', 'grand total', 'total tagihan', 'total charge', 'charged amount'];
-                const weakPositiveWords = ['total', 'bayar', 'dibayar', 'tagihan', 'amount', 'paid', 'akhir', 'jumlah', 'pembayaran'];
-                const negativeWords = ['diskon', 'hemat', 'cashback', 'potongan', 'voucher', 'mulai', 'dari', 'harga', 'semula', 'rekomendasi', 'kembali', 'sisa', 'biaya layanan channel', 'simulasi cicilan', 'ongkir', 'jne', 'j&t', 'sicepat', 'alfamart', 'indomaret', 'admin'];
-
-                for(let i=0; i < lines.length; i++) {
-                    let line = lines[i];
-                    let pMatch = line.match(priceRegex);
-                    
-                    if(pMatch) {
-                        let priceVal = parseInt(pMatch[1].replace(/[.,]/g, ''));
-                        if(priceVal === 0) continue;
-
-                        let context = line.toLowerCase();
-                        if (i > 0) context += " " + lines[i-1].toLowerCase(); // Ambil konteks baris sebelumnya juga
-
-                        let lineScore = 0;
-                        if (strongPositiveWords.some(w => context.includes(w))) lineScore += 25;
-                        else if (weakPositiveWords.some(w => context.includes(w))) lineScore += 10;
-                        
-                        if (negativeWords.some(w => context.includes(w))) lineScore -= 30; // Penalti berat untuk area negatif
-
-                        // Jika score lebih baik ATAU (score sama tapi harga lebih masuk akal sebagai total di area netral/positif)
-                        if (lineScore > bestScore || (lineScore === bestScore && priceVal > bestAmount && lineScore >= 0)) {
-                            bestScore = lineScore;
-                            bestAmount = priceVal;
-                        }
-                        
-                        // Ekstraksi Item Heuristik (Abaikan jika terdeteksi konteks negatif/promo)
-                        if (lineScore < 10 && lineScore >= 0 && !negativeWords.some(w => context.includes(w))) {
-                            let name = line.replace(pMatch[0], '').replace(/^[-\*\.]+|[-\*\.]+$/g, '').trim();
-                            if (name.length < 3 && i > 0) name = lines[i-1].replace(/^[-\*\.]+|[-\*\.]+$/g, '').trim();
-                            if (name && name.length > 2 && name.length < 50 && priceVal > 0) {
-                                 items.push({ name: name, price: priceVal });
-                            }
-                        }
-                    }
-                }
-
-                if (bestScore >= 20) confidence += 0.4;
-                if (bestScore < 0) confidence -= 0.5;
-                if (bestAmount === 0) confidence -= 1.0;
-
-                // STRICT THRESHOLD: Tolak transaksi palsu / pending / promo
-                if (confidence < 0.6) return { isValid: false };
-
-                // Bersihkan items yang harganya melampaui Grand Total (pasti salah parsing)
-                items = items.filter(it => it.price < bestAmount);
-
-                return { 
-                    isValid: true, merchant, amount: bestAmount, category, icon, 
-                    date: formattedDate, timestamp: internalTimestamp, threadId,
-                    items, confidence, accountId: accountEmail 
-                };
+      };
+      class AccountState {
+        constructor(email, token, profile) {
+          this.email = email;
+          this.token = token;
+          this.profile = profile; // { name, picture }
+          this.expenses = [];
+          this.logs = [];
+          this.syncProgress = 0;
+          this.isScanning = false;
+          this.lastSync = 0;
+        }
+      }
+      // ==========================================
+      // SMART CACHING LAYER
+      // ==========================================
+      const CacheEngine = {
+        CACHE_KEY: 'autotrack_workspace_cache',
+        TTL: 3600000, // 1 Jam
+        save: () => {
+          try {
+            const data = {
+              accounts: [],
+              updated: Date.now()
+            };
+            for (const [email, acc] of Workspace.accounts.entries()) {
+              data.accounts.push({
+                email: acc.email,
+                profile: acc.profile,
+                expenses: acc.expenses,
+                lastSync: acc.lastSync
+              });
             }
-        };
-
-        // ==========================================
-        // 3. INTELLIGENT DEDUPLICATION ENGINE
-        // ==========================================
-        const DeduplicationEngine = {
-            // Membuang duplikat dengan menoleransi perbedaan Admin Fee dan Waktu
-            advancedDedupe: (expensesArray) => {
-                // Urutkan dari yang terbaru
-                const sorted = [...expensesArray].sort((a, b) => b.timestamp - a.timestamp);
-                const deduplicated = [];
-
-                for (const exp of sorted) {
-                    let isDuplicate = false;
-
-                    for (let i = 0; i < deduplicated.length; i++) {
-                        const existing = deduplicated[i];
-
-                        const isSameMerchant = exp.merchant === existing.merchant;
-                        const timeDiffHours = Math.abs(exp.timestamp - existing.timestamp) / (1000 * 60 * 60);
-                        const isTimeClose = timeDiffHours < 48; // Transaksi dalam 48 jam
-                        const isSameThread = exp.threadId && existing.threadId && (exp.threadId === existing.threadId);
-
-                        // Toleransi nominal sedikit beda (karena fee gateway/admin), max 5% atau 5000 perak
-                        const maxAmount = Math.max(exp.amount, existing.amount);
-                        const minAmount = Math.min(exp.amount, existing.amount);
-                        const diffRatio = maxAmount > 0 ? ((maxAmount - minAmount) / maxAmount) : 0;
-                        const isAmountSimilar = diffRatio < 0.05 || (maxAmount - minAmount <= 5000); 
-
-                        // Jika Merchant sama, waktunya berdekatan, DAN (Nominal Mirip ATAU Thread sama)
-                        if (isSameMerchant && isTimeClose && (isSameThread || isAmountSimilar)) {
-                            isDuplicate = true;
-                            // Prioritaskan transaksi dengan Confidence (Status Paid) yang lebih tinggi
-                            if (exp.confidence > existing.confidence) {
-                                deduplicated[i] = exp; 
-                            }
-                            break;
-                        }
-                    }
-
-                    if (!isDuplicate) deduplicated.push(exp);
-                }
-                
-                return deduplicated;
-            },
-
-            mergeGlobal: () => {
-                const allRaw = [];
-                for (const account of Workspace.accounts.values()) {
-                    allRaw.push(...account.expenses);
-                }
-                const deduplicated = DeduplicationEngine.advancedDedupe(allRaw);
-                Workspace.globalAnalytics.expenses = deduplicated.sort((a, b) => new Date(b.date) - new Date(a.date));
-                return Workspace.globalAnalytics.expenses;
-            }
-        };
-
-
-        // ==========================================
-        // 4. UI CONTROLLER
-        // ==========================================
-        const UI = {
-            formatRupiah: (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num),
-            formatDate: (dStr) => {
-                const d = new Date(dStr);
-                return isNaN(d) ? dStr : d.toLocaleDateString('id-ID', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-            },
-
-            initDOM: () => {
-                const mSelect = document.getElementById('filter-month');
-                const ySelect = document.getElementById('filter-year');
-                const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-                mSelect.innerHTML = '<option value="all">Semua Bulan</option>' + months.map((m,i) => `<option value="${i}">${m}</option>`).join('');
-                
-                const curYear = new Date().getFullYear();
-                ySelect.innerHTML = '<option value="all">Semua Tahun</option>' + [0,1,2].map(i => `<option value="${curYear-i}">${curYear-i}</option>`).join('');
-                
-                mSelect.value = Workspace.filters.month;
-                ySelect.value = Workspace.filters.year;
-
-                mSelect.addEventListener('change', (e) => { Workspace.filters.month = e.target.value; UI.renderDashboard(); });
-                ySelect.addEventListener('change', (e) => { Workspace.filters.year = e.target.value; UI.renderDashboard(); });
-                document.getElementById('chart-mode').addEventListener('change', () => UI.renderChart());
-            },
-
-            renderTabs: () => {
-                const container = document.getElementById('workspace-tabs');
-                container.innerHTML = '';
-
-                const globalTab = document.createElement('button');
-                globalTab.className = `px-5 py-2.5 rounded-t-xl text-sm transition-colors ${Workspace.activeTab === 'global' ? 'tab-active' : 'tab-inactive'}`;
-                globalTab.innerHTML = `<div class="flex items-center space-x-2"><i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Global View</span></div>`;
-                globalTab.onclick = () => { Workspace.activeTab = 'global'; UI.renderTabs(); UI.renderDashboard(); };
-                container.appendChild(globalTab);
-
-                for (const [email, account] of Workspace.accounts.entries()) {
-                    const accTab = document.createElement('button');
-                    accTab.className = `px-5 py-2.5 rounded-t-xl text-sm transition-colors flex items-center space-x-2 ${Workspace.activeTab === email ? 'tab-active' : 'tab-inactive'}`;
-                    accTab.innerHTML = `
-                        <img src="${account.profile.picture}" class="w-4 h-4 rounded-full bg-slate-200">
-                        <span class="truncate max-w-[120px]">${email}</span>
-                        ${account.isScanning ? '<i data-lucide="loader-2" class="w-3 h-3 animate-spin ml-1 text-indigo-500"></i>' : ''}
-                    `;
-                    accTab.onclick = () => { Workspace.activeTab = email; UI.renderTabs(); UI.renderDashboard(); };
-                    container.appendChild(accTab);
-                }
-
-                const addTab = document.createElement('button');
-                addTab.className = `px-4 py-2.5 rounded-t-xl text-sm font-semibold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors`;
-                addTab.innerHTML = `<div class="flex items-center space-x-1"><i data-lucide="plus" class="w-4 h-4"></i><span>Akun</span></div>`;
-                addTab.onclick = () => document.getElementById('btn-login').click();
-                container.appendChild(addTab);
-
-                lucide.createIcons();
-            },
-
-            updateHeaderProfile: () => {
-                const nameEl = document.getElementById('header-user-name');
-                const emailEl = document.getElementById('header-user-email');
-                const avatarEl = document.getElementById('header-avatar');
-
-                if (Workspace.activeTab === 'global') {
-                    nameEl.textContent = 'Global View';
-                    emailEl.textContent = `${Workspace.accounts.size} Akun Terhubung`;
-                    avatarEl.innerHTML = `<i data-lucide="globe" class="w-5 h-5"></i>`;
-                    avatarEl.className = 'w-9 h-9 rounded-full bg-indigo-100 text-indigo-600 border border-slate-200 shadow-sm flex items-center justify-center';
-                } else {
-                    const account = Workspace.accounts.get(Workspace.activeTab);
-                    nameEl.textContent = account.profile.name;
-                    emailEl.textContent = account.email;
-                    avatarEl.innerHTML = `<img src="${account.profile.picture}" class="w-full h-full rounded-full object-cover">`;
-                    avatarEl.className = 'w-9 h-9 rounded-full border border-slate-200 shadow-sm bg-slate-100 overflow-hidden';
-                }
-                lucide.createIcons();
-            },
-
-            getActiveExpenses: () => {
-                let data = [];
-                if (Workspace.activeTab === 'global') {
-                    data = DeduplicationEngine.mergeGlobal();
-                } else {
-                    data = Workspace.accounts.get(Workspace.activeTab)?.expenses || [];
-                }
-
-                const sM = Workspace.filters.month;
-                const sY = Workspace.filters.year;
-
-                return data.filter(exp => {
-                    const d = new Date(exp.date);
-                    if (isNaN(d)) return true;
-                    return (sM === 'all' || d.getMonth() === parseInt(sM)) && (sY === 'all' || d.getFullYear() === parseInt(sY));
-                });
-            },
-
-            renderDashboard: () => {
-                UI.updateHeaderProfile();
-                const filtered = UI.getActiveExpenses();
-                
-                const totalEl = document.getElementById('total-expense');
-                const countEl = document.getElementById('tx-count');
-                const summaryEl = document.getElementById('filter-summary-text');
-                const listContainer = document.getElementById('expense-container');
-                const emptyEl = document.getElementById('empty-state');
-                const chartContainer = document.getElementById('chart-container');
-                const btnScan = document.getElementById('btn-scan');
-                const scanContainer = document.getElementById('scan-container');
-
-                const mSelect = document.getElementById('filter-month');
-                const ySelect = document.getElementById('filter-year');
-                const mText = mSelect.options[mSelect.selectedIndex].text;
-                const yText = ySelect.options[ySelect.selectedIndex].text;
-                
-                const sM = Workspace.filters.month;
-                const sY = Workspace.filters.year;
-                
-                summaryEl.textContent = (sM === 'all' && sY === 'all') ? "Semua Waktu" : `Filter: ${mText} ${yText}`;
-                totalEl.textContent = UI.formatRupiah(filtered.reduce((s, i) => s + i.amount, 0));
-                countEl.textContent = filtered.length;
-
-                let isScanning = false;
-                if (Workspace.activeTab === 'global') {
-                    for (const acc of Workspace.accounts.values()) if(acc.isScanning) isScanning = true;
-                    btnScan.querySelector('span').textContent = 'Sinkronisasi Semua';
-                } else {
-                    const acc = Workspace.accounts.get(Workspace.activeTab);
-                    isScanning = acc.isScanning;
-                    btnScan.querySelector('span').textContent = 'Sinkronisasi Akun';
-                }
-
-                if (isScanning) {
-                    btnScan.classList.replace('bg-indigo-600', 'bg-indigo-200');
-                    btnScan.classList.replace('hover:bg-indigo-700', 'cursor-not-allowed');
-                    document.getElementById('scan-icon').classList.add('animate-spin');
-                    listContainer.classList.add('hidden');
-                    emptyEl.classList.add('hidden');
-                    chartContainer.classList.add('hidden');
-                    scanContainer.classList.remove('hidden');
-                    UI.renderTerminalLogs();
-                } else {
-                    btnScan.classList.replace('bg-indigo-200', 'bg-indigo-600');
-                    btnScan.classList.replace('cursor-not-allowed', 'hover:bg-indigo-700');
-                    document.getElementById('scan-icon').classList.remove('animate-spin');
-                    scanContainer.classList.add('hidden');
-
-                    if (filtered.length === 0) {
-                        listContainer.classList.add('hidden');
-                        chartContainer.classList.add('hidden');
-                        emptyEl.classList.remove('hidden');
-                    } else {
-                        emptyEl.classList.add('hidden');
-                        listContainer.classList.remove('hidden');
-                        chartContainer.classList.remove('hidden');
-                        UI.renderList(filtered);
-                        UI.renderChart(filtered);
-                    }
-                }
-            },
-
-            renderList: (data) => {
-                const listEl = document.getElementById('expense-list');
-                listEl.innerHTML = '';
-                data.forEach(exp => {
-                    const item = document.createElement('div');
-                    item.className = 'p-4 px-6 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer group border-l-4 border-transparent hover:border-indigo-500';
-                    item.onclick = () => UI.openModal(exp);
-                    
-                    const accBadge = Workspace.activeTab === 'global' ? 
-                        `<span class="ml-2 text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded uppercase tracking-wider">${exp.accountId.split('@')[0]}</span>` : '';
-
-                    item.innerHTML = `
-                        <div class="flex items-center space-x-4">
-                            <div class="bg-indigo-50 p-3.5 rounded-2xl text-indigo-600 flex-shrink-0 group-hover:scale-110 group-hover:bg-indigo-100 transition-all">
-                                <i data-lucide="${exp.icon}" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <p class="font-extrabold text-slate-800 leading-tight flex items-center">${exp.merchant} ${accBadge}</p>
-                                <p class="text-xs font-semibold text-slate-500 mt-1">${UI.formatDate(exp.date)}</p>
-                            </div>
-                        </div>
-                        <div class="text-right flex-shrink-0 flex items-center space-x-3">
-                            <p class="font-extrabold text-slate-800">${UI.formatRupiah(exp.amount)}</p>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors"></i>
-                        </div>
-                    `;
-                    listEl.appendChild(item);
-                });
-                lucide.createIcons();
-            },
-
-            renderTerminalLogs: () => {
-                const logContainer = document.getElementById('scan-logs');
-                const progBar = document.getElementById('scan-progress-bar');
-                const progTxt = document.getElementById('scan-percentage');
-                const accLabel = document.getElementById('terminal-account-label');
-
-                logContainer.innerHTML = '';
-                
-                if (Workspace.activeTab === 'global') {
-                    accLabel.textContent = `[Semua Akun]`;
-                    progBar.style.width = `100%`;
-                    progTxt.textContent = `...`;
-                    let totalLogs = [];
-                    for(const acc of Workspace.accounts.values()) {
-                        if(acc.isScanning) totalLogs.push(`>> Sinkronisasi ${acc.email} sedang berjalan...`);
-                    }
-                    totalLogs.forEach(l => {
-                        logContainer.innerHTML += `<div class="flex items-start"><span class="text-emerald-500 mr-2 font-bold">></span><p>${l}</p></div>`;
-                    });
-                } else {
-                    const acc = Workspace.accounts.get(Workspace.activeTab);
-                    accLabel.textContent = `[${acc.email}]`;
-                    progBar.style.width = `${acc.syncProgress}%`;
-                    progTxt.textContent = `${acc.syncProgress}%`;
-                    
-                    acc.logs.forEach(log => {
-                        logContainer.innerHTML += `<div class="flex items-start"><span class="text-emerald-500 mr-2 font-bold">></span><p>${log}</p></div>`;
-                    });
-                    logContainer.scrollTop = logContainer.scrollHeight;
-                }
-            },
-
-            renderChart: (forcedData) => {
-                const data = forcedData || UI.getActiveExpenses();
-                const chartCanvas = document.getElementById('expense-chart');
-                if (!chartCanvas || data.length === 0) return;
-                
-                const mode = document.getElementById('chart-mode').value;
-                let labels = [], values = [];
-
-                if (mode === 'category') {
-                    const totals = {};
-                    data.forEach(e => totals[e.category] = (totals[e.category] || 0) + e.amount);
-                    const sorted = Object.entries(totals).sort((a,b) => b[1]-a[1]);
-                    labels = sorted.map(i=>i[0]); values = sorted.map(i=>i[1]);
-                } else {
-                    const totals = {};
-                    data.forEach(e => {
-                        const d = new Date(e.date);
-                        const label = !isNaN(d) ? d.toLocaleDateString('id-ID',{day:'numeric',month:'short'}) : e.date;
-                        if(!totals[e.date]) totals[e.date] = {l:label, v:0};
-                        totals[e.date].v += e.amount;
-                    });
-                    const sorted = Object.entries(totals).sort((a,b)=>new Date(a[0])-new Date(b[0]));
-                    labels = sorted.map(i=>i[1].l); values = sorted.map(i=>i[1].v);
-                }
-
-                if (window.expenseChartInstance) window.expenseChartInstance.destroy();
-                
-                window.expenseChartInstance = new Chart(chartCanvas.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [{
-                            data: values,
-                            backgroundColor: ['rgba(79,70,229,0.85)','rgba(20,184,166,0.85)','rgba(59,130,246,0.85)','rgba(16,185,129,0.85)','rgba(245,158,11,0.85)'],
-                            borderRadius: 6, maxBarThickness: 50
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: {display:false}, tooltip: { callbacks: { label: c => UI.formatRupiah(c.raw) } } },
-                        scales: { y: { display: false }, x: { grid: {display:false} } }
-                    }
-                });
-            },
-
-            openModal: (exp) => {
-                document.getElementById('modal-merchant').textContent = exp.merchant;
-                document.getElementById('modal-date').textContent = UI.formatDate(exp.date);
-                document.getElementById('modal-total').textContent = UI.formatRupiah(exp.amount);
-                document.getElementById('modal-icon-container').innerHTML = `<i data-lucide="${exp.icon}" class="w-7 h-7"></i>`;
-                
-                const accEl = document.getElementById('modal-account');
-                accEl.textContent = `Via: ${exp.accountId}`;
-                accEl.classList.remove('hidden');
-
-                const confEl = document.getElementById('modal-confidence');
-                confEl.textContent = `Score: ${(exp.confidence * 100).toFixed(0)}%`;
-                if(exp.confidence > 0.8) { confEl.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700'; }
-                else { confEl.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700'; }
-
-                const list = document.getElementById('modal-items-list');
-                list.innerHTML = '';
-                let subtotal = 0;
-                
-                if (exp.items && exp.items.length > 0) {
-                    exp.items.forEach(it => {
-                        subtotal += it.price;
-                        list.innerHTML += `<li class="flex justify-between text-sm"><span class="font-semibold text-slate-700">${it.name}</span><span class="font-bold">${UI.formatRupiah(it.price)}</span></li>`;
-                    });
-                } else {
-                    subtotal = exp.amount;
-                    list.innerHTML = `<li class="flex justify-between text-sm"><span class="font-semibold text-slate-700">Pembayaran Terverifikasi</span><span class="font-bold">${UI.formatRupiah(exp.amount)}</span></li>`;
-                }
-
-                let fees = exp.amount - subtotal;
-                if (fees < 0 || Math.abs(fees) < 100) fees = 0;
-
-                document.getElementById('modal-subtotal').textContent = UI.formatRupiah(subtotal);
-                document.getElementById('modal-fees').textContent = UI.formatRupiah(fees);
-
-                document.getElementById('detail-modal').classList.remove('hidden');
-                lucide.createIcons();
-            }
-        };
-
-        // ==========================================
-        // 5. APP CONTROLLER & EVENTS
-        // ==========================================
-        document.getElementById('btn-close-modal').onclick = () => document.getElementById('detail-modal').classList.add('hidden');
-        document.getElementById('modal-backdrop').onclick = () => document.getElementById('detail-modal').classList.add('hidden');
-
-        let tokenClient;
-
-        document.getElementById('btn-login').addEventListener('click', () => {
-            const clientId = document.getElementById('client-id-input').value.trim();
-            if (!clientId) return alert("Harap masukkan Client ID.");
-
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: clientId,
-                scope: 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-                prompt: 'select_account', 
-                callback: async (res) => {
-                    if (res && res.access_token) {
-                        try {
-                            const pRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': `Bearer ${res.access_token}` } });
-                            if (!pRes.ok) throw new Error("Gagal mengambil data userinfo dari Google API.");
-                            
-                            const profile = await pRes.json();
-                            if (!profile.email) throw new Error("Akses email tidak ditemukan pada profil Google.");
-                            
-                            if (!Workspace.accounts.has(profile.email)) {
-                                Workspace.accounts.set(profile.email, new AccountState(profile.email, res.access_token, profile));
-                            } else {
-                                Workspace.accounts.get(profile.email).token = res.access_token;
-                            }
-
-                            Workspace.activeTab = profile.email;
-                            
-                            document.getElementById('login-view').classList.add('hidden');
-                            document.getElementById('dashboard-view').classList.remove('hidden');
-                            document.getElementById('dashboard-view').classList.add('flex');
-                            
-                            UI.renderTabs();
-                            UI.renderDashboard();
-                            
-                            if (Workspace.accounts.get(profile.email).expenses.length === 0) {
-                                setTimeout(() => document.getElementById('btn-scan').click(), 500);
-                            }
-                        } catch (err) { 
-                            console.error("Terjadi kesalahan saat login:", err);
-                            alert('Gagal memuat profil Google: ' + err.message); 
-                        }
-                    }
-                },
+            localStorage.setItem(CacheEngine.CACHE_KEY, JSON.stringify(data));
+          } catch (e) {
+            console.warn("Storage limits exceeded, cannot cache.");
+          }
+        },
+        load: () => {
+          try {
+            const raw = localStorage.getItem(CacheEngine.CACHE_KEY);
+            if (!raw) return false;
+            const data = JSON.parse(raw);
+            let loaded = false;
+            data.accounts.forEach(acc => {
+              if (!Workspace.accounts.has(acc.email)) {
+                const newAcc = new AccountState(acc.email, null, acc.profile);
+                newAcc.expenses = acc.expenses || [];
+                newAcc.lastSync = acc.lastSync || 0;
+                Workspace.accounts.set(acc.email, newAcc);
+                loaded = true;
+              }
             });
-            tokenClient.requestAccessToken();
-        });
-
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            if(confirm('Keluar dari semua akun Workspace?')) {
-                Workspace.accounts.clear();
-                Workspace.activeTab = 'global';
-                document.getElementById('dashboard-view').classList.add('hidden');
-                document.getElementById('dashboard-view').classList.remove('flex');
-                document.getElementById('login-view').classList.remove('hidden');
+            if (loaded) DeduplicationEngine.mergeGlobal();
+            return loaded;
+          } catch (e) {
+            return false;
+          }
+        },
+        isExpired: (email) => {
+          const acc = Workspace.accounts.get(email);
+          if (!acc || !acc.lastSync) return true;
+          return (Date.now() - acc.lastSync) > CacheEngine.TTL;
+        }
+      };
+      // ==========================================
+      // UNIFIED SEARCH ENGINE
+      // ==========================================
+      const SearchEngine = {
+        aliases: {
+          'tokped': 'tokopedia',
+          'toped': 'tokopedia',
+          'gofood': 'gojek',
+          'goride': 'gojek',
+          'gocar': 'gojek',
+          'gopay': 'gojek',
+          'shope': 'shopee',
+          'spay': 'shopee',
+          'shopeepay': 'shopee',
+          'subs': 'subscription',
+          'game': 'gaming',
+          'bsi': 'bank syariah indonesia',
+          'bca': 'bank central asia',
+          'bri': 'bank rakyat indonesia',
+          'bni': 'bank negara indonesia'
+        },
+        query: (expenses, keyword) => {
+          if (!keyword || keyword.trim() === '') return expenses;
+          let kw = keyword.toLowerCase().trim();
+          // Normalization via Aliases
+          for (const [alias, real] of Object.entries(SearchEngine.aliases)) {
+            kw = kw.replace(new RegExp(`\\b${alias}\\b`, 'g'), real);
+          }
+          const terms = kw.split(/\s+/); // Handle multiple search terms
+          return expenses.filter(exp => {
+            const itemNames = exp.items ? exp.items.map(i => i.name).join(' ') : '';
+            // Unified Index Data
+            const searchableIndex = [
+              exp.merchant,
+              exp.category,
+              exp.date,
+              exp.orderId || '',
+              itemNames
+            ].join(' ').toLowerCase();
+            // All terms must exist somewhere in the index
+            return terms.every(term => searchableIndex.includes(term));
+          });
+        }
+      };
+      // ==========================================
+      // ANALYTICS & INSIGHT ENGINE
+      // ==========================================
+      const AnalyticsEngine = {
+        generateInsights: (expenses) => {
+          const container = document.getElementById('insights-container');
+          const grid = document.getElementById('insights-grid');
+          grid.innerHTML = '';
+          if (!expenses || expenses.length === 0) {
+            container.classList.add('hidden');
+            return;
+          }
+          const now = new Date();
+          const curM = now.getMonth();
+          const curY = now.getFullYear();
+          let totalThisMonth = 0,
+            totalLastMonth = 0;
+          let totalThisYear = 0,
+            totalLastYear = 0;
+          const merchantCount = {},
+            catTotals = {};
+          expenses.forEach(exp => {
+            const d = new Date(exp.date);
+            if (isNaN(d)) return;
+            const m = d.getMonth();
+            const y = d.getFullYear();
+            if (y === curY) {
+              totalThisYear += exp.amount;
+              if (m === curM) totalThisMonth += exp.amount;
+              if (m === curM - 1 || (curM === 0 && m === 11)) totalLastMonth += exp.amount;
+            } else if (y === curY - 1) {
+              totalLastYear += exp.amount;
             }
-        });
-
-        document.getElementById('btn-scan').addEventListener('click', async () => {
-            let accountsToSync = [];
-            if (Workspace.activeTab === 'global') {
-                accountsToSync = Array.from(Workspace.accounts.values());
+            merchantCount[exp.merchant] = (merchantCount[exp.merchant] || 0) + 1;
+            catTotals[exp.category] = (catTotals[exp.category] || 0) + exp.amount;
+          });
+          const insights = [];
+          // 1. Monthly Comparison Rule
+          if (totalLastMonth > 0 && totalThisMonth > 0) {
+            const diff = ((totalThisMonth - totalLastMonth) / totalLastMonth) * 100;
+            if (diff > 5) {
+              insights.push({
+                icon: 'trending-up',
+                text: `Pengeluaran bulan ini <span class="font-bold text-red-500">naik ${diff.toFixed(1)}%</span> dibanding bulan lalu.`
+              });
+            } else if (diff < -5) {
+              insights.push({
+                icon: 'trending-down',
+                text: `Pengeluaran bulan ini <span class="font-bold text-emerald-500">turun ${Math.abs(diff).toFixed(1)}%</span>. Good job!`
+              });
             } else {
-                accountsToSync = [Workspace.accounts.get(Workspace.activeTab)];
+              insights.push({
+                icon: 'minus',
+                text: `Pengeluaran bulan ini stabil dengan bulan lalu.`
+              });
             }
-
-            for (const acc of accountsToSync) {
-                if (acc.isScanning) continue;
-                syncAccount(acc); 
+          } else if (totalThisMonth > 0) {
+            insights.push({
+              icon: 'calendar',
+              text: `Bulan ini kamu sudah menghabiskan <span class="font-bold text-indigo-700 dark:text-indigo-400">${UI.formatRupiah(totalThisMonth)}</span>.`
+            });
+          }
+          // 2. Frequency Rule (Top Merchant)
+          const sortedMerchants = Object.entries(merchantCount).sort((a, b) => b[1] - a[1]);
+          if (sortedMerchants.length > 0 && sortedMerchants[0][1] > 2) {
+            insights.push({
+              icon: 'shopping-bag',
+              text: `Platform favoritmu adalah <span class="font-bold text-indigo-700 dark:text-indigo-400">${sortedMerchants[0][0]}</span> (${sortedMerchants[0][1]}x transaksi).`
+            });
+          }
+          // 3. Spending Category Rule
+          const sortedCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+          if (sortedCats.length > 0) {
+            insights.push({
+              icon: 'pie-chart',
+              text: `Pengeluaran terbesarmu habis di sektor <span class="font-bold text-indigo-700 dark:text-indigo-400">${sortedCats[0][0]}</span>.`
+            });
+          }
+          // Append to UI
+          if (insights.length > 0) {
+            insights.forEach(ins => {
+              const div = document.createElement('div');
+              div.className = 'bg-white/60 dark:bg-slate-800/60 p-3 rounded-xl flex items-start space-x-3';
+              div.innerHTML = `
+											<i data-lucide="${ins.icon}" class="w-4 h-4 mt-0.5 text-indigo-500 dark:text-indigo-400 flex-shrink-0"></i>
+											<p class="text-xs leading-relaxed text-indigo-900 dark:text-indigo-200">${ins.text}</p>`;
+              grid.appendChild(div);
+            });
+            container.classList.remove('hidden');
+            lucide.createIcons();
+          } else {
+            container.classList.add('hidden');
+          }
+        }
+      };
+      // ==========================================
+      // 2. INTELLIGENT PARSER ENGINE
+      // ==========================================
+      const ParserEngine = {
+        decodeBase64URL: (str) => {
+          try {
+            return decodeURIComponent(atob(str.replace(/-/g, '+').replace(/_/g, '/')).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+          } catch (e) {
+            return "";
+          }
+        },
+        getBodyText: (part) => {
+          if (part.body && part.body.data) return part.body.data;
+          if (part.parts) {
+            for (let p of part.parts)
+              if (p.mimeType === 'text/plain') return p.body.data;
+            for (let p of part.parts) {
+              if (p.mimeType === 'text/html') return p.body.data;
+              if (p.parts) return ParserEngine.getBodyText(p);
             }
-        });
-
-        const syncAccount = async (account) => {
-            account.isScanning = true;
-            account.logs = [];
-            account.progress = 10;
+          }
+          return '';
+        },
+        normalizeMerchant: (fromHeader) => {
+          const from = fromHeader.toLowerCase();
+          if (from.includes('gojek') || from.includes('gopay')) return {
+            merchant: 'Gojek',
+            icon: 'car-taxi-front',
+            category: 'Transport/Food'
+          };
+          if (from.includes('grab')) return {
+            merchant: 'Grab',
+            icon: 'car',
+            category: 'Transport/Food'
+          };
+          if (from.includes('tokopedia')) return {
+            merchant: 'Tokopedia',
+            icon: 'shopping-bag',
+            category: 'Shopping'
+          };
+          if (from.includes('shopee')) return {
+            merchant: 'Shopee',
+            icon: 'shopping-bag',
+            category: 'Shopping'
+          };
+          if (from.includes('blibli')) return {
+            merchant: 'Blibli',
+            icon: 'shopping-bag',
+            category: 'Shopping'
+          };
+          if (from.includes('traveloka')) return {
+            merchant: 'Traveloka',
+            icon: 'plane',
+            category: 'Travel'
+          };
+          if (from.includes('apple') || from.includes('itunes')) return {
+            merchant: 'Apple',
+            icon: 'monitor-play',
+            category: 'Digital/Subscription'
+          };
+          if (from.includes('bsi') || from.includes('bank syariah indonesia')) return {
+            merchant: 'BSI',
+            icon: 'landmark',
+            category: 'Bank'
+          };
+          if (from.includes('mandiri')) return {
+            merchant: 'Mandiri',
+            icon: 'landmark',
+            category: 'Bank'
+          };
+          if (from.includes('bca') || from.includes('bank central asia')) return {
+            merchant: 'BCA',
+            icon: 'landmark',
+            category: 'Bank'
+          };
+          if (from.includes('bri') || from.includes('bank rakyat indonesia')) return {
+            merchant: 'BRI',
+            icon: 'landmark',
+            category: 'Bank'
+          };
+          if (from.includes('bni') || from.includes('bank negara indonesia')) return {
+            merchant: 'BNI',
+            icon: 'landmark',
+            category: 'Bank'
+          };
+          if (from.includes('dana')) return {
+            merchant: 'DANA',
+            icon: 'wallet',
+            category: 'E-Wallet'
+          };
+          if (from.includes('ovo')) return {
+            merchant: 'OVO',
+            icon: 'wallet',
+            category: 'E-Wallet'
+          };
+          if (from.includes('linkaja')) return {
+            merchant: 'LinkAja',
+            icon: 'wallet',
+            category: 'E-Wallet'
+          };
+          if (from.includes('netflix')) return {
+            merchant: 'Netflix',
+            icon: 'monitor-play',
+            category: 'Digital/Subscription'
+          };
+          if (from.includes('spotify')) return {
+            merchant: 'Spotify',
+            icon: 'monitor-play',
+            category: 'Digital/Subscription'
+          };
+          if (from.includes('google')) return {
+            merchant: 'Google',
+            icon: 'monitor-play',
+            category: 'Digital'
+          };
+          if (from.includes('steampowered') || from.includes('steam')) return {
+            merchant: 'Steam',
+            icon: 'gamepad-2',
+            category: 'Gaming'
+          };
+          if (from.includes('pln')) return {
+            merchant: 'PLN',
+            icon: 'zap',
+            category: 'Utilities'
+          };
+          let extractedName = fromHeader.split('<')[0].replace(/"/g, '').trim();
+          return {
+            merchant: extractedName || 'Merchant Lain',
+            icon: 'credit-card',
+            category: 'Lainnya'
+          };
+        },
+        processEmail: (payload, headers, accountEmail, msgData) => {
+          const fromHeader = headers.find(h => h.name === 'From')?.value || '';
+          const subjectHeader = headers.find(h => h.name === 'Subject')?.value || '';
+          const dateStr = headers.find(h => h.name === 'Date')?.value || '';
+          const listUnsubscribe = headers.find(h => h.name === 'List-Unsubscribe')?.value;
+          const subject = subjectHeader.toLowerCase();
+          const {
+            merchant,
+            icon,
+            category
+          } = ParserEngine.normalizeMerchant(fromHeader);
+          const formattedDate = !isNaN(new Date(dateStr)) ? new Date(dateStr).toISOString().split('T')[0] : dateStr;
+          const internalTimestamp = parseInt(msgData.internalDate) || new Date(dateStr).getTime() || Date.now();
+          const threadId = msgData.threadId;
+          let textContent = ParserEngine.decodeBase64URL(ParserEngine.getBodyText(payload));
+          let cleanText = textContent.replace(/<[^>]*>?/gm, '\n').replace(/&nbsp;/g, ' ');
+          const cleanTextLower = cleanText.toLowerCase();
+          let orderId = null;
+          const idMatch = cleanTextLower.match(/(?:order id|no pesanan|nomor pesanan|invoice|no tagihan|invoice no|trx id|transaction id|referensi|no referensi|nomor referensi|ref)[\s#:-]*([a-z0-9-]+)/i);
+          if (idMatch && idMatch[1].length > 4) orderId = idMatch[1].toUpperCase();
+          const cutoffRegex = /kamu mungkin suka|rekomendasi untukmu|produk terkait|pilihan lainnya|cara pembayaran|instruksi pembayaran|metode pembayaran alternatif|daftar channel pembayaran|biaya layanan per channel|sponsor|flash sale|best seller/i;
+          const cutoffMatch = cleanText.match(cutoffRegex);
+          if (cutoffMatch) {
+            cleanText = cleanText.substring(0, cutoffMatch.index);
+          }
+          let confidence = 0.5;
+          let status = 'processing';
+          const promoKeywords = /promo|diskon|cashback|sale|spesial|penawaran|newsletter|voucher|hemat|beli sekarang|shop now|rekomendasi|wishlist|jangan lewatkan/i;
+          const pendingKeywords = /menunggu pembayaran|cara bayar|instruksi pembayaran|virtual account|pay before|unpaid|pending payment|menunggu|belum dibayar/i;
+          const successKeywords = /pembayaran berhasil|paid|payment successful|transaksi berhasil|order completed|invoice paid|lunas|charged|berhasil transfer|transfer berhasil|top up berhasil|berhasil top up/i;
+          if (promoKeywords.test(subject)) confidence -= 0.6;
+          if (listUnsubscribe) confidence -= 0.5;
+          if (pendingKeywords.test(subject) || pendingKeywords.test(cleanTextLower)) {
+            status = 'pending';
+            confidence -= 0.6;
+          } else if (/selesai|completed|delivered/i.test(subject) || /pesanan selesai/i.test(cleanTextLower)) {
+            status = 'completed';
+            confidence += 0.5;
+          } else if (/dikirim|shipped|shipping|resi/i.test(subject)) {
+            status = 'shipped';
+          } else if (successKeywords.test(subject) || successKeywords.test(cleanTextLower)) {
+            status = 'paid';
+            confidence += 0.5;
+          }
+          if (orderId) confidence += 0.3;
+          const lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          // MENDUKUNG NOMINAL TANPA TITIK (e.g. Rp 150000) MAUPUN DENGAN TITIK
+          const priceRegex = /Rp[.\s]*([0-9]{1,3}(?:[.,][0-9]{3})+|[0-9]+)/i;
+          let bestAmount = 0;
+          let bestScore = -999;
+          let items = [];
+          const strongPositiveWords = ['total dibayar', 'total pembayaran', 'amount paid', 'grand total', 'total tagihan', 'total charge', 'charged amount', 'tagihan', 'nominal transfer', 'jumlah transfer', 'nominal top up', 'jumlah top up'];
+          const weakPositiveWords = ['total', 'bayar', 'dibayar', 'amount', 'paid', 'akhir', 'jumlah', 'pembayaran', 'nominal'];
+          const negativeWords = ['diskon', 'hemat', 'cashback', 'potongan', 'voucher', 'mulai', 'dari', 'harga', 'semula', 'rekomendasi', 'kembali', 'sisa', 'biaya layanan channel', 'simulasi cicilan', 'ongkir', 'jne', 'j&t', 'sicepat', 'alfamart', 'indomaret', 'admin'];
+          for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            let pMatch = line.match(priceRegex);
+            if (pMatch) {
+              let priceVal = parseInt(pMatch[1].replace(/[.,]/g, ''));
+              if (priceVal === 0) continue;
+              let context = line.toLowerCase();
+              if (i > 0) context += " " + lines[i - 1].toLowerCase();
+              let lineScore = 0;
+              if (strongPositiveWords.some(w => context.includes(w))) lineScore += 25;
+              else if (weakPositiveWords.some(w => context.includes(w))) lineScore += 10;
+              if (negativeWords.some(w => context.includes(w))) lineScore -= 30;
+              if (lineScore > bestScore || (lineScore === bestScore && priceVal > bestAmount && lineScore >= 0)) {
+                bestScore = lineScore;
+                bestAmount = priceVal;
+              }
+              if (lineScore < 15 && !negativeWords.some(w => context.includes(w))) {
+                let name = line.replace(pMatch[0], '').replace(/^[-\*\.:=]+|[-\*\.:=]+$/g, '').trim();
+                // Jika nama terlalu pendek (misal cuma '1x' atau kosong), cari di baris atasnya
+                if (name.length < 5) {
+                  for (let step = 1; step <= 3; step++) {
+                    if (i - step >= 0) {
+                      let prevLine = lines[i - step].replace(/^[-\*\.:=]+|[-\*\.:=]+$/g, '').trim();
+                      // Pastikan baris sebelumnya bukan angka/harga dan cukup panjang
+                      if (prevLine.length > 3 && !priceRegex.test(prevLine)) {
+                        name = prevLine + (name ? ' (' + name + ')' : ''); // gabungkan qty/varian jika ada
+                        break;
+                      }
+                    }
+                  }
+                }
+                const invalidNames = ['subtotal', 'total', 'pajak', 'biaya', 'ongkir', 'pengiriman', 'admin', 'harga', 'price', 'diskon', 'promo', 'kembalian', 'layanan', 'service', 'donasi', 'asuransi', 'proteksi'];
+                const isInvalidName = invalidNames.some(inv => name.toLowerCase().includes(inv));
+                // Panjang nama barang e-commerce sering panjang, naikkan batas jadi 120
+                if (name && name.length > 2 && name.length <= 120 && priceVal > 0 && !isInvalidName) {
+                  // Cegah duplikasi item yang sama persis (flatten html kadang bikin redundan)
+                  if (!items.some(it => it.name === name && it.price === priceVal)) {
+                    items.push({
+                      name: name,
+                      price: priceVal
+                    });
+                  }
+                }
+              }
+            }
+          }
+          if (bestScore >= 20) confidence += 0.4;
+          if (bestScore < 0) confidence -= 0.5;
+          if (bestAmount === 0) confidence -= 1.0;
+          if (confidence < 0.6) return {
+            isValid: false
+          };
+          items = items.filter(it => it.price < bestAmount);
+          return {
+            isValid: true,
+            merchant,
+            amount: bestAmount,
+            category,
+            icon,
+            date: formattedDate,
+            timestamp: internalTimestamp,
+            threadId,
+            orderId,
+            status,
+            items,
+            confidence,
+            accountId: accountEmail
+          };
+        }
+      };
+      // ==========================================
+      // 3. INTELLIGENT DEDUPLICATION & MERGE ENGINE
+      // ==========================================
+      const DeduplicationEngine = {
+        advancedDedupe: (expensesArray) => {
+          const sorted = [...expensesArray].sort((a, b) => a.timestamp - b.timestamp);
+          const merged = [];
+          for (const exp of sorted) {
+            let bestMatchIndex = -1;
+            let highestMergeScore = 0;
+            for (let i = 0; i < merged.length; i++) {
+              const existing = merged[i];
+              let mergeScore = 0;
+              if (exp.orderId && existing.orderId && exp.orderId === existing.orderId) mergeScore += 90;
+              if (exp.threadId && existing.threadId && exp.threadId === existing.threadId) mergeScore += 70;
+              if (exp.merchant === existing.merchant) mergeScore += 30;
+              const timeDiffHours = Math.abs(exp.timestamp - existing.timestamp) / (1000 * 60 * 60);
+              if (timeDiffHours < 48) mergeScore += 20;
+              const maxAmount = Math.max(exp.amount, existing.amount);
+              const minAmount = Math.min(exp.amount, existing.amount);
+              const diffRatio = maxAmount > 0 ? ((maxAmount - minAmount) / maxAmount) : 0;
+              if (diffRatio < 0.05 || (maxAmount - minAmount <= 5000)) mergeScore += 40;
+              if (exp.items && existing.items && exp.items.length > 0 && existing.items.length > 0) {
+                const hasCommonItem = exp.items.some(eItem => existing.items.some(exItem => eItem.name.includes(exItem.name) || exItem.name.includes(eItem.name)));
+                if (hasCommonItem) mergeScore += 50;
+              }
+              if (mergeScore > highestMergeScore) {
+                highestMergeScore = mergeScore;
+                bestMatchIndex = i;
+              }
+            }
+            if (highestMergeScore >= 100) {
+              const existing = merged[bestMatchIndex];
+              const statusWeight = {
+                'pending': 1,
+                'processing': 2,
+                'paid': 3,
+                'shipped': 4,
+                'completed': 5
+              };
+              const expWeight = statusWeight[exp.status] || 0;
+              const extWeight = statusWeight[existing.status] || 0;
+              if (expWeight >= extWeight) {
+                existing.status = exp.status;
+                existing.timestamp = exp.timestamp;
+                existing.date = exp.date;
+                if (expWeight >= 3 && exp.amount > 0) {
+                  existing.amount = exp.amount;
+                  if (exp.items && exp.items.length > 0) existing.items = exp.items;
+                }
+                existing.confidence = Math.max(existing.confidence, exp.confidence);
+                if (!existing.orderId && exp.orderId) existing.orderId = exp.orderId;
+              }
+            } else {
+              merged.push(exp);
+            }
+          }
+          return merged.filter(e => e.status !== 'pending').sort((a, b) => b.timestamp - a.timestamp);
+        },
+        mergeGlobal: () => {
+          const allRaw = [];
+          for (const account of Workspace.accounts.values()) {
+            allRaw.push(...account.expenses);
+          }
+          Workspace.globalAnalytics.expenses = DeduplicationEngine.advancedDedupe(allRaw);
+          return Workspace.globalAnalytics.expenses;
+        }
+      };
+      // ==========================================
+      // 4. UI CONTROLLER
+      // ==========================================
+      const UI = {
+        formatRupiah: (num) => new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          minimumFractionDigits: 0
+        }).format(num),
+        formatDate: (dStr) => {
+          const d = new Date(dStr);
+          return isNaN(d) ? dStr : d.toLocaleDateString('id-ID', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+        },
+        initDOM: () => {
+          const mSelect = document.getElementById('filter-month');
+          const ySelect = document.getElementById('filter-year');
+          const searchInput = document.getElementById('search-input');
+          const sortSelect = document.getElementById('filter-sort');
+          const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+          mSelect.innerHTML = '<option value="all">Semua Bulan</option>' + months.map((m,i) => `<option value="${i}">${m}</option>`).join('');
+          const curYear = new Date().getFullYear();
+          ySelect.innerHTML = '<option value="all">Semua Tahun</option>' + [0,1,2].map(i => `<option value="${curYear-i}">${curYear - i}</option>`).join('');
+          mSelect.value = Workspace.filters.month;
+          ySelect.value = Workspace.filters.year;
+          sortSelect.value = Workspace.filters.sort;
+          mSelect.addEventListener('change', (e) => {
+            Workspace.filters.month = e.target.value;
+            UI.renderDashboard();
+          });
+          ySelect.addEventListener('change', (e) => {
+            Workspace.filters.year = e.target.value;
+            UI.renderDashboard();
+          });
+          sortSelect.addEventListener('change', (e) => {
+            Workspace.filters.sort = e.target.value;
+            UI.renderDashboard();
+          });
+          document.getElementById('chart-mode').addEventListener('change', () => UI.renderChart());
+          let searchTimeout;
+          searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            Workspace.filters.searchQuery = e.target.value;
+            searchTimeout = setTimeout(() => {
+              UI.renderDashboard();
+            }, 200);
+          });
+        },
+        renderTabs: () => {
+          const container = document.getElementById('workspace-tabs');
+          container.innerHTML = '';
+          const globalTab = document.createElement('button');
+          globalTab.className = `px-5 py-2.5 rounded-t-xl text-sm transition-colors flex items-center space-x-2 ${Workspace.activeTab === 'global' ? 'tab-active' : 'tab-inactive'}`;
+          globalTab.innerHTML = `
+											<i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+											<span>Global View</span>`;
+          globalTab.onclick = () => {
+            Workspace.activeTab = 'global';
             UI.renderTabs();
             UI.renderDashboard();
+          };
+          container.appendChild(globalTab);
+          for (const [email, account] of Workspace.accounts.entries()) {
+            const accTab = document.createElement('div');
+            accTab.className = `group flex items-center px-3 py-2.5 rounded-t-xl text-sm transition-colors cursor-pointer ${Workspace.activeTab === email ? 'tab-active' : 'tab-inactive'}`;
+            
+            const tabContent = document.createElement('div');
+            tabContent.className = 'flex items-center space-x-2';
+            tabContent.innerHTML = `
+              <img src="${account.profile.picture}" class="w-4 h-4 rounded-full bg-slate-200">
+              <span class="truncate max-w-[120px]">${email}</span>
+              ${account.isScanning ? '<i data-lucide="loader-2" class="w-3 h-3 animate-spin ml-1 text-indigo-500"></i>' : ''}
+            `;
+            tabContent.onclick = () => {
+              Workspace.activeTab = email;
+              UI.renderTabs();
+              UI.renderDashboard();
+            };
 
-            const addLog = (msg) => { account.logs.push(msg); if(Workspace.activeTab === account.email) UI.renderTerminalLogs(); };
-            const setProg = (val) => { account.syncProgress = val; if(Workspace.activeTab === account.email) UI.renderTerminalLogs(); };
-
-            addLog(`Init secure pipeline for ${account.email}...`);
-
-            try {
-                const sM = Workspace.filters.month;
-                const sY = Workspace.filters.year;
-                let dateQuery = "";
-
-                if (sY !== 'all') {
-                    const y = parseInt(sY);
-                    if (sM !== 'all') {
-                        const m = parseInt(sM) + 1; 
-                        const nM = m === 12 ? 1 : m + 1;
-                        const nY = m === 12 ? y + 1 : y;
-                        dateQuery = ` after:${y}/${m.toString().padStart(2, '0')}/01 before:${nY}/${nM.toString().padStart(2, '0')}/01`;
-                    } else {
-                        dateQuery = ` after:${y}/01/01 before:${y + 1}/01/01`;
-                    }
+            const closeBtn = document.createElement('button');
+            closeBtn.className = `ml-2 p-0.5 rounded-full opacity-0 group-hover:opacity-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all ${Workspace.activeTab === email ? 'opacity-100' : ''}`;
+            closeBtn.innerHTML = `<i data-lucide="x" class="w-3 h-3"></i>`;
+            closeBtn.onclick = (e) => {
+              e.stopPropagation();
+              if (confirm(`Logout akun ${email}?`)) {
+                Workspace.accounts.delete(email);
+                if (Workspace.activeTab === email) {
+                  Workspace.activeTab = 'global';
                 }
-
-                const query = `(subject:(receipt OR invoice OR pembayaran OR tagihan) OR from:(gojek OR grab OR tokopedia OR shopee OR apple))${dateQuery}`;
-                addLog(`Executing search...`);
-                setProg(20);
-
-                let messages = [];
-                let pageToken = '';
-                let pageCount = 0;
-                const maxPages = 4; // Max 2000 emails
-
-                do {
-                    let fetchUrl = `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=500`;
-                    if (pageToken) fetchUrl += `&pageToken=${pageToken}`;
-
-                    const res = await fetch(fetchUrl, { headers: { 'Authorization': `Bearer ${account.token}` } });
-                    if (!res.ok) throw new Error(`Token expired or API Error.`);
-                    
-                    const data = await res.json();
-                    if (data.messages) messages = messages.concat(data.messages);
-                    pageToken = data.nextPageToken;
-                    pageCount++;
-                    
-                    addLog(`Page ${pageCount} fetched. (${messages.length} enc-entities)`);
-                    if (pageToken) await new Promise(r => setTimeout(r, 200));
-                } while (pageToken && pageCount < maxPages);
-
-                if (messages.length === 0) {
-                    addLog('No transactions found in this period.');
-                    setProg(100);
+                CacheEngine.save();
+                if (Workspace.accounts.size === 0) {
+                  document.getElementById('btn-logout').click();
                 } else {
-                    const fetchedExpenses = [];
-                    let processed = 0;
-                    const batchSize = 10;
-
-                    for (let i = 0; i < messages.length; i += batchSize) {
-                        const chunk = messages.slice(i, i + batchSize);
-                        const promises = chunk.map(async (msg) => {
-                            try {
-                                const msgRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`, { headers: { 'Authorization': `Bearer ${account.token}` } });
-                                const msgData = await msgRes.json();
-                                const pData = ParserEngine.processEmail(msgData.payload, msgData.payload.headers, account.email, msgData);
-                                
-                                if (pData.isValid) {
-                                    pData.id = msg.id; 
-                                    fetchedExpenses.push(pData);
-                                    addLog(`[OK] ${pData.merchant}: ${UI.formatRupiah(pData.amount)}`);
-                                }
-                            } catch (err) {}
-                        });
-                        
-                        await Promise.all(promises);
-                        await new Promise(r => setTimeout(r, 350)); // Strict limiter
-                        processed += chunk.length;
-                        setProg(20 + Math.floor((processed / messages.length) * 80));
-                    }
-
-                    // Lakukan deduplikasi canggih di level akun
-                    const deduplicatedAccountExpenses = DeduplicationEngine.advancedDedupe(fetchedExpenses);
-                    account.expenses = deduplicatedAccountExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    
-                    addLog(`Deduplikasi: ${fetchedExpenses.length} -> ${account.expenses.length} transaksi unik.`);
-                    addLog('Parsing completed successfully.');
-                    setProg(100);
+                  DeduplicationEngine.mergeGlobal();
+                  UI.renderTabs();
+                  UI.renderDashboard();
                 }
-            } catch (e) {
-                addLog(`[CRITICAL] ${e.message}`);
-                setProg(100);
-            } finally {
-                setTimeout(() => {
-                    account.isScanning = false;
-                    if(Workspace.activeTab === 'global') DeduplicationEngine.mergeGlobal();
-                    UI.renderTabs();
-                    UI.renderDashboard();
-                }, 1500);
+              }
+            };
+
+            accTab.appendChild(tabContent);
+            accTab.appendChild(closeBtn);
+            container.appendChild(accTab);
+          }
+          const addTab = document.createElement('button');
+          addTab.className = `px-4 py-2.5 rounded-t-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors flex items-center space-x-1`;
+          addTab.innerHTML = `
+												<i data-lucide="plus" class="w-4 h-4"></i>
+												<span>Akun</span>`;
+          addTab.onclick = () => document.getElementById('btn-login').click();
+          container.appendChild(addTab);
+          lucide.createIcons();
+        },
+        updateHeaderProfile: () => {
+          const nameEl = document.getElementById('header-user-name');
+          const emailEl = document.getElementById('header-user-email');
+          const avatarEl = document.getElementById('header-avatar');
+          if (Workspace.activeTab === 'global') {
+            nameEl.textContent = 'Global View';
+            emailEl.textContent = `${Workspace.accounts.size} Akun Terhubung`;
+            avatarEl.innerHTML = `
+												<i data-lucide="globe" class="w-5 h-5"></i>`;
+            avatarEl.className = 'w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center';
+          } else {
+            const account = Workspace.accounts.get(Workspace.activeTab);
+            nameEl.textContent = account.profile.name;
+            emailEl.textContent = account.email;
+            avatarEl.innerHTML = `
+												<img src="${account.profile.picture}" class="w-full h-full rounded-full object-cover">`;
+            avatarEl.className = 'w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm bg-slate-100 dark:bg-slate-800 overflow-hidden';
+          }
+          lucide.createIcons();
+        },
+        getActiveExpenses: () => {
+          let data = [];
+          if (Workspace.activeTab === 'global') {
+            data = DeduplicationEngine.mergeGlobal();
+          } else {
+            data = Workspace.accounts.get(Workspace.activeTab)?.expenses || [];
+          }
+          const sM = Workspace.filters.month;
+          const sY = Workspace.filters.year;
+          // 1. Time Filters
+          let filtered = data.filter(exp => {
+            const d = new Date(exp.date);
+            if (isNaN(d)) return true;
+            return (sM === 'all' || d.getMonth() === parseInt(sM)) && (sY === 'all' || d.getFullYear() === parseInt(sY));
+          });
+          // 2. Unified Search Filter
+          if (Workspace.filters.searchQuery) {
+            filtered = SearchEngine.query(filtered, Workspace.filters.searchQuery);
+          }
+          // 3. Sort Filter
+          filtered.sort((a, b) => {
+            if (Workspace.filters.sort === 'amount-desc') return b.amount - a.amount;
+            if (Workspace.filters.sort === 'amount-asc') return a.amount - b.amount;
+            if (Workspace.filters.sort === 'date-asc') return a.timestamp - b.timestamp;
+            return b.timestamp - a.timestamp; // default: date-desc
+          });
+          return filtered;
+        },
+        renderDashboard: () => {
+          UI.updateHeaderProfile();
+          const filtered = UI.getActiveExpenses();
+          const totalEl = document.getElementById('total-expense');
+          const countEl = document.getElementById('tx-count');
+          const summaryEl = document.getElementById('filter-summary-text');
+          const listContainer = document.getElementById('expense-container');
+          const emptyEl = document.getElementById('empty-state');
+          const chartContainer = document.getElementById('chart-container');
+          const btnScan = document.getElementById('btn-scan');
+          const scanContainer = document.getElementById('scan-container');
+          const mSelect = document.getElementById('filter-month');
+          const ySelect = document.getElementById('filter-year');
+          const mText = mSelect.options[mSelect.selectedIndex].text;
+          const yText = ySelect.options[ySelect.selectedIndex].text;
+          const sM = Workspace.filters.month;
+          const sY = Workspace.filters.year;
+          const isSearching = Workspace.filters.searchQuery.trim() !== '';
+          summaryEl.textContent = isSearching ? `Hasil pencarian untuk "${Workspace.filters.searchQuery}"` : ((sM === 'all' && sY === 'all') ? "Semua Waktu" : `Filter: ${mText} ${yText}`);
+          totalEl.textContent = UI.formatRupiah(filtered.reduce((s, i) => s + i.amount, 0));
+          countEl.textContent = filtered.length;
+          // Execute Analytics Engine logic
+          AnalyticsEngine.generateInsights(filtered);
+          let isScanning = false;
+          if (Workspace.activeTab === 'global') {
+            for (const acc of Workspace.accounts.values())
+              if (acc.isScanning) isScanning = true;
+            btnScan.querySelector('span').textContent = 'Sinkronisasi Semua';
+          } else {
+            const acc = Workspace.accounts.get(Workspace.activeTab);
+            isScanning = acc.isScanning;
+            btnScan.querySelector('span').textContent = 'Sinkronisasi Akun';
+          }
+          if (isScanning) {
+            btnScan.classList.replace('bg-indigo-600', 'bg-indigo-200');
+            btnScan.classList.replace('hover:bg-indigo-700', 'cursor-not-allowed');
+            document.getElementById('scan-icon').classList.add('animate-spin');
+            listContainer.classList.add('hidden');
+            emptyEl.classList.add('hidden');
+            chartContainer.classList.add('hidden');
+            document.getElementById('insights-container').classList.add('hidden');
+            scanContainer.classList.remove('hidden');
+            UI.renderTerminalLogs();
+          } else {
+            btnScan.classList.replace('bg-indigo-200', 'bg-indigo-600');
+            btnScan.classList.replace('cursor-not-allowed', 'hover:bg-indigo-700');
+            document.getElementById('scan-icon').classList.remove('animate-spin');
+            scanContainer.classList.add('hidden');
+            if (filtered.length === 0) {
+              listContainer.classList.add('hidden');
+              chartContainer.classList.add('hidden');
+              emptyEl.classList.remove('hidden');
+            } else {
+              emptyEl.classList.add('hidden');
+              listContainer.classList.remove('hidden');
+              chartContainer.classList.remove('hidden');
+              UI.renderList(filtered);
+              UI.renderChart(filtered);
             }
+          }
+        },
+        renderList: (data) => {
+          const listEl = document.getElementById('expense-list');
+          listEl.innerHTML = '';
+          data.forEach(exp => {
+            const item = document.createElement('div');
+            item.className = 'p-4 px-6 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group border-l-4 border-transparent hover:border-indigo-500';
+            item.onclick = () => UI.openModal(exp);
+            const accBadge = Workspace.activeTab === 'global' ? `
+													<span class="ml-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded uppercase tracking-wider">${exp.accountId.split('@')[0]}</span>` : '';
+            item.innerHTML = `
+              <div class="flex items-center space-x-4">
+                <div class="bg-indigo-50 dark:bg-indigo-900/30 p-3.5 rounded-2xl text-indigo-600 dark:text-indigo-400 flex-shrink-0 group-hover:scale-110 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-all">
+                  <i data-lucide="${exp.icon}" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <p class="font-extrabold text-slate-800 dark:text-slate-100 leading-tight flex items-center">${exp.merchant} ${accBadge}</p>
+                  <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">${UI.formatDate(exp.date)}</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 flex items-center space-x-3">
+                <p class="font-extrabold text-slate-800 dark:text-slate-100">${UI.formatRupiah(exp.amount)}</p>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors"></i>
+              </div>
+            `;
+            listEl.appendChild(item);
+          });
+          lucide.createIcons();
+        },
+        renderTerminalLogs: () => {
+          const logContainer = document.getElementById('scan-logs');
+          const progBar = document.getElementById('scan-progress-bar');
+          const progTxt = document.getElementById('scan-percentage');
+          const accLabel = document.getElementById('terminal-account-label');
+          logContainer.innerHTML = '';
+          if (Workspace.activeTab === 'global') {
+            accLabel.textContent = `[Semua Akun]`;
+            progBar.style.width = `100%`;
+            progTxt.textContent = `...`;
+            let totalLogs = [];
+            for (const acc of Workspace.accounts.values()) {
+              if (acc.isScanning) totalLogs.push(`>> Sinkronisasi ${acc.email} sedang berjalan...`);
+            }
+            totalLogs.forEach(l => {
+              logContainer.innerHTML += `
+                <div class="flex items-start">
+                  <span class="text-emerald-500 mr-2 font-bold">></span>
+                  <p>${l}</p>
+                </div>
+              `;
+            });
+          } else {
+            const acc = Workspace.accounts.get(Workspace.activeTab);
+            accLabel.textContent = `[${acc.email}]`;
+            progBar.style.width = `${acc.syncProgress}%`;
+            progTxt.textContent = `${acc.syncProgress}%`;
+            acc.logs.forEach(log => {
+              logContainer.innerHTML += `
+                <div class="flex items-start">
+                  <span class="text-emerald-500 mr-2 font-bold">></span>
+                  <p>${log}</p>
+                </div>
+              `;
+            });
+            logContainer.scrollTop = logContainer.scrollHeight;
+          }
+        },
+        renderChart: (forcedData) => {
+          const data = forcedData || UI.getActiveExpenses();
+          const chartCanvas = document.getElementById('expense-chart');
+          if (!chartCanvas || data.length === 0) return;
+          const mode = document.getElementById('chart-mode').value;
+          const isDark = document.documentElement.classList.contains('dark');
+          let labels = [],
+            values = [];
+          if (mode === 'category') {
+            const totals = {};
+            data.forEach(e => totals[e.category] = (totals[e.category] || 0) + e.amount);
+            const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+            labels = sorted.map(i => i[0]);
+            values = sorted.map(i => i[1]);
+          } else {
+            const totals = {};
+            data.forEach(e => {
+              const d = new Date(e.date);
+              const label = !isNaN(d) ? d.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short'
+              }) : e.date;
+              if (!totals[e.date]) totals[e.date] = {
+                l: label,
+                v: 0
+              };
+              totals[e.date].v += e.amount;
+            });
+            const sorted = Object.entries(totals).sort((a, b) => new Date(a[0]) - new Date(b[0]));
+            labels = sorted.map(i => i[1].l);
+            values = sorted.map(i => i[1].v);
+          }
+          if (window.expenseChartInstance) window.expenseChartInstance.destroy();
+          window.expenseChartInstance = new Chart(chartCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+              labels,
+              datasets: [{
+                data: values,
+                backgroundColor: ['rgba(79,70,229,0.85)', 'rgba(20,184,166,0.85)', 'rgba(59,130,246,0.85)', 'rgba(16,185,129,0.85)', 'rgba(245,158,11,0.85)'],
+                borderRadius: 6,
+                maxBarThickness: 50
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: c => UI.formatRupiah(c.raw)
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  display: false
+                },
+                x: {
+                  grid: {
+                    display: false
+                  },
+                  ticks: {
+                    color: isDark ? '#94a3b8' : '#64748b'
+                  }
+                }
+              }
+            }
+          });
+        },
+        openModal: (exp) => {
+          document.getElementById('modal-merchant').textContent = exp.merchant;
+          document.getElementById('modal-date').textContent = UI.formatDate(exp.date);
+          document.getElementById('modal-total').textContent = UI.formatRupiah(exp.amount);
+          document.getElementById('modal-icon-container').innerHTML = `<i data-lucide="${exp.icon}" class="w-7 h-7"></i>`;
+          const accEl = document.getElementById('modal-account');
+          accEl.textContent = `Via: ${exp.accountId}`;
+          accEl.classList.remove('hidden');
+          const confEl = document.getElementById('modal-confidence');
+          confEl.textContent = `Score: ${(exp.confidence * 100).toFixed(0)}%`;
+          if (exp.confidence > 0.8) {
+            confEl.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400';
+          } else {
+            confEl.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400';
+          }
+          const list = document.getElementById('modal-items-list');
+          list.innerHTML = '';
+          let subtotal = 0;
+          if (exp.items && exp.items.length > 0) {
+            exp.items.forEach(it => {
+              subtotal += it.price;
+              list.innerHTML += `
+                <li class="flex justify-between text-sm">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300">${it.name}</span>
+                  <span class="font-bold text-slate-800 dark:text-slate-100">${UI.formatRupiah(it.price)}</span>
+                </li>
+              `;
+            });
+          } else {
+            subtotal = exp.amount;
+            list.innerHTML = `
+              <li class="flex justify-between text-sm">
+                <span class="font-semibold text-slate-700 dark:text-slate-300">Pembayaran Terverifikasi</span>
+                <span class="font-bold text-slate-800 dark:text-slate-100">${UI.formatRupiah(exp.amount)}</span>
+              </li>
+            `;
+          }
+          let fees = exp.amount - subtotal;
+          if (fees < 0 || Math.abs(fees) < 100) fees = 0;
+          document.getElementById('modal-subtotal').textContent = UI.formatRupiah(subtotal);
+          document.getElementById('modal-fees').textContent = UI.formatRupiah(fees);
+          document.getElementById('detail-modal').classList.remove('hidden');
+          lucide.createIcons();
+        }
+      };
+      // ==========================================
+      // 5. APP CONTROLLER & EVENTS
+      // ==========================================
+      document.getElementById('btn-close-modal').onclick = () => document.getElementById('detail-modal').classList.add('hidden');
+      document.getElementById('modal-backdrop').onclick = () => document.getElementById('detail-modal').classList.add('hidden');
+      let tokenClient;
+      document.getElementById('btn-login').addEventListener('click', () => {
+        const clientId = document.getElementById('client-id-input').value.trim();
+        if (!clientId) return alert("Harap masukkan Client ID.");
+        // CACHING SYSTEM: Check load cache first
+        const hasCache = CacheEngine.load();
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+          prompt: 'select_account',
+          callback: async (res) => {
+            if (res && res.access_token) {
+              try {
+                const pRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: {
+                    'Authorization': `Bearer ${res.access_token}`
+                  }
+                });
+                if (!pRes.ok) throw new Error("Gagal mengambil data userinfo dari Google API.");
+                const profile = await pRes.json();
+                if (!profile.email) throw new Error("Akses email tidak ditemukan pada profil Google.");
+                if (!Workspace.accounts.has(profile.email)) {
+                  Workspace.accounts.set(profile.email, new AccountState(profile.email, res.access_token, profile));
+                } else {
+                  Workspace.accounts.get(profile.email).token = res.access_token;
+                  Workspace.accounts.get(profile.email).profile = profile;
+                }
+                Workspace.activeTab = profile.email;
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                document.getElementById('dashboard-view').classList.add('flex');
+                UI.renderTabs();
+                UI.renderDashboard();
+                // INTELLIGENT SYNC TRIGGER (Caching duration: 1 hour)
+                const acc = Workspace.accounts.get(profile.email);
+                if (acc.expenses.length === 0 || CacheEngine.isExpired(profile.email)) {
+                  setTimeout(() => syncAccount(acc, hasCache), 500);
+                }
+              } catch (err) {
+                console.error("Terjadi kesalahan saat login:", err);
+                alert('Gagal memuat profil Google: ' + err.message);
+              }
+            }
+          },
+        });
+        tokenClient.requestAccessToken();
+      });
+      document.getElementById('btn-logout').addEventListener('click', () => {
+        if (confirm('Keluar dari semua akun Workspace?')) {
+          Workspace.accounts.clear();
+          Workspace.activeTab = 'global';
+          localStorage.removeItem(CacheEngine.CACHE_KEY); // Reset cache on explicit logout
+          document.getElementById('dashboard-view').classList.add('hidden');
+          document.getElementById('dashboard-view').classList.remove('flex');
+          document.getElementById('login-view').classList.remove('hidden');
+        }
+      });
+      document.getElementById('btn-scan').addEventListener('click', async () => {
+        let accountsToSync = [];
+        if (Workspace.activeTab === 'global') {
+          accountsToSync = Array.from(Workspace.accounts.values());
+        } else {
+          accountsToSync = [Workspace.accounts.get(Workspace.activeTab)];
+        }
+        for (const acc of accountsToSync) {
+          if (acc.isScanning) continue;
+          syncAccount(acc, false); // False means trigger full UI block
+        }
+      });
+      const syncAccount = async (account, isBackground = false) => {
+        account.isScanning = true;
+        account.logs = [];
+        account.progress = 10;
+        UI.renderTabs();
+        if (!isBackground) UI.renderDashboard();
+        const addLog = (msg) => {
+          account.logs.push(msg);
+          if (Workspace.activeTab === account.email && !isBackground) UI.renderTerminalLogs();
         };
-
-        // Init
-        UI.initDOM();
-
+        const setProg = (val) => {
+          account.syncProgress = val;
+          if (Workspace.activeTab === account.email && !isBackground) UI.renderTerminalLogs();
+        };
+        addLog(`Init secure pipeline for ${account.email}...`);
+        try {
+          const sM = Workspace.filters.month;
+          const sY = Workspace.filters.year;
+          let dateQuery = "";
+          if (sY !== 'all') {
+            const y = parseInt(sY);
+            if (sM !== 'all') {
+              const m = parseInt(sM) + 1;
+              const nM = m === 12 ? 1 : m + 1;
+              const nY = m === 12 ? y + 1 : y;
+              dateQuery = ` after:${y}/${m.toString().padStart(2, '0')}/01 before:${nY}/${nM.toString().padStart(2, '0')}/01`;
+            } else {
+              dateQuery = ` after:${y}/01/01 before:${y + 1}/01/01`;
+            }
+          }
+          const query = `(subject:(receipt OR invoice OR pembayaran OR tagihan OR transfer OR "top up") OR from:(gojek OR grab OR tokopedia OR shopee OR apple OR bsi OR mandiri OR bca OR bri OR bni OR dana OR ovo OR linkaja OR gopay OR shopeepay))${dateQuery}`;
+          addLog(`Executing search...`);
+          setProg(20);
+          let messages = [];
+          let pageToken = '';
+          let pageCount = 0;
+          const maxPages = 4; // Max 2000 emails
+          do {
+            let fetchUrl = `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=500`;
+            if (pageToken) fetchUrl += `&pageToken=${pageToken}`;
+            const res = await fetch(fetchUrl, {
+              headers: {
+                'Authorization': `Bearer ${account.token}`
+              }
+            });
+            if (!res.ok) throw new Error(`Token expired or API Error.`);
+            const data = await res.json();
+            if (data.messages) messages = messages.concat(data.messages);
+            pageToken = data.nextPageToken;
+            pageCount++;
+            addLog(`Page ${pageCount} fetched. (${messages.length} enc-entities)`);
+            if (pageToken) await new Promise(r => setTimeout(r, 200));
+          } while (pageToken && pageCount < maxPages);
+          if (messages.length === 0) {
+            addLog('No transactions found in this period.');
+            setProg(100);
+          } else {
+            const fetchedExpenses = [];
+            let processed = 0;
+            const batchSize = 10;
+            for (let i = 0; i < messages.length; i += batchSize) {
+              const chunk = messages.slice(i, i + batchSize);
+              const promises = chunk.map(async (msg) => {
+                try {
+                  const msgRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`, {
+                    headers: {
+                      'Authorization': `Bearer ${account.token}`
+                    }
+                  });
+                  const msgData = await msgRes.json();
+                  const pData = ParserEngine.processEmail(msgData.payload, msgData.payload.headers, account.email, msgData);
+                  if (pData.isValid) {
+                    pData.id = msg.id;
+                    fetchedExpenses.push(pData);
+                    addLog(`[OK] ${pData.merchant}: ${UI.formatRupiah(pData.amount)}`);
+                  }
+                } catch (err) {}
+              });
+              await Promise.all(promises);
+              await new Promise(r => setTimeout(r, 350)); // Strict limiter
+              processed += chunk.length;
+              setProg(20 + Math.floor((processed / messages.length) * 80));
+            }
+            // Lakukan deduplikasi canggih
+            const deduplicatedAccountExpenses = DeduplicationEngine.advancedDedupe(fetchedExpenses);
+            account.expenses = deduplicatedAccountExpenses;
+            account.lastSync = Date.now(); // SET CACHE EXPIRY
+            addLog(`Deduplikasi Cerdas: ${fetchedExpenses.length} Email digabung menjadi ${account.expenses.length} Transaksi Final.`);
+            addLog('Parsing & Grouping completed successfully.');
+            setProg(100);
+          }
+        } catch (e) {
+          addLog(`[CRITICAL] ${e.message}`);
+          setProg(100);
+        } finally {
+          setTimeout(() => {
+            account.isScanning = false;
+            CacheEngine.save(); // SAVE CACHE
+            if (Workspace.activeTab === 'global') DeduplicationEngine.mergeGlobal();
+            UI.renderTabs();
+            UI.renderDashboard();
+          }, 1500);
+        }
+      };
+      // Init App On Load
+      UI.initDOM();
     </script>
-</body>
+  </body>
 </html>
