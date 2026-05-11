@@ -319,8 +319,9 @@
       standings: {}, 
       viewMode: 'grid', 
       replay: {
-         dataByDriver: {}, trackPoints: [], trackBgCanvas: null,
+         dataByDriver: {}, trackPoints: [], trackBgCanvas: null, trackStatusData: [], weatherData: [],
          lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, totalLaps: 0,
+         historicalFastestLaps: [], historicalMaxSpeeds: [],
          scale: 1, offsetX: 0, offsetY: 0,
          zoom: 1, panX: 0, panY: 0,
          minX: 0, maxX: 0, minY: 0, maxY: 0, 
@@ -528,6 +529,40 @@
             let minTime = dataByDriver[driverNum][0].time;
             let maxTime = dataByDriver[driverNum][dataByDriver[driverNum].length - 1].time;
 
+            let trackStatusData = [{
+                time: minTime,
+                status: '1',
+                message: 'Track Clear (Offline Data)'
+            }];
+            
+            // Historical Top Speeds for JSON (Estimating from x,y,t)
+            let allSpeeds = [];
+            Object.keys(dataByDriver).forEach(drv => {
+                const points = dataByDriver[drv];
+                for(let i=1; i<points.length; i++) {
+                    let dt = (points[i].time - points[i-1].time) / 1000;
+                    if (dt > 0.1 && dt < 5) {
+                        let dx = points[i].x - points[i-1].x;
+                        let dy = points[i].y - points[i-1].y;
+                        let dist = Math.sqrt(dx*dx + dy*dy);
+                        let speed = (dist / dt) * 3.6; 
+                        if (speed > 100 && speed < 370) {
+                            allSpeeds.push({ time: points[i].time, speed: speed, driver_number: drv });
+                        }
+                    }
+                }
+            });
+            allSpeeds.sort((a, b) => a.time - b.time);
+
+            let historicalMaxSpeeds = [];
+            let currentMaxSpeed = 0;
+            allSpeeds.forEach(s => {
+                if (s.speed > currentMaxSpeed + 1) { 
+                    currentMaxSpeed = s.speed;
+                    historicalMaxSpeeds.push(s);
+                }
+            });
+
             state.replay = {
                 ...state.replay,
                 dataByDriver,
@@ -541,7 +576,8 @@
                 loading: false,
                 error: null,
                 zoom: 1, panX: 0, panY: 0,
-                lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, totalLaps: 0
+                lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, trackStatusData: trackStatusData, weatherData: [], totalLaps: 0,
+                historicalFastestLaps: [], historicalMaxSpeeds: historicalMaxSpeeds
             };
 
             renderMain();
@@ -602,6 +638,39 @@
             }
         });
 
+        let trackStatusData = [{
+            time: minTime === Infinity ? 0 : minTime,
+            status: '1',
+            message: 'Track Clear (Offline Data)'
+        }];
+        
+        let allSpeeds = [];
+        Object.keys(dataByDriver).forEach(drv => {
+            const points = dataByDriver[drv];
+            for(let i=1; i<points.length; i++) {
+                let dt = (points[i].time - points[i-1].time) / 1000;
+                if (dt > 0.1 && dt < 5) {
+                    let dx = points[i].x - points[i-1].x;
+                    let dy = points[i].y - points[i-1].y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    let speed = (dist / dt) * 3.6; 
+                    if (speed > 100 && speed < 370) {
+                        allSpeeds.push({ time: points[i].time, speed: speed, driver_number: drv });
+                    }
+                }
+            }
+        });
+        allSpeeds.sort((a, b) => a.time - b.time);
+
+        let historicalMaxSpeeds = [];
+        let currentMaxSpeed = 0;
+        allSpeeds.forEach(s => {
+            if (s.speed > currentMaxSpeed + 1) { 
+                currentMaxSpeed = s.speed;
+                historicalMaxSpeeds.push(s);
+            }
+        });
+
         state.replay = {
             ...state.replay,
             dataByDriver,
@@ -614,7 +683,8 @@
             loading: false,
             error: null,
             zoom: 1, panX: 0, panY: 0,
-            lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, totalLaps: 0
+            lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, trackStatusData: trackStatusData, weatherData: [], totalLaps: 0,
+            historicalFastestLaps: [], historicalMaxSpeeds: historicalMaxSpeeds
         };
 
         renderMain();
@@ -642,6 +712,8 @@
         let totalLaps = 0;
         let trackPoints = [];
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        let trackStatusData = [];
+        let weatherData = [];
 
         try {
             lapsData = await fetchCached(`https://api.openf1.org/v1/laps?session_key=${sessionKey}`);
@@ -663,6 +735,48 @@
                 });
             }
         } catch (e) {}
+
+        // Mengambil data cuaca
+        try {
+            const weatherRaw = await fetchCached(`https://api.openf1.org/v1/weather?session_key=${sessionKey}`);
+            if (weatherRaw && weatherRaw.length > 0) {
+                weatherData = weatherRaw.map(w => ({
+                    time: new Date(w.date).getTime(),
+                    air: w.air_temperature,
+                    track: w.track_temperature,
+                    hum: w.humidity,
+                    rain: w.rainfall
+                })).sort((a, b) => a.time - b.time);
+            }
+        } catch (e) {
+            console.warn('Gagal memuat data cuaca', e);
+        }
+
+        // Menggunakan Race Control sebagai sumber utama (bukan track_status)
+        try {
+            const rcRaw = await fetchCached(`https://api.openf1.org/v1/race_control?session_key=${sessionKey}`);
+            if (rcRaw && rcRaw.length > 0) {
+                rcRaw.forEach(r => {
+                    // Ambil flag yang berlaku untuk seluruh track, hiraukan flag personal driver seperti Black & White
+                    if (r.category === 'Flag' && r.flag && (r.scope === 'Track' || r.driver_number == null)) {
+                        let st = '1';
+                        if (r.flag === 'YELLOW' || r.flag === 'DOUBLE YELLOW') st = '2';
+                        else if (r.flag === 'RED') st = '5';
+                        else if (r.flag === 'GREEN' || r.flag === 'CLEAR') st = '1';
+                        else return; // Hiraukan flag lain
+                        
+                        trackStatusData.push({ time: new Date(r.date).getTime(), status: st, message: r.message });
+                    } else if (r.category === 'SafetyCar') {
+                        let st = '4';
+                        if (r.message && (r.message.includes('VIRTUAL') || r.message.includes('VSC'))) st = '6';
+                        trackStatusData.push({ time: new Date(r.date).getTime(), status: st, message: r.message });
+                    }
+                });
+                trackStatusData.sort((a, b) => a.time - b.time);
+            }
+        } catch(e) {
+            console.warn('Gagal memuat Race Control', e);
+        }
 
         const stintsRaw = await fetchCached(`https://api.openf1.org/v1/stints?session_key=${sessionKey}`);
         const stintsData = {};
@@ -764,19 +878,65 @@
                 if (dataByDriver[drv][dataByDriver[drv].length - 1].time > globalEnd) globalEnd = dataByDriver[drv][dataByDriver[drv].length - 1].time;
             }
         });
+        
+        // 1. Hitung Histori Fastest Lap
+        let validLapsCalc = lapsData.filter(l => l.lap_duration != null);
+        validLapsCalc.sort((a, b) => new Date(a.date_start).getTime() - new Date(b.date_start).getTime());
+        let historicalFastestLaps = [];
+        let currentBestDuration = Infinity;
+
+        validLapsCalc.forEach(lap => {
+            let lapEndTime = new Date(lap.date_start).getTime() + (lap.lap_duration * 1000);
+            if (lap.lap_duration < currentBestDuration) {
+                currentBestDuration = lap.lap_duration;
+                historicalFastestLaps.push({
+                    time: lapEndTime,
+                    driver_number: lap.driver_number,
+                    duration: lap.lap_duration
+                });
+            }
+        });
+
+        // 2. Hitung Histori Top Speeds
+        let allSpeeds = [];
+        Object.keys(dataByDriver).forEach(drv => {
+            const points = dataByDriver[drv];
+            for(let i=1; i<points.length; i++) {
+                let dt = (points[i].time - points[i-1].time) / 1000;
+                if (dt > 0.1 && dt < 5) {
+                    let dx = points[i].x - points[i-1].x;
+                    let dy = points[i].y - points[i-1].y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    let speed = (dist / dt) * 3.6; 
+                    if (speed > 100 && speed < 370) {
+                        allSpeeds.push({ time: points[i].time, speed: speed, driver_number: drv });
+                    }
+                }
+            }
+        });
+        allSpeeds.sort((a, b) => a.time - b.time);
+
+        let historicalMaxSpeeds = [];
+        let currentMaxSpeed = 0;
+        allSpeeds.forEach(s => {
+            if (s.speed > currentMaxSpeed + 1) { // Hanya update kalau lebih cepat > 1 km/h biar DOM ga stres
+                currentMaxSpeed = s.speed;
+                historicalMaxSpeeds.push(s);
+            }
+        });
 
         state.replay = {
             ...state.replay,
             dataByDriver,
-            trackPoints, minX, maxX, minY, maxY,
+            trackPoints, minX, maxX, minY, maxY, trackStatusData, weatherData,
             lapsData, positionsData, stintsData, intervalsData, totalLaps,
+            historicalFastestLaps, historicalMaxSpeeds,
             startTime: globalStart,
             endTime: globalEnd,
             currentTime: globalStart,
             isPlaying: false,
             loading: false,
-            error: null,
-            zoom: 1, panX: 0, panY: 0
+            error: null
         };
 
         renderMain();
@@ -867,7 +1027,7 @@
           const delta = e.deltaY < 0 ? 1 + zoomIntensity : 1 - zoomIntensity;
           
           let newZoom = rState.zoom * delta;
-          newZoom = Math.max(0.5, Math.min(newZoom, 15)); // Limit zoom dari 0.5x sampai 15x
+          newZoom = Math.max(0.5, Math.min(newZoom, 15)); 
 
           const canvasX = (mouseX - rState.panX) / rState.zoom;
           const canvasY = (mouseY - rState.panY) / rState.zoom;
@@ -888,7 +1048,7 @@
       let pinchCenterY = 0;
 
       canvas.addEventListener('mousedown', (e) => {
-          if (e.button === 1 || e.button === 0) { // Middle click atau Left Click buat geser
+          if (e.button === 1 || e.button === 0) { 
               isDragging = true;
               lastX = e.clientX;
               lastY = e.clientY;
@@ -986,7 +1146,7 @@
              rState.currentTime = rState.endTime;
              const btn = document.getElementById('btn-play-pause');
              if(btn) {
-                 btn.innerHTML = '<i data-lucide="play" class="w-5 h-5 fill-current"></i>';
+                 btn.innerHTML = '<i data-lucide="play" class="w-4 h-4 sm:w-5 sm:h-5 fill-current"></i>';
                  lucide.createIcons();
              }
          }
@@ -1050,14 +1210,14 @@
          }
       });
 
-      const dotRadius = window.innerWidth > 640 ? 7 : 4;
+      const dotRadius = window.innerWidth > 640 ? 14 : 10;
 
       Object.entries(latestPos).forEach(([driverNum, pos]) => {
          if (pos.x == null || pos.y == null) return;
 
          const driver = state.drivers.find(d => d.driver_number == driverNum);
          const teamColor = driver ? getTeamColor(driver.team_colour) : '#ffffff';
-         const labelText = driver ? `${driver.name_acronym} ${driverNum}` : driverNum;
+         const labelText = driver ? driver.name_acronym : driverNum;
 
          const baseCx = rState.offsetX + (pos.x - rState.minX) * rState.scale;
          const baseCy = rState.offsetY + (rState.maxY - pos.y) * rState.scale;
@@ -1074,10 +1234,12 @@
          ctx.stroke();
 
          ctx.fillStyle = '#ffffff';
-         ctx.font = `bold ${window.innerWidth > 640 ? '11px' : '9px'} "Plus Jakarta Sans", sans-serif`;
-         ctx.shadowColor = 'rgba(0,0,0,0.8)';
-         ctx.shadowBlur = 4;
-         ctx.fillText(labelText, cx + (window.innerWidth > 640 ? 10 : 6), cy + (window.innerWidth > 640 ? 4 : 3));
+         ctx.textAlign = 'center';
+         ctx.textBaseline = 'middle';
+         ctx.font = `bold ${window.innerWidth > 640 ? '10px' : '7.5px'} "Plus Jakarta Sans", sans-serif`;
+         ctx.shadowColor = 'rgba(0,0,0,0.9)';
+         ctx.shadowBlur = 3;
+         ctx.fillText(labelText, cx, cy + 0.5);
          ctx.shadowBlur = 0; 
       });
     }
@@ -1177,10 +1339,163 @@
           slider.value = ((rState.currentTime - rState.startTime) / (rState.endTime - rState.startTime)) * 100;
       }
 
-      // Animasi Leaderboard di throttle tiap 500ms biar sinkron dengan CSS transition 500ms
+      // Animasi Leaderboard & UI Update di throttle tiap 500ms
       if (!force && time - lastUiUpdateTime < 500) return;
       lastUiUpdateTime = time;
 
+      // 1. UPDATE FLAG NOTIFICATION CARD
+      const flagCard = document.getElementById('flag-card');
+      if (flagCard) {
+          let currentStatusObj = { status: '1', message: 'Track Clear', time: rState.startTime || 0 }; // Default Persisten
+          
+          if (rState.trackStatusData && rState.trackStatusData.length > 0) {
+              for (let i = 0; i < rState.trackStatusData.length; i++) {
+                  if (rState.trackStatusData[i].time <= rState.currentTime) {
+                      currentStatusObj = rState.trackStatusData[i];
+                  } else {
+                      break;
+                  }
+              }
+          }
+
+          const status = currentStatusObj.status.toString();
+          let bgColor = 'bg-green-500';
+          let textColor = 'text-black';
+          let title = 'GREEN FLAG';
+          let subtitle = currentStatusObj.message || 'Track Clear';
+          let icon = 'flag';
+          let showCard = true;
+
+          if (status === '2') {
+              bgColor = 'bg-yellow-400'; textColor = 'text-black'; title = 'YELLOW FLAG'; icon = 'alert-triangle'; subtitle = currentStatusObj.message || 'Hazard on Track';
+          } else if (status === '4') {
+              bgColor = 'bg-yellow-400'; textColor = 'text-black'; title = 'SAFETY CAR'; subtitle = currentStatusObj.message || 'Deployed on Track'; icon = 'car';
+          } else if (status === '5') {
+              bgColor = 'bg-red-600'; textColor = 'text-white'; title = 'RED FLAG'; subtitle = currentStatusObj.message || 'Session Stopped'; icon = 'ban';
+          } else if (status === '6' || status === '7') {
+              bgColor = 'bg-yellow-400'; textColor = 'text-black'; title = 'VIRTUAL SC'; icon = 'alert-triangle'; subtitle = currentStatusObj.message || 'Maintain Delta';
+          } else if (status === '1') {
+              bgColor = 'bg-green-500'; textColor = 'text-black'; title = 'GREEN FLAG'; icon = 'flag'; subtitle = currentStatusObj.message || 'Track Clear';
+          }
+
+          // Override dengan Chequered Flag di 10 detik terakhir sesi
+          if (rState.endTime > rState.startTime && rState.currentTime >= rState.endTime - 10000) {
+              bgColor = 'bg-white'; textColor = 'text-black'; title = 'CHEQUERED FLAG'; subtitle = 'Session Ended'; icon = 'flag';
+          }
+
+          if (showCard) {
+              flagCard.classList.remove('opacity-0', 'pointer-events-none');
+              flagCard.classList.add('opacity-100', 'pointer-events-auto');
+
+              const bodyEl = document.getElementById('flag-body');
+              const titleEl = document.getElementById('flag-title');
+              const subEl = document.getElementById('flag-subtitle');
+              const iconCont = document.getElementById('flag-icon-container');
+
+              if (titleEl.innerText !== title) {
+                  bodyEl.className = `p-3 sm:p-4 flex justify-between items-center transition-colors duration-500 ${bgColor}`;
+                  titleEl.className = `font-black text-base sm:text-xl uppercase tracking-tight ${textColor}`;
+                  titleEl.innerText = title;
+                  iconCont.className = `shrink-0 opacity-80 ${textColor}`;
+                  
+                  document.getElementById('icon-flag').style.display = icon === 'flag' ? 'block' : 'none';
+                  document.getElementById('icon-alert').style.display = icon === 'alert-triangle' ? 'block' : 'none';
+                  document.getElementById('icon-car').style.display = icon === 'car' ? 'block' : 'none';
+                  document.getElementById('icon-ban').style.display = icon === 'ban' ? 'block' : 'none';
+              }
+              if (subEl.innerText !== subtitle) {
+                  subEl.className = `text-[9px] sm:text-xs font-medium mt-0.5 sm:mt-1 ${textColor === 'text-black' ? 'text-black/80' : 'text-white/80'}`;
+                  subEl.innerText = subtitle;
+              }
+          }
+      }
+
+      // 2. UPDATE WEATHER CARD
+      const weatherCard = document.getElementById('weather-card');
+      if (weatherCard && rState.weatherData && rState.weatherData.length > 0) {
+          let currentW = rState.weatherData[0];
+          for (let i = 0; i < rState.weatherData.length; i++) {
+              if (rState.weatherData[i].time <= rState.currentTime) {
+                  currentW = rState.weatherData[i];
+              } else {
+                  break;
+              }
+          }
+          
+          weatherCard.classList.remove('opacity-0', 'pointer-events-none');
+          weatherCard.classList.add('opacity-100', 'pointer-events-auto');
+          
+          const elAir = document.getElementById('w-air');
+          const elTrack = document.getElementById('w-track');
+          const elHum = document.getElementById('w-hum');
+          const elRain = document.getElementById('w-rain');
+          
+          if(elAir) elAir.innerText = currentW.air !== null ? `${currentW.air}°C` : '-';
+          if(elTrack) elTrack.innerText = currentW.track !== null ? `${currentW.track}°C` : '-';
+          if(elHum) elHum.innerText = currentW.hum !== null ? `${currentW.hum}%` : '-';
+          if(elRain) elRain.innerText = currentW.rain === 1 ? 'YES' : 'NO';
+      } else if (weatherCard) {
+          weatherCard.classList.add('opacity-0', 'pointer-events-none');
+          weatherCard.classList.remove('opacity-100', 'pointer-events-auto');
+      }
+
+      // 3. UPDATE FASTEST LAP CARD
+      const flCard = document.getElementById('fastest-lap-card');
+      if (flCard && rState.historicalFastestLaps && rState.historicalFastestLaps.length > 0) {
+          let currentFL = null;
+          for (let i = rState.historicalFastestLaps.length - 1; i >= 0; i--) {
+              if (rState.historicalFastestLaps[i].time <= rState.currentTime) {
+                  currentFL = rState.historicalFastestLaps[i];
+                  break;
+              }
+          }
+          
+          if (currentFL) {
+              flCard.classList.remove('opacity-0', 'pointer-events-none');
+              flCard.classList.add('opacity-100', 'pointer-events-auto');
+              
+              const m = Math.floor(currentFL.duration / 60);
+              const s = (currentFL.duration % 60).toFixed(3).padStart(6, '0');
+              const drv = state.drivers.find(d => d.driver_number == currentFL.driver_number);
+              
+              const elTime = document.getElementById('fl-time');
+              const elDriver = document.getElementById('fl-driver');
+              if(elTime) elTime.innerText = `${m}:${s}`;
+              if(elDriver) elDriver.innerText = drv ? drv.name_acronym : currentFL.driver_number;
+          } else {
+              flCard.classList.add('opacity-0', 'pointer-events-none');
+              flCard.classList.remove('opacity-100', 'pointer-events-auto');
+          }
+      }
+
+      // 4. UPDATE TOP SPEED CARD
+      const tsCard = document.getElementById('top-speed-card');
+      if (tsCard && rState.historicalMaxSpeeds && rState.historicalMaxSpeeds.length > 0) {
+          let currentTS = null;
+          for (let i = rState.historicalMaxSpeeds.length - 1; i >= 0; i--) {
+              if (rState.historicalMaxSpeeds[i].time <= rState.currentTime) {
+                  currentTS = rState.historicalMaxSpeeds[i];
+                  break;
+              }
+          }
+          
+          if (currentTS) {
+              tsCard.classList.remove('opacity-0', 'pointer-events-none');
+              tsCard.classList.add('opacity-100', 'pointer-events-auto');
+              
+              const drv = state.drivers.find(d => d.driver_number == currentTS.driver_number);
+              
+              const elSpeed = document.getElementById('ts-speed');
+              const elDriver = document.getElementById('ts-driver');
+              if(elSpeed) elSpeed.innerText = Math.round(currentTS.speed);
+              if(elDriver) elDriver.innerText = drv ? drv.name_acronym : currentTS.driver_number;
+          } else {
+              tsCard.classList.add('opacity-0', 'pointer-events-none');
+              tsCard.classList.remove('opacity-100', 'pointer-events-auto');
+          }
+      }
+
+      // 5. UPDATE LEADERBOARD TOWER
       const lbContainer = document.getElementById('replay-leaderboard-content');
       const lapInfoElTower = document.getElementById('replay-lap-info-tower');
       const lapInfoElTop = document.getElementById('replay-lap-info');
@@ -1604,8 +1919,9 @@
       state.intervals = {};
       
       state.replay = { 
-        dataByDriver: {}, trackPoints: [], trackBgCanvas: null,
+        dataByDriver: {}, trackPoints: [], trackBgCanvas: null, trackStatusData: [], weatherData: [],
         lapsData: [], positionsData: {}, stintsData: {}, intervalsData: {}, totalLaps: 0,
+        historicalFastestLaps: [], historicalMaxSpeeds: [],
         scale: 1, offsetX: 0, offsetY: 0, minX: 0, maxX: 0, minY: 0, maxY: 0, 
         zoom: 1, panX: 0, panY: 0,
         startTime: 0, endTime: 0, currentTime: 0, loadedUntil: 0, isBuffering: false, 
@@ -1939,6 +2255,7 @@
               <!-- Top Overlay (Info, Lap, Screen, Speed) -->
               <div class="absolute top-0 left-0 right-0 p-3 sm:p-4 flex justify-between items-start sm:items-center z-20 bg-gradient-to-b from-black/90 to-transparent gap-2 sm:gap-4 pointer-events-none">
                   <div class="flex items-center gap-2 sm:gap-4 pointer-events-auto">
+                      <!-- Teks F1 Live Notification Style -->
                       <h4 class="font-black text-lg sm:text-xl uppercase italic text-gray-200 hidden sm:block">Track Tracker <span class="text-[10px] sm:text-xs font-bold tracking-widest text-red-500 ml-2 border border-red-500/50 bg-red-500/10 px-1.5 sm:px-2 py-0.5 rounded">LIVE MAP</span></h4>
                       <div id="replay-lap-info" class="bg-red-600 text-white text-[10px] sm:text-sm font-black italic tracking-widest px-2 sm:px-3 py-1 rounded shadow-lg border border-red-500">LAP 1</div>
                   </div>
@@ -2002,6 +2319,82 @@
                        ${initialLeaderboardHtml}
                     </div>
                  </div>
+              </div>
+
+              <!-- FLAG CARD (Notifikasi Status Balapan) -->
+              <div id="flag-card" class="absolute top-[90px] sm:top-[120px] right-2 sm:right-4 w-[160px] sm:w-[240px] rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl z-30 transition-all duration-500 opacity-0 translate-y-[-20px] pointer-events-none">
+                  <div class="bg-[#15151e] p-2 sm:p-3 flex justify-between items-center border-b border-white/10">
+                      <span class="font-black italic text-white text-xs sm:text-lg leading-none">F1<span class="text-red-600">®</span></span>
+                      <span class="text-[7px] sm:text-[10px] font-bold text-white uppercase">${state.selectedSession?.session_name || 'RACE'}</span>
+                  </div>
+                  <div id="flag-body" class="bg-green-500 p-2.5 sm:p-4 flex justify-between items-center transition-colors duration-500">
+                      <div>
+                          <h3 id="flag-title" class="font-black text-sm sm:text-xl uppercase tracking-tight text-black">GREEN FLAG</h3>
+                          <p id="flag-subtitle" class="text-[8px] sm:text-xs font-medium text-black/80 mt-0.5 sm:mt-1">Track Clear</p>
+                      </div>
+                      <div id="flag-icon-container" class="text-black opacity-80 shrink-0">
+                          <i data-lucide="flag" id="icon-flag" class="w-5 h-5 sm:w-8 sm:h-8 hidden"></i>
+                          <i data-lucide="alert-triangle" id="icon-alert" class="w-5 h-5 sm:w-8 sm:h-8 hidden"></i>
+                          <i data-lucide="car" id="icon-car" class="w-5 h-5 sm:w-8 sm:h-8 hidden"></i>
+                          <i data-lucide="ban" id="icon-ban" class="w-5 h-5 sm:w-8 sm:h-8 hidden"></i>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- FASTEST LAP CARD -->
+              <div id="fastest-lap-card" class="absolute top-[190px] sm:top-[250px] right-2 sm:right-4 w-[160px] sm:w-[240px] rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl z-30 transition-all duration-500 opacity-0 pointer-events-none bg-gradient-to-br from-purple-800 to-purple-950 border border-purple-500/50">
+                  <div class="p-2 sm:p-3">
+                      <div class="flex justify-between items-center mb-1 sm:mb-2">
+                          <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-purple-200">Fastest Lap</span>
+                          <i data-lucide="timer" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-300"></i>
+                      </div>
+                      <div class="flex justify-between items-end">
+                          <span id="fl-time" class="font-mono text-lg sm:text-2xl font-black text-white leading-none drop-shadow-md">-</span>
+                          <span id="fl-driver" class="text-[10px] sm:text-xs font-bold text-white uppercase bg-black/40 px-2 py-1 rounded drop-shadow-md">-</span>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- TOP SPEED CARD -->
+              <div id="top-speed-card" class="absolute top-[260px] sm:top-[340px] right-2 sm:right-4 w-[160px] sm:w-[240px] rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl z-30 transition-all duration-500 opacity-0 pointer-events-none bg-gradient-to-br from-blue-800 to-blue-950 border border-blue-500/50">
+                  <div class="p-2 sm:p-3">
+                      <div class="flex justify-between items-center mb-1 sm:mb-2">
+                          <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-blue-200">Top Speed</span>
+                          <i data-lucide="gauge" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-300"></i>
+                      </div>
+                      <div class="flex justify-between items-end">
+                          <div class="flex items-baseline gap-1">
+                             <span id="ts-speed" class="font-mono text-lg sm:text-2xl font-black text-white leading-none drop-shadow-md">-</span>
+                             <span class="text-[8px] sm:text-[10px] font-bold text-white/70">KM/H</span>
+                          </div>
+                          <span id="ts-driver" class="text-[10px] sm:text-xs font-bold text-white uppercase bg-black/40 px-2 py-1 rounded drop-shadow-md">-</span>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- WEATHER CARD -->
+              <div id="weather-card" class="absolute bottom-[80px] sm:bottom-[100px] right-2 sm:right-4 w-auto bg-[#15151e]/90 backdrop-blur-md rounded-xl border border-white/10 flex flex-col overflow-hidden z-20 shadow-2xl transition-opacity duration-500 opacity-0 pointer-events-none">
+                  <div class="flex items-center justify-between p-2 px-3 border-b border-white/5 bg-black/40">
+                      <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1.5"><i data-lucide="cloud-sun" class="w-3.5 h-3.5 text-blue-400"></i> Weather</span>
+                  </div>
+                  <div class="p-2 sm:p-3 flex gap-3 sm:gap-4 justify-between">
+                      <div class="flex flex-col items-center">
+                          <span class="text-[8px] sm:text-[9px] text-gray-500 font-bold uppercase tracking-widest">Air</span>
+                          <span id="w-air" class="text-xs sm:text-sm font-black text-white">-</span>
+                      </div>
+                      <div class="flex flex-col items-center">
+                          <span class="text-[8px] sm:text-[9px] text-gray-500 font-bold uppercase tracking-widest">Track</span>
+                          <span id="w-track" class="text-xs sm:text-sm font-black text-white">-</span>
+                      </div>
+                      <div class="flex flex-col items-center">
+                          <span class="text-[8px] sm:text-[9px] text-gray-500 font-bold uppercase tracking-widest">Hum</span>
+                          <span id="w-hum" class="text-xs sm:text-sm font-black text-white">-</span>
+                      </div>
+                      <div class="flex flex-col items-center">
+                          <span class="text-[8px] sm:text-[9px] text-gray-500 font-bold uppercase tracking-widest">Rain</span>
+                          <span id="w-rain" class="text-xs sm:text-sm font-black text-white">-</span>
+                      </div>
+                  </div>
               </div>
 
               <!-- Main Loading Overlay -->
