@@ -1,0 +1,887 @@
+﻿<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moodboard Studio</title>
+    
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- PDF & Canvas Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Custom Color Picker CSS handled inline -->
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', 'sans-serif'],
+                        display: ['"Outfit"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                        },
+                        // Custom palette matching the 3D software aesthetic
+                        app: {
+                            bg: '#0e0e0e',          
+                            panel: '#161616',       
+                            surface: '#1c1c1c',     
+                            surfaceHover: '#2a2a2a',
+                            border: '#2a2a2a',      
+                            borderLight: '#3a3a3a', 
+                            textMuted: '#888888',   
+                            text: '#e5e5e5',        
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { overscroll-behavior: none; }
+        
+        .bg-dots {
+            background-color: #fafafa; 
+            background-image: radial-gradient(#d4d4d8 1px, transparent 1px);
+        }
+        .dark .bg-dots {
+            background-color: #0e0e0e; 
+            background-image: radial-gradient(#222222 1px, transparent 1px); 
+        }
+        
+        .bg-solid {
+            background-color: #fafafa;
+        }
+        .dark .bg-solid {
+            background-color: #0e0e0e;
+        }
+
+        .tool-active {
+            background-color: #e0f2fe;
+            color: #0284c7;
+            border-color: #bae6fd;
+        }
+        .dark .tool-active {
+            background-color: #333333; 
+            color: #ffffff; 
+            border-color: #4a4a4a; 
+        }
+
+        .element-item { transition: transform 0.1s ease, box-shadow 0.2s ease; }
+        .element-item:hover { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        
+        .image-dragging {
+            opacity: 0.9;
+            transform: scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .delete-btn { display: none; }
+        .image-container:hover .delete-btn, .element-container:hover .delete-btn { display: flex; }
+
+        /* Transform Handles (Shown only on selection) */
+        .element-container .handle { display: none; }
+        .element-container.ring-1 .handle { display: flex; }
+
+        .point-edit-node {
+            transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+        }
+        .point-edit-node-selected {
+            background-color: #0ea5e9 !important;
+            border-color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.35);
+        }
+        .dark .point-edit-node-selected {
+            background-color: #38bdf8 !important;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.35);
+        }
+
+        /* Drop Indicators for Layers */
+        .drag-over-top { box-shadow: inset 0 2px 0 0 #0ea5e9 !important; }
+        .drag-over-bottom { box-shadow: inset 0 -2px 0 0 #0ea5e9 !important; }
+        .dark .drag-over-top { box-shadow: inset 0 2px 0 0 #ffffff !important; }
+        .dark .drag-over-bottom { box-shadow: inset 0 -2px 0 0 #ffffff !important; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 8px; }
+        .dark ::-webkit-scrollbar-thumb { background: #333333; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #555555; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Hide Number Input Arrows */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Brush Preview Cursor */
+        #brush-cursor { mix-blend-mode: difference; }
+
+        /* Custom Rotate Cursors */
+        .cursor-rotate-nw { cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 15.5C16.5 11.0817 12.9183 7.5 8.5 7.5H6.5V10L2.5 6L6.5 2V4.5H8.5C14.5751 4.5 19.5 9.42487 19.5 15.5H16.5Z" fill="black" stroke="white" stroke-width="1"/></svg>') 12 12, auto; }
+        .cursor-rotate-ne { cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 15.5C7.5 11.0817 11.0817 7.5 15.5 7.5H17.5V10L21.5 6L17.5 2V4.5H15.5C9.42487 4.5 4.5 9.42487 4.5 15.5H7.5Z" fill="black" stroke="white" stroke-width="1"/></svg>') 12 12, auto; }
+        .cursor-rotate-sw { cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 8.5C16.5 12.9183 12.9183 16.5 8.5 16.5H6.5V14L2.5 18L6.5 22V19.5H8.5C14.5751 19.5 19.5 14.5751 19.5 8.5H16.5Z" fill="black" stroke="white" stroke-width="1"/></svg>') 12 12, auto; }
+        .cursor-rotate-se { cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 8.5C7.5 12.9183 11.0817 16.5 15.5 16.5H17.5V14L21.5 18L17.5 22V19.5H15.5C9.42487 19.5 4.5 14.5751 4.5 8.5H7.5Z" fill="black" stroke="white" stroke-width="1"/></svg>') 12 12, auto; }
+
+        /* ====== Premium Custom Color Picker ====== */
+        #color-picker-modal { user-select: none; -webkit-user-select: none; }
+        #cp-sv-field { touch-action: none; }
+        #cp-hue-slider, #cp-alpha-track { touch-action: none; }
+        .cp-thumb {
+            position: absolute; top: 50%;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: white;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.45), 0 0 0 1.5px rgba(0,0,0,0.18);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: box-shadow 0.1s;
+        }
+        #cp-sv-cursor {
+            position: absolute;
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 2.5px solid white;
+            box-shadow: 0 0 0 1.5px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.45);
+            transform: translate(-50%, -50%);
+            pointer-events: none; z-index: 5;
+        }
+        .cp-swatch {
+            width: 20px; height: 20px; border-radius: 5px;
+            cursor: pointer; border: 2px solid transparent;
+            transition: transform 0.1s, box-shadow 0.1s;
+            position: relative;
+        }
+        .cp-swatch:hover { transform: scale(1.25); box-shadow: 0 3px 10px rgba(0,0,0,0.35); }
+        .cp-swatch.selected { border-color: white; box-shadow: 0 0 0 2px #0ea5e9; }
+        .cp-num-input {
+            width: 100%; text-align: center;
+            background: transparent;
+            border: 1px solid rgba(128,128,128,0.2);
+            border-radius: 5px; padding: 4px 2px;
+            font-size: 11px; font-weight: 500;
+            outline: none; transition: border-color 0.15s;
+            color: inherit;
+        }
+        .cp-num-input:focus { border-color: #0ea5e9; }
+        .dark .cp-num-input { background: rgba(255,255,255,0.05); }
+        .cp-num-input::-webkit-inner-spin-button, .cp-num-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+        .cp-num-input { -moz-appearance: textfield; }
+
+        /* ====== Export Modal Styles ====== */
+        .export-fmt-btn {
+            background: transparent;
+            border-color: rgba(0,0,0,0.08);
+            color: #888;
+        }
+        .dark .export-fmt-btn {
+            border-color: #333;
+            color: #666;
+        }
+        .export-fmt-btn:hover {
+            background: rgba(0,0,0,0.03);
+            color: #555;
+        }
+        .dark .export-fmt-btn:hover {
+            background: rgba(255,255,255,0.04);
+            color: #aaa;
+        }
+        .export-fmt-btn.active-fmt {
+            background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(99,102,241,0.12));
+            border-color: rgba(139,92,246,0.4);
+            color: #7c3aed;
+            box-shadow: 0 0 0 1px rgba(139,92,246,0.15);
+        }
+        .dark .export-fmt-btn.active-fmt {
+            background: linear-gradient(135deg, rgba(139,92,246,0.18), rgba(99,102,241,0.15));
+            border-color: rgba(139,92,246,0.5);
+            color: #a78bfa;
+        }
+        .export-scale-btn {
+            background: transparent;
+            border-color: rgba(0,0,0,0.08);
+            color: #888;
+        }
+        .dark .export-scale-btn {
+            border-color: #333;
+            color: #666;
+        }
+        .export-scale-btn:hover {
+            background: rgba(0,0,0,0.03);
+            color: #555;
+        }
+        .dark .export-scale-btn:hover {
+            background: rgba(255,255,255,0.04);
+            color: #aaa;
+        }
+        .export-scale-btn.active-scale {
+            background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(99,102,241,0.12));
+            border-color: rgba(139,92,246,0.4);
+            color: #7c3aed;
+            font-weight: 800;
+        }
+        .dark .export-scale-btn.active-scale {
+            background: linear-gradient(135deg, rgba(139,92,246,0.18), rgba(99,102,241,0.15));
+            border-color: rgba(139,92,246,0.5);
+            color: #a78bfa;
+        }
+        #export-quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            box-shadow: 0 2px 8px rgba(139,92,246,0.4);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col overflow-hidden text-slate-800 dark:text-app-text bg-white dark:bg-app-bg transition-colors duration-200 font-sans">
+
+    <!-- Top Container: Header & Tabs -->
+    <div class="flex flex-col z-[200] shadow-sm dark:shadow-none relative">
+        <header class="bg-white dark:bg-app-panel border-b border-slate-200 dark:border-app-border px-5 flex flex-row items-center justify-between transition-colors duration-200 z-20 relative pt-2 h-[68px]">
+            
+            <div class="flex items-center gap-1 shrink-0">
+                <div class="flex items-center shrink-0 h-full">
+                    <div class="relative flex items-center h-full">
+                        <button onclick="toggleFileMenu()" class="flex items-center justify-center px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-app-surfaceHover rounded-md transition-colors text-slate-700 dark:text-app-text" title="File Menu">
+                            <i class="ph ph-list text-xl"></i>
+                        </button>
+                        <div id="file-menu" class="hidden absolute top-[calc(100%-10px)] left-0 mt-2 w-64 bg-white dark:bg-app-surface/90 dark:backdrop-blur-xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-[#333] py-2 z-[250]">
+                            <button onclick="createNewProject(); toggleFileMenu();" class="w-full text-left px-5 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/20 text-base flex items-center justify-between transition-colors">
+                                <span>New Project</span><span class="text-sm text-slate-400 dark:text-app-textMuted">Ctrl+N</span>
+                            </button>
+                            <button onclick="openLocalFile(); toggleFileMenu();" class="w-full text-left px-5 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/20 text-base flex items-center justify-between transition-colors">
+                                <span>Open Local (.mb)</span>
+                            </button>
+                            <button onclick="saveProjectToLocal(); toggleFileMenu();" class="w-full text-left px-5 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/20 text-base flex items-center justify-between transition-colors">
+                                <span>Save</span><span class="text-sm text-slate-400 dark:text-app-textMuted">Ctrl+S</span>
+                            </button>
+                            <button onclick="saveProjectAsNew(); toggleFileMenu();" class="w-full text-left px-5 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/20 text-base flex items-center justify-between transition-colors">
+                                <span>Save As...</span>
+                            </button>
+                            <div class="h-px bg-slate-200 dark:bg-app-border my-1.5"></div>
+                            <button onclick="document.getElementById('image-upload').click(); toggleFileMenu();" class="w-full text-left px-5 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/20 text-base flex items-center justify-between transition-colors">
+                                <span>Import Image...</span>
+                            </button>
+                            <div class="h-px bg-slate-200 dark:bg-app-border my-1.5"></div>
+                            <button onclick="clearCanvas(); toggleFileMenu();" class="w-full text-left px-5 py-2.5 hover:bg-red-50 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 text-base flex items-center justify-between transition-colors">
+                                <span>Clear All Canvas</span>
+                            </button>
+                            <div class="h-px bg-slate-200 dark:bg-app-border my-1.5"></div>
+                            <button onclick="openExportModal(); toggleFileMenu();" class="w-full text-left px-5 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/20 text-base flex items-center justify-between transition-colors">
+                                <span>Export to PDF...</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="w-px h-5 bg-slate-300 dark:bg-[#333] mx-3"></div>
+                </div>
+
+                <div class="relative h-[68px] px-3 py-2 flex items-center justify-between shrink-0">
+                    <div id="project-switcher" onclick="toggleProjectMenu(event)" class="min-w-0 text-left group flex rounded-md px-0.5 py-1 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <input id="project-title-input" type="text"
+                                   readonly
+                                   onchange="updateProjectTitle(this.value)"
+                                   onclick="event.stopPropagation(); toggleProjectMenu(event);"
+                                   ondblclick="event.stopPropagation(); this.removeAttribute('readonly'); this.focus(); this.select();"
+                                   onblur="this.setAttribute('readonly', 'true'); window.getSelection().removeAllRanges();"
+                                   class="bg-transparent border-none focus:outline-none min-w-0 truncate text-sm font-semibold text-slate-900 dark:text-white cursor-pointer">
+                            <i class="ph ph-caret-down text-[11px] text-slate-400 dark:text-slate-500 shrink-0 group-hover:text-slate-700 dark:group-hover:text-white"></i>
+                        </div>
+                    </div>
+                    <div class="h-6 w-px bg-slate-200 dark:bg-app-border mx-2"></div>
+                    <button onclick="createNewProject()" class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-app-surface dark:hover:bg-app-surfaceHover text-slate-700 dark:text-white shadow-sm transition-colors" title="New Project">
+                        <i class="ph ph-plus text-xl"></i>
+                    </button>
+                    <div id="project-menu" class="hidden absolute left-0 top-[calc(100%+8px)] z-[260] rounded-lg border border-slate-200 dark:border-app-border bg-white dark:bg-app-surface shadow-[0_16px_40px_rgba(0,0,0,0.35)] overflow-hidden"></div>
+                </div>
+            </div>
+
+            <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-auto z-[260]">
+                <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-app-surface p-1.5 rounded-lg border border-slate-200 dark:border-app-border transition-colors">
+                    <button onclick="changeZoom(-0.1)" class="p-1.5 hover:bg-white dark:hover:bg-app-surfaceHover text-slate-600 dark:text-app-textMuted dark:hover:text-white rounded-md transition-colors" title="Zoom Out (-)">
+                        <i class="ph ph-minus text-base"></i>
+                    </button>
+                    <span id="zoom-label" class="text-sm font-semibold w-12 text-center text-slate-600 dark:text-app-text cursor-pointer hover:text-brand-600 dark:hover:text-white" onclick="centerBoard()" title="Reset View (0)">100%</span>
+                    <button onclick="changeZoom(0.1)" class="p-1.5 hover:bg-white dark:hover:bg-app-surfaceHover text-slate-600 dark:text-app-textMuted dark:hover:text-white rounded-md transition-colors" title="Zoom In (+)">
+                        <i class="ph ph-plus text-base"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center bg-slate-100 dark:bg-app-surface p-1.5 rounded-lg border border-slate-200 dark:border-app-border transition-colors gap-0.5 ml-1">
+                    <button onclick="setMode('move')" id="btn-move" class="tool-active flex items-center justify-center w-10 h-10 rounded-md transition-all" title="Select / Move (V)">
+                        <i class="ph ph-arrows-out-cardinal text-xl"></i>
+                    </button>
+                    
+                    <button onclick="setMode('frame')" id="btn-frame" class="text-slate-600 dark:text-app-textMuted hover:bg-white dark:hover:bg-app-surfaceHover hover:text-slate-900 dark:hover:text-white flex items-center justify-center w-10 h-10 rounded-md transition-all" title="Add Canvas/Frame (F)">
+                        <i class="ph ph-frame-corners text-xl"></i>
+                    </button>
+
+                    <div class="w-px bg-slate-300 dark:bg-app-border mx-1 my-2 h-6"></div>
+
+                    <button onclick="setMode('text')" id="btn-text" class="text-slate-600 dark:text-app-textMuted hover:bg-white dark:hover:bg-app-surfaceHover hover:text-slate-900 dark:hover:text-white flex items-center justify-center w-10 h-10 rounded-md transition-all" title="Add Text (T)">
+                        <i class="ph ph-text-t text-xl"></i>
+                    </button>
+
+                    <div class="relative flex items-center group">
+                        <button onclick="setMode('shape')" id="btn-shape" class="text-slate-600 dark:text-app-textMuted hover:bg-white dark:hover:bg-app-surfaceHover hover:text-slate-900 dark:hover:text-white flex items-center justify-center w-8 h-10 rounded-l-md transition-all" title="Add Shape (R)">
+                            <i class="ph ph-square text-xl" id="current-shape-icon"></i>
+                        </button>
+                        <button onclick="toggleShapeMenu(event)" class="text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center w-3 h-10 rounded-r-md transition-all">
+                            <i class="ph ph-caret-down text-[10px]"></i>
+                        </button>
+                        <div id="shape-menu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-app-surface/95 dark:backdrop-blur-xl rounded-lg shadow-xl border border-slate-200 dark:border-[#333] p-1 flex gap-1 z-[250]">
+                            <button onclick="selectShapeType('rect')" class="p-2 text-slate-700 dark:text-app-text hover:bg-slate-100 dark:hover:bg-[#333] rounded transition-colors" title="Rectangle"><i class="ph ph-square text-xl"></i></button>
+                            <button onclick="selectShapeType('circle')" class="p-2 text-slate-700 dark:text-app-text hover:bg-slate-100 dark:hover:bg-[#333] rounded transition-colors" title="Circle"><i class="ph ph-circle text-xl"></i></button>
+                            <button onclick="selectShapeType('triangle')" class="p-2 text-slate-700 dark:text-app-text hover:bg-slate-100 dark:hover:bg-[#333] rounded transition-colors" title="Triangle"><i class="ph ph-triangle text-xl"></i></button>
+                            <button onclick="selectShapeType('star')" class="p-2 text-slate-700 dark:text-app-text hover:bg-slate-100 dark:hover:bg-[#333] rounded transition-colors" title="Star"><i class="ph ph-star text-xl"></i></button>
+                        </div>
+                    </div>
+
+                    <button onclick="setMode('pentool')" id="btn-pentool" class="text-slate-600 dark:text-app-textMuted hover:bg-white dark:hover:bg-app-surfaceHover hover:text-slate-900 dark:hover:text-white flex items-center justify-center w-10 h-10 rounded-md transition-all" title="Vector Pen (B)">
+                        <i class="ph ph-bezier-curve text-xl"></i>
+                    </button>
+
+                    <button onclick="setMode('connect')" id="btn-connect" class="text-slate-600 dark:text-app-textMuted hover:bg-white dark:hover:bg-app-surfaceHover hover:text-slate-900 dark:hover:text-white flex items-center justify-center w-10 h-10 rounded-md transition-all" title="Kabel (C)">
+                        <i class="ph ph-link text-xl"></i>
+                    </button>
+
+                    <div class="w-px bg-slate-300 dark:bg-app-border mx-1 my-2 h-6"></div>
+                    
+                    <button onclick="setMode('pen')" id="btn-pen" class="text-slate-600 dark:text-app-textMuted hover:bg-white dark:hover:bg-app-surfaceHover hover:text-slate-900 dark:hover:text-white flex items-center justify-center w-10 h-10 rounded-md transition-all" title="Pulpen (P)">
+                        <i class="ph ph-pen-nib text-xl"></i>
+                    </button>
+                    <button onclick="setMode('pencil')" id="btn-pencil" class="text-slate-600 dark:text-app-textMuted hover:bg-white dark:hover:bg-app-surfaceHover hover:text-slate-900 dark:hover:text-white flex items-center justify-center w-10 h-10 rounded-md transition-all" title="Pensil (N)">
+                        <i class="ph ph-pencil-simple text-xl"></i>
+                    </button>
+                    <button onclick="setMode('highlighter')" id="btn-highlighter" class="text-slate-600 dark:text-app-textMuted hover:bg-white dark:hover:bg-app-surfaceHover hover:text-slate-900 dark:hover:text-white flex items-center justify-center w-10 h-10 rounded-md transition-all" title="Stabilo (H)">
+                        <i class="ph ph-marker-circle text-xl"></i>
+                    </button>
+                    <button onclick="setMode('eraser')" id="btn-eraser" class="text-slate-600 dark:text-app-textMuted hover:bg-white dark:hover:bg-app-surfaceHover hover:text-slate-900 dark:hover:text-white flex items-center justify-center w-10 h-10 rounded-md transition-all" title="Penghapus Coretan (E)">
+                        <i class="ph ph-eraser text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="absolute right-5 flex items-center gap-1.5 pointer-events-auto z-[260]">
+                <button onclick="undo()" id="btn-undo" class="text-slate-400 dark:text-app-border p-2 w-10 h-10 flex items-center justify-center rounded-md transition-colors" title="Undo (Ctrl+Z)" disabled>
+                    <i class="ph ph-arrow-u-up-left text-xl"></i>
+                </button>
+                <button onclick="redo()" id="btn-redo" class="text-slate-400 dark:text-app-border p-2 w-10 h-10 flex items-center justify-center rounded-md transition-colors" title="Redo (Ctrl+Y)" disabled>
+                    <i class="ph ph-arrow-u-up-right text-xl"></i>
+                </button>
+                
+                <div class="w-px h-7 bg-slate-200 dark:bg-app-border my-auto mx-1"></div>
+
+                <button onclick="toggleSnap()" id="btn-snap" class="text-slate-500 dark:text-app-textMuted hover:bg-slate-200 dark:hover:bg-app-surface w-10 h-10 flex items-center justify-center rounded-md transition-colors" title="Snap to Grid (S)">
+                    <i class="ph ph-magnet text-xl"></i>
+                </button>
+
+                <div class="w-px h-7 bg-slate-200 dark:bg-app-border my-auto mx-1"></div>
+
+                <button onclick="toggleDarkMode()" id="btn-dark" class="text-slate-500 dark:text-app-textMuted hover:bg-slate-200 dark:hover:bg-app-surface w-10 h-10 flex items-center justify-center rounded-md transition-colors" title="Toggle Dark Mode">
+                    <i class="ph ph-moon text-xl" id="icon-dark"></i>
+                </button>
+
+                <input type="file" id="image-upload" class="hidden" accept="image/*" multiple onchange="handleImageUpload(event)">
+                <input type="file" id="mb-upload" class="hidden" accept=".mb" onchange="fallbackLoadLocal(event)">
+                <button onclick="openExportModal()" class="ml-1 bg-slate-800 dark:bg-white hover:bg-slate-700 dark:hover:bg-gray-200 text-white dark:text-black py-2.5 px-4 rounded-lg transition-colors flex items-center gap-2 text-sm font-semibold tracking-wide whitespace-nowrap shadow-md">
+                    <i class="ph ph-export text-xl"></i>
+                    <span>Export</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Text Format Floating Toolbar (Hidden by default) -->
+        <div id="text-format-toolbar" class="hidden absolute top-20 left-1/2 -translate-x-1/2 bg-white dark:bg-app-surface/95 dark:backdrop-blur-xl border border-slate-200 dark:border-[#333] rounded-lg shadow-xl p-2 flex items-center gap-2 z-[250]">
+            <select id="text-font" onchange="applyTextFormat('font', this.value)" onmousedown="event.preventDefault();" class="bg-slate-100 dark:bg-[#222] border-none rounded px-2 py-1 text-sm text-slate-800 dark:text-white focus:ring-1 focus:ring-brand-500 outline-none cursor-pointer">
+                <option value='"Inter", sans-serif'>Inter</option>
+                <option value='"Outfit", sans-serif'>Outfit</option>
+                <option value='monospace'>Monospace</option>
+                <option value='serif'>Serif</option>
+            </select>
+            
+            <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1">
+                <i class="ph ph-text-aa text-slate-500 dark:text-app-textMuted mr-1"></i>
+                <input type="number" id="text-size" class="bg-transparent border-none w-12 text-sm text-slate-800 dark:text-white outline-none" title="Font Size (Drag horizontally to scrub)">
+            </div>
+
+            <div class="w-px h-5 bg-slate-300 dark:bg-app-border"></div>
+
+            <button onmousedown="event.preventDefault();" onclick="applyTextFormat('bold')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors" title="Bold">
+                <i class="ph ph-text-b text-lg pointer-events-none"></i>
+            </button>
+            <button onmousedown="event.preventDefault();" onclick="applyTextFormat('italic')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors" title="Italic">
+                <i class="ph ph-text-italic text-lg pointer-events-none"></i>
+            </button>
+            
+            <div class="w-px h-5 bg-slate-300 dark:bg-app-border"></div>
+
+            <button onmousedown="event.preventDefault();" onclick="applyTextFormat('align', 'left')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors" title="Align Left">
+                <i class="ph ph-text-align-left text-lg pointer-events-none"></i>
+            </button>
+            <button onmousedown="event.preventDefault();" onclick="applyTextFormat('align', 'center')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors" title="Align Center">
+                <i class="ph ph-text-align-center text-lg pointer-events-none"></i>
+            </button>
+            <button onmousedown="event.preventDefault();" onclick="applyTextFormat('align', 'right')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors" title="Align Right">
+                <i class="ph ph-text-align-right text-lg pointer-events-none"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main App Layout (Sidebar + Workspace + Properties) -->
+    <div class="flex flex-1 overflow-hidden relative w-full h-full bg-white dark:bg-app-bg">
+        
+        <!-- Layers Panel (Left Sidebar) -->
+        <aside id="layer-panel" class="hidden w-72 bg-[#f8fafc] dark:bg-app-bg border-r border-slate-200 dark:border-app-border flex flex-col z-[200] shadow-[4px_0_15px_rgba(0,0,0,0.05)] dark:shadow-none h-full transition-all duration-300 shrink-0">
+            <div class="px-3 py-3 border-b border-slate-200 dark:border-app-border bg-white/60 dark:bg-app-panel">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="font-semibold text-sm tracking-wide text-slate-800 dark:text-app-text">Layers</span>
+                    <button onclick="setMode('frame')" class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5 transition-colors" title="Add Canvas">
+                        <i class="ph ph-plus text-lg"></i>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2 h-8 px-2 rounded-md border border-slate-200 dark:border-app-border bg-white dark:bg-app-bg text-slate-500 dark:text-slate-400">
+                    <i class="ph ph-magnifying-glass text-sm shrink-0"></i>
+                    <input id="layer-search" type="text" oninput="renderLayers()" placeholder="Search layers..." class="bg-transparent border-none outline-none w-full text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500">
+                    <i class="ph ph-sliders-horizontal text-sm shrink-0"></i>
+                </div>
+            </div>
+            <div id="layers-list" class="flex-1 overflow-y-auto py-2 px-2"></div>
+        </aside>
+
+        <!-- Workspace (Center) -->
+        <main id="workspace" class="flex-1 relative overflow-hidden bg-dots w-full cursor-default transition-colors duration-200 z-0">
+            
+            <!-- Rulers -->
+            <div id="ruler-corner" class="absolute top-0 left-0 w-5 h-5 z-[15] bg-white dark:bg-[#161616] border-r border-b border-slate-200 dark:border-[#333] pointer-events-none"></div>
+            <canvas id="ruler-h" class="absolute top-0 left-5 w-[calc(100%-20px)] h-5 z-[15] bg-white dark:bg-[#161616] border-b border-slate-200 dark:border-[#333] cursor-ns-resize"></canvas>
+            <canvas id="ruler-v" class="absolute top-5 left-0 w-5 h-[calc(100%-20px)] z-[15] bg-white dark:bg-[#161616] border-r border-slate-200 dark:border-[#333] cursor-ew-resize"></canvas>
+            
+            <!-- Ruler Guides -->
+            <div id="ruler-guides" class="absolute inset-0 w-full h-full pointer-events-none z-[25]"></div>
+
+            <div id="board-container" class="absolute top-0 left-0 origin-top-left" style="width: 4000px; height: 4000px;">
+                <!-- Layer 0: Connections -->
+                <svg id="connection-layer" class="absolute inset-0 w-full h-full pointer-events-none z-0"></svg>
+                <!-- Layer 1: Elements (DOM Elements) -->
+                <div id="image-layer" class="absolute inset-0 w-full h-full z-10"></div>
+                
+                <!-- Ghost Box for Drag-to-Spawn -->
+                <div id="ghost-box" class="absolute border border-brand-500 bg-brand-500/10 hidden z-[200] pointer-events-none"></div>
+
+                <!-- Path Nodes Container -->
+                <div id="path-nodes-container" class="absolute inset-0 w-full h-full pointer-events-none z-[250]"></div>
+
+                <!-- Layer 2: Drawing Canvas -->
+                <canvas id="drawing-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
+            </div>
+            
+            <!-- Selection Box (Marquee) -->
+            <div id="selection-box" class="absolute border-2 border-brand-500 dark:border-white bg-brand-500/10 dark:bg-white/10 hidden z-[100] pointer-events-none rounded-sm"></div>
+
+            <!-- Brush Size Cursor Preview -->
+            <div id="brush-cursor" class="fixed rounded-full pointer-events-none hidden border border-slate-800 dark:border-white z-[150] transform -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
+
+            <!-- Floating Layer Toggle Button (Bottom-Left) -->
+            <button id="floating-layer-btn" onclick="toggleLayerPanel()" class="absolute bottom-8 left-6 w-14 h-14 flex items-center justify-center bg-white dark:bg-app-surface/90 dark:backdrop-blur-xl border border-slate-200 dark:border-[#333] rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.3)] z-[45] text-slate-700 dark:text-app-text hover:text-brand-500 dark:hover:text-white hover:scale-105 transition-all" title="Toggle Layers">
+                <i class="ph ph-stack text-2xl"></i>
+            </button>
+        </main>
+
+        <!-- Properties Panel (Right Sidebar) -->
+        <aside id="properties-panel" class="w-64 bg-white dark:bg-app-panel border-l border-slate-200 dark:border-app-border flex flex-col z-[200] shadow-[-4px_0_15px_rgba(0,0,0,0.05)] dark:shadow-none h-full transition-all duration-300 shrink-0 relative">
+            <div class="p-3 border-b border-slate-200 dark:border-app-border flex justify-between items-center bg-slate-50 dark:bg-app-panel">
+                <span class="font-semibold text-xs tracking-wider text-slate-800 dark:text-app-text uppercase">Design</span>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="properties-empty" class="flex-1 flex items-center justify-center text-xs text-slate-500 dark:text-app-textMuted">
+                No selection
+            </div>
+
+            <!-- Properties Content -->
+            <div id="properties-content" class="flex-1 overflow-y-auto hidden flex flex-col">
+                
+                <!-- Transform Section -->
+                <div id="prop-section-transform" class="p-4 border-b border-slate-200 dark:border-app-border space-y-3 shrink-0">
+                    <h3 class="text-[11px] font-semibold text-slate-800 dark:text-app-text uppercase mb-2">Location</h3>
+                    <div class="flex gap-2">
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all">
+                            <span class="text-slate-400 text-[10px] w-3 font-semibold pointer-events-none">X</span>
+                            <input type="number" id="prop-x" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all">
+                            <span class="text-slate-400 text-[10px] w-3 font-semibold pointer-events-none">Y</span>
+                            <input type="number" id="prop-y" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                    </div>
+
+                    <h3 class="text-[11px] font-semibold text-slate-800 dark:text-app-text uppercase mt-4 mb-2">Size</h3>
+                    <div class="flex gap-2">
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all">
+                            <span class="text-slate-400 text-[10px] w-3 font-semibold pointer-events-none">W</span>
+                            <input type="number" id="prop-w" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all">
+                            <span class="text-slate-400 text-[10px] w-3 font-semibold pointer-events-none">H</span>
+                            <input type="number" id="prop-h" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                    </div>
+
+                    <h3 class="text-[11px] font-semibold text-slate-800 dark:text-app-text uppercase mt-4 mb-2">Rotation & Corner</h3>
+                    <div class="flex gap-2">
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all" title="Rotation">
+                            <i class="ph ph-angle text-slate-400 text-xs w-4 pointer-events-none"></i>
+                            <input type="number" id="prop-rot" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all" title="Corner Radius">
+                            <i class="ph ph-corners-out text-slate-400 text-xs w-4 pointer-events-none"></i>
+                            <input type="number" id="prop-radius" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Align Section -->
+                <div id="prop-section-align" class="p-4 border-b border-slate-200 dark:border-app-border space-y-2 shrink-0">
+                    <h3 class="text-[11px] font-semibold text-slate-800 dark:text-app-text uppercase">Align</h3>
+                    <div class="grid grid-cols-6 gap-1 bg-slate-100 dark:bg-[#222] rounded p-1">
+                        <button onclick="alignSelection('left')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex justify-center" title="Align Left">
+                            <i class="ph ph-align-left text-lg pointer-events-none"></i>
+                        </button>
+                        <button onclick="alignSelection('hcenter')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex justify-center" title="Align Horizontal Center">
+                            <i class="ph ph-align-center-horizontal text-lg pointer-events-none"></i>
+                        </button>
+                        <button onclick="alignSelection('right')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex justify-center" title="Align Right">
+                            <i class="ph ph-align-right text-lg pointer-events-none"></i>
+                        </button>
+                        <button onclick="alignSelection('top')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex justify-center" title="Align Top">
+                            <i class="ph ph-align-top text-lg pointer-events-none"></i>
+                        </button>
+                        <button onclick="alignSelection('vcenter')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex justify-center" title="Align Vertical Center">
+                            <i class="ph ph-align-center-vertical text-lg pointer-events-none"></i>
+                        </button>
+                        <button onclick="alignSelection('bottom')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex justify-center" title="Align Bottom">
+                            <i class="ph ph-align-bottom text-lg pointer-events-none"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Text Section -->
+                <div id="prop-section-text" class="p-4 border-b border-slate-200 dark:border-app-border space-y-3 hidden shrink-0">
+                    <h3 class="text-[11px] font-semibold text-slate-800 dark:text-app-text uppercase mb-2">Text</h3>
+                    
+                    <select id="prop-text-font" onchange="applyTextFormat('font', this.value)" class="w-full bg-slate-100 dark:bg-[#222] border-none rounded px-2 py-2 text-xs font-medium text-slate-800 dark:text-white focus:ring-1 focus:ring-brand-500 outline-none cursor-pointer mb-2">
+                        <option value='"Inter", sans-serif'>Inter</option>
+                        <option value='"Outfit", sans-serif'>Outfit</option>
+                        <option value='monospace'>Monospace</option>
+                        <option value='serif'>Serif</option>
+                    </select>
+                    
+                    <div class="flex gap-2 mb-2">
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all" title="Font Size">
+                            <i class="ph ph-text-aa text-slate-400 text-xs w-4 pointer-events-none"></i>
+                            <input type="number" id="prop-text-size" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all" title="Line Height">
+                            <i class="ph ph-line-height text-slate-400 text-xs w-4 pointer-events-none"></i>
+                            <input type="number" id="prop-text-line-height" step="0.1" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 mb-2">
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all" title="Letter Spacing">
+                            <i class="ph ph-text-a-under text-slate-400 text-xs w-4 pointer-events-none"></i>
+                            <input type="number" id="prop-text-spacing" step="0.5" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all" title="Word Spacing">
+                            <i class="ph ph-space-bar text-slate-400 text-xs w-4 pointer-events-none"></i>
+                            <input type="number" id="prop-text-word-spacing" step="0.5" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between bg-slate-100 dark:bg-[#222] rounded p-1 mb-3">
+                        <button onclick="applyTextFormat('bold')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex-1 flex justify-center" title="Bold"><i class="ph ph-text-b text-lg pointer-events-none"></i></button>
+                        <button onclick="applyTextFormat('italic')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex-1 flex justify-center" title="Italic"><i class="ph ph-text-italic text-lg pointer-events-none"></i></button>
+                        <div class="w-px h-4 bg-slate-300 dark:bg-app-border mx-1"></div>
+                        <button onclick="applyTextFormat('align', 'left')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex-1 flex justify-center" title="Align Left"><i class="ph ph-text-align-left text-lg pointer-events-none"></i></button>
+                        <button onclick="applyTextFormat('align', 'center')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex-1 flex justify-center" title="Align Center"><i class="ph ph-text-align-center text-lg pointer-events-none"></i></button>
+                        <button onclick="applyTextFormat('align', 'right')" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded text-slate-700 dark:text-app-text transition-colors flex-1 flex justify-center" title="Align Right"><i class="ph ph-text-align-right text-lg pointer-events-none"></i></button>
+                    </div>
+
+                    <h3 class="text-[11px] font-semibold text-slate-800 dark:text-app-text uppercase mb-2">Text Color</h3>
+                    <div class="flex items-center gap-2">
+                        <!-- Custom Alwan Trigger -->
+                        <button onclick="openColorPickerModal('text')" id="alwan-text-trigger" class="w-6 h-6 rounded cursor-pointer shrink-0 border border-slate-300 dark:border-[#444] shadow-inner bg-black hover:scale-110 transition-transform" title="Text"></button>
+                        <input type="text" id="prop-text-hex" class="bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-[#444] rounded px-1.5 py-1 text-xs font-medium text-slate-800 dark:text-white uppercase outline-none w-20 transition-all" onchange="syncColorInput('prop-text-hex', null, 'fill')">
+                    </div>
+                </div>
+
+                <!-- Fill Section -->
+                <div id="prop-section-fill" class="p-4 border-b border-slate-200 dark:border-app-border space-y-2 hidden shrink-0">
+                    <h3 class="text-[11px] font-semibold text-slate-800 dark:text-app-text uppercase">Fill</h3>
+                    <div class="flex items-center gap-2 mt-2">
+                        <!-- Custom Alwan Trigger -->
+                        <button onclick="openColorPickerModal('fill')" id="alwan-fill-trigger" class="w-6 h-6 rounded cursor-pointer shrink-0 border border-slate-300 dark:border-[#444] shadow-inner bg-[#e2e8f0] hover:scale-110 transition-transform" title="Fill"></button>
+                        <input type="text" id="prop-fill-hex" class="bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-[#444] rounded px-1.5 py-1 text-xs font-medium text-slate-800 dark:text-white uppercase outline-none w-[70px] shrink-0 transition-all" onchange="syncColorInput('prop-fill-hex', null, 'fill')">
+                        <div class="w-px h-5 bg-slate-300 dark:bg-app-border mx-0.5"></div>
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all" title="Fill Opacity">
+                            <i class="ph ph-drop-half-bottom text-slate-400 text-xs w-4 pointer-events-none"></i>
+                            <input type="number" id="prop-fill-opacity" min="0" max="100" value="100" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium text-right pr-1">
+                            <span class="text-xs text-slate-500 font-medium pointer-events-none">%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <button onclick="document.getElementById('fill-image-upload').click()" class="w-full bg-slate-100 dark:bg-[#222] hover:bg-slate-200 dark:hover:bg-[#333] rounded px-3 py-2 text-xs font-medium text-slate-700 dark:text-app-text transition-colors flex items-center justify-center gap-2">
+                            <i class="ph ph-image text-sm"></i>
+                            <span>Fill with Image</span>
+                        </button>
+                        <input type="file" id="fill-image-upload" class="hidden" accept="image/*" onchange="handleFillImageUpload(event)">
+                    </div>
+                </div>
+
+                <!-- Stroke Section -->
+                <div id="prop-section-stroke" class="p-4 border-b border-slate-200 dark:border-app-border space-y-2 hidden shrink-0">
+                    <h3 class="text-[11px] font-semibold text-slate-800 dark:text-app-text uppercase">Stroke</h3>
+                    <div class="flex items-center gap-2 mt-2">
+                        <!-- Custom Alwan Trigger -->
+                        <button onclick="openColorPickerModal('stroke')" id="alwan-stroke-trigger" class="w-6 h-6 rounded cursor-pointer shrink-0 border border-slate-300 dark:border-[#444] shadow-inner bg-[#94a3b8] hover:scale-110 transition-transform" title="Stroke"></button>
+                        <input type="text" id="prop-stroke-hex" class="bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-[#444] rounded px-1.5 py-1 text-xs font-medium text-slate-800 dark:text-white uppercase outline-none w-[70px] shrink-0 transition-all" onchange="syncColorInput('prop-stroke-hex', null, 'stroke')">
+                        <div class="w-px h-5 bg-slate-300 dark:bg-app-border mx-0.5"></div>
+                        <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 flex-1 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all" title="Stroke Width">
+                            <i class="ph ph-line-segments text-slate-400 text-xs w-4 pointer-events-none"></i>
+                            <input type="number" id="prop-stroke-width" min="0" max="100" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium text-right">
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 mt-2">
+                        <label class="text-[10px] text-slate-500 dark:text-app-textMuted font-medium uppercase">Stroke Align</label>
+                        <select id="prop-stroke-align" onchange="applyFormatToSelection('strokeAlign', this.value)" class="w-full bg-slate-100 dark:bg-[#222] border-none rounded px-2 py-2 text-xs font-medium text-slate-800 dark:text-white focus:ring-1 focus:ring-brand-500 outline-none cursor-pointer">
+                            <option value="center">Center</option>
+                            <option value="inner">Inner</option>
+                            <option value="outer">Outer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Appearance Section -->
+                <div id="prop-section-blend" class="p-4 border-b border-slate-200 dark:border-app-border space-y-3 hidden shrink-0">
+                    <h3 class="text-[11px] font-semibold text-slate-800 dark:text-app-text uppercase">Appearance</h3>
+                    
+                    <div class="flex items-center bg-slate-100 dark:bg-[#222] rounded px-2 py-1.5 hover:ring-1 ring-slate-300 dark:ring-[#444] transition-all" title="Opacity">
+                        <i class="ph ph-drop-half-bottom text-slate-400 text-xs w-5 pointer-events-none"></i>
+                        <input type="number" id="prop-opacity" min="0" max="100" value="100" class="bg-transparent border-none w-full text-xs text-slate-800 dark:text-white outline-none font-medium text-right pr-1">
+                        <span class="text-xs text-slate-500 font-medium pointer-events-none">%</span>
+                    </div>
+
+                    <div class="flex flex-col gap-1 mt-2">
+                        <label class="text-[10px] text-slate-500 dark:text-app-textMuted font-medium uppercase">Blend Mode</label>
+                        <select id="prop-blend-mode" onchange="applyFormatToSelection('blendMode', this.value)" class="w-full bg-slate-100 dark:bg-[#222] border-none rounded px-2 py-2 text-xs font-medium text-slate-800 dark:text-white focus:ring-1 focus:ring-brand-500 outline-none cursor-pointer">
+                            <option value="normal">Normal</option>
+                            <option value="multiply">Multiply</option>
+                            <option value="screen">Screen</option>
+                            <option value="overlay">Overlay</option>
+                            <option value="darken">Darken</option>
+                            <option value="lighten">Lighten</option>
+                            <option value="color-dodge">Color Dodge</option>
+                            <option value="color-burn">Color Burn</option>
+                            <option value="difference">Difference</option>
+                            <option value="exclusion">Exclusion</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Export Selected Section -->
+                <div class="mt-auto p-4 border-t border-slate-200 dark:border-app-border shrink-0">
+                    <button onclick="exportSelected()" id="btn-export-selected" class="w-full bg-slate-800 dark:bg-white hover:bg-slate-700 dark:hover:bg-slate-200 text-white dark:text-black text-xs font-semibold py-2.5 rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm">
+                        <i class="ph ph-export text-base"></i> Export Selected
+                    </button>
+                </div>
+
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Floating Color Picker Modal (Premium Custom) -->
+    <div id="color-picker-modal" class="hidden fixed bg-white dark:bg-[#1c1c1c] rounded-2xl border border-slate-200 dark:border-[#303030] z-[9999] w-[252px] overflow-hidden" style="top:50%;left:50%;transform:translate(-50%,-50%);touch-action:none;box-shadow:0 28px 70px rgba(0,0,0,0.55);">
+        <div id="color-picker-header" class="flex items-center justify-between px-3.5 py-2.5 border-b border-slate-100 dark:border-[#272727] cursor-move select-none">
+            <span id="cp-title" class="text-[10px] font-bold text-slate-400 dark:text-[#666] uppercase tracking-widest">Color</span>
+            <button onclick="closeColorPickerModal()" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-[#555] dark:hover:text-white rounded-md transition-colors"><i class="ph ph-x text-sm"></i></button>
+        </div>
+        <div class="p-3 space-y-2.5">
+            <div id="cp-sv-field" class="relative w-full rounded-lg overflow-hidden" style="height:160px;cursor:crosshair;">
+                <div id="cp-sv-hue-bg" class="absolute inset-0"></div>
+                <div class="absolute inset-0" style="background:linear-gradient(to right,#fff,transparent);"></div>
+                <div class="absolute inset-0" style="background:linear-gradient(to bottom,transparent,#000);"></div>
+                <div id="cp-sv-cursor"></div>
+            </div>
+            <div id="cp-hue-slider" class="relative h-3 rounded-full cursor-pointer" style="background:linear-gradient(to right,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%);">
+                <div id="cp-hue-thumb" class="cp-thumb"></div>
+            </div>
+            <div class="relative h-3 rounded-full" style="background-image:repeating-conic-gradient(#bbb 0% 25%,#e5e5e5 0% 50%);background-size:10px 10px;">
+                <div id="cp-alpha-track" class="absolute inset-0 rounded-full cursor-pointer">
+                    <div id="cp-alpha-overlay" class="absolute inset-0 rounded-full"></div>
+                    <div id="cp-alpha-thumb" class="cp-thumb"></div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="flex rounded-lg overflow-hidden border border-slate-200 dark:border-[#333] shrink-0" style="width:40px;height:28px;">
+                    <div id="cp-preview-old" class="w-1/2 h-full cursor-pointer" title="Click to revert"></div>
+                    <div id="cp-preview-new" class="w-1/2 h-full"></div>
+                </div>
+                <input id="cp-hex-input" type="text" maxlength="7" placeholder="#000000" class="cp-num-input flex-1 text-left px-2 py-1.5 text-xs font-mono uppercase bg-slate-100 dark:bg-[#272727] rounded-lg border border-transparent focus:border-brand-500 outline-none text-slate-800 dark:text-white transition-colors">
+                <div class="flex flex-col items-center gap-0.5 shrink-0" style="width:38px;">
+                    <input id="cp-alpha-input" type="number" min="0" max="100" class="cp-num-input py-1.5 bg-slate-100 dark:bg-[#272727] rounded-lg border border-transparent focus:border-brand-500 outline-none text-slate-800 dark:text-white transition-colors">
+                    <span class="text-[9px] text-slate-400 dark:text-[#555] font-bold uppercase">Opac</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5">
+                <div class="flex flex-col items-center gap-0.5"><input id="cp-r-input" type="number" min="0" max="255" class="cp-num-input py-1.5 bg-slate-100 dark:bg-[#272727] rounded-lg border border-transparent focus:border-brand-500 outline-none text-slate-800 dark:text-white"><span class="text-[9px] text-slate-400 dark:text-[#555] font-bold">R</span></div>
+                <div class="flex flex-col items-center gap-0.5"><input id="cp-g-input" type="number" min="0" max="255" class="cp-num-input py-1.5 bg-slate-100 dark:bg-[#272727] rounded-lg border border-transparent focus:border-brand-500 outline-none text-slate-800 dark:text-white"><span class="text-[9px] text-slate-400 dark:text-[#555] font-bold">G</span></div>
+                <div class="flex flex-col items-center gap-0.5"><input id="cp-b-input" type="number" min="0" max="255" class="cp-num-input py-1.5 bg-slate-100 dark:bg-[#272727] rounded-lg border border-transparent focus:border-brand-500 outline-none text-slate-800 dark:text-white"><span class="text-[9px] text-slate-400 dark:text-[#555] font-bold">B</span></div>
+            </div>
+            <div>
+                <div class="text-[9px] font-bold text-slate-400 dark:text-[#555] uppercase tracking-widest mb-1.5">Swatches</div>
+                <div id="cp-swatches" class="flex flex-wrap gap-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- EXPORT MODAL  (Figma-style: multi-format + scale)            -->
+    <!-- ============================================================ -->
+    <div id="export-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] flex items-center justify-center p-4" onclick="if(event.target===this)closeExportModal()">
+        <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-[0_32px_80px_rgba(0,0,0,0.6)] w-full max-w-sm border border-slate-200 dark:border-[#2e2e2e] overflow-hidden">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-[#252525]">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md">
+                        <i class="ph ph-export text-white text-base"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-800 dark:text-white leading-none">Export</h2>
+                        <p id="export-subtitle" class="text-[10px] text-slate-400 dark:text-[#666] mt-0.5">Selected object</p>
+                    </div>
+                </div>
+                <button onclick="closeExportModal()" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-[#555] dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-[#2a2a2a] transition-all">
+                    <i class="ph ph-x text-sm"></i>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-5">
+
+                <!-- Format Selector -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 dark:text-[#666] uppercase tracking-widest mb-2">Format</label>
+                    <div class="grid grid-cols-4 gap-1.5" id="export-format-tabs">
+                        <button onclick="setExportFormat('png')" data-fmt="png"  class="export-fmt-btn active-fmt flex flex-col items-center gap-1 py-2.5 rounded-xl border text-xs font-semibold transition-all">
+                            <i class="ph ph-file-png text-lg"></i> PNG
+                        </button>
+                        <button onclick="setExportFormat('jpg')" data-fmt="jpg"  class="export-fmt-btn flex flex-col items-center gap-1 py-2.5 rounded-xl border text-xs font-semibold transition-all">
+                            <i class="ph ph-file-jpg text-lg"></i> JPG
+                        </button>
+                        <button onclick="setExportFormat('svg')" data-fmt="svg"  class="export-fmt-btn flex flex-col items-center gap-1 py-2.5 rounded-xl border text-xs font-semibold transition-all">
+                            <i class="ph ph-file-svg text-lg"></i> SVG
+                        </button>
+                        <button onclick="setExportFormat('pdf')" data-fmt="pdf"  class="export-fmt-btn flex flex-col items-center gap-1 py-2.5 rounded-xl border text-xs font-semibold transition-all">
+                            <i class="ph ph-file-pdf text-lg"></i> PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Scale Selector (hidden for SVG/PDF) -->
+                <div id="export-scale-section">
+                    <label class="block text-[10px] font-bold text-slate-400 dark:text-[#666] uppercase tracking-widest mb-2">Scale</label>
+                    <div class="grid grid-cols-5 gap-1.5" id="export-scale-tabs">
+                        <button onclick="setExportScale(1)"  data-scale="1"  class="export-scale-btn py-2 rounded-xl border text-xs font-bold transition-all">1×</button>
+                        <button onclick="setExportScale(2)"  data-scale="2"  class="export-scale-btn active-scale py-2 rounded-xl border text-xs font-bold transition-all">2×</button>
+                        <button onclick="setExportScale(4)"  data-scale="4"  class="export-scale-btn py-2 rounded-xl border text-xs font-bold transition-all">4×</button>
+                        <button onclick="setExportScale(6)"  data-scale="6"  class="export-scale-btn py-2 rounded-xl border text-xs font-bold transition-all">6×</button>
+                        <button onclick="setExportScale(8)"  data-scale="8"  class="export-scale-btn py-2 rounded-xl border text-xs font-bold transition-all">8×</button>
+                    </div>
+                </div>
+
+                <!-- JPG Quality (only for JPG) -->
+                <div id="export-quality-section" class="hidden">
+                    <label class="flex justify-between text-[10px] font-bold text-slate-400 dark:text-[#666] uppercase tracking-widest mb-2">
+                        <span>JPG Quality</span>
+                        <span id="export-quality-val" class="text-violet-500">92%</span>
+                    </label>
+                    <input id="export-quality-slider" type="range" min="10" max="100" value="92" step="1"
+                        oninput="document.getElementById('export-quality-val').textContent=this.value+'%'"
+                        class="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-violet-500 bg-slate-200 dark:bg-[#333]">
+                </div>
+
+                <!-- PDF Options (only for PDF) -->
+                <div id="export-pdf-section" class="hidden space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 dark:text-[#666] uppercase tracking-widest mb-2">Paper Size</label>
+                        <select id="pdf-size" class="w-full bg-slate-50 dark:bg-[#222] border border-slate-200 dark:border-[#333] rounded-xl px-3 py-2.5 text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-violet-500">
+                            <option value="a4">A4</option>
+                            <option value="a3">A3</option>
+                            <option value="letter">Letter</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 dark:text-[#666] uppercase tracking-widest mb-2">Mode</label>
+                        <select id="pdf-mode" class="w-full bg-slate-50 dark:bg-[#222] border border-slate-200 dark:border-[#333] rounded-xl px-3 py-2.5 text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-violet-500">
+                            <option value="fit">Fit to 1 Page</option>
+                            <option value="split">Split to Multiple Pages</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Preview size hint -->
+                <p id="export-size-hint" class="text-[10px] text-slate-400 dark:text-[#555] text-center -mt-1"></p>
+
+                <!-- Export Button -->
+                <button id="btn-execute-export" onclick="executeExport()"
+                    class="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-sm py-3 rounded-xl transition-all shadow-lg shadow-violet-500/25 flex items-center justify-center gap-2 active:scale-[0.98]">
+                    <i class="ph ph-download-simple text-base"></i>
+                    <span id="btn-execute-label">Export PNG</span>
+                </button>
+
+                <div id="export-loading" class="hidden text-center text-xs text-violet-500 animate-pulse font-semibold -mt-2">
+                    Processing, please wait…
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Loading Overlay -->
+    <div id="global-loading" class="hidden fixed inset-0 bg-white/50 dark:bg-black/60 backdrop-blur-md z-[300] flex flex-col items-center justify-center transition-opacity">
+        <div class="bg-white dark:bg-app-surface/90 dark:backdrop-blur-xl py-5 px-8 rounded-xl shadow-2xl flex flex-col items-center gap-4 border border-slate-200 dark:border-[#333]">
+            <i class="ph ph-spinner-gap animate-spin text-4xl text-slate-800 dark:text-white"></i>
+            <span id="global-loading-text" class="text-base font-semibold tracking-wide text-slate-700 dark:text-app-text font-display">Memproses...</span>
+        </div>
+    </div>
+
+    <script src="board.js"></script>
+
+</body>
+</html>
