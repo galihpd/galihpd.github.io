@@ -1,0 +1,100 @@
+﻿{
+    "status":  true,
+    "data":  [
+                 {
+                     "number":  1,
+                     "name":  "Al-Fatihah",
+                     "name_latin":  "Al-Fatihah",
+                     "number_of_ayahs":  7,
+                     "translation":  "Pembukaan",
+                     "revelation":  "Makkiyah",
+                     "description":  "Surat Al Faatihah (Pembukaan) yang diturunkan di Mekah dan terdiri dari 7 ayat adalah surat yang pertama-tama diturunkan dengan lengkap  diantara surat-surat yang ada dalam Al Quran dan termasuk golongan surat Makkiyyah. Surat ini disebut Al Faatihah (Pembukaan), karena dengan surat inilah dibuka dan dimulainya Al Quran. Dinamakan Ummul Quran (induk Al Quran) atau Ummul Kitaab (induk Al Kitaab) karena dia merupakan induk dari semua isi Al Quran, dan karena itu diwajibkan membacanya pada tiap-tiap sembahyang. Dinamakan pula As Sab\u0027ul matsaany (tujuh yang berulang-ulang) karena ayatnya tujuh dan dibaca berulang-ulang dalam sholat.",
+                     "audio_url":  "https://cdn.myquran.com/audio/surah/1.mp3"
+                 },
+                 {
+                     "number":  2,
+                     "name":  "Al-Baqarah",
+                     "name_latin":  "Al-Baqarah",
+                     "number_of_ayahs":  286,
+                     "translation":  "Sapi",
+                     "revelation":  "Madaniyah",
+                     "description":  "Surat Al Baqarah yang 286 ayat itu turun di Madinah yang sebahagian besar diturunkan pada permulaan tahun Hijrah, kecuali ayat 281 diturunkan di Mina pada Hajji wadaa\u0027 (hajji Nabi Muhammad s.a.w. yang terakhir). Seluruh ayat dari surat Al Baqarah termasuk golongan Madaniyyah, merupakan surat yang terpanjang di antara surat-surat Al Quran yang di dalamnya terdapat pula ayat yang terpancang (ayat 282). Surat ini dinamai Al Baqarah karena di dalamnya disebutkan kisah penyembelihan sapi betina yang diperintahkan Allah kepada Bani Israil (ayat 67 sampai dengan 74), dimana dijelaskan watak orang Yahudi pada umumnya. Dinamai Fusthaatul-Quran (puncak Al Quran) karena memuat beberapa hukum yang tidak disebutkan dalam surat yang lain. Dinamai juga surat  alif-laam-miim karena surat ini dimulai dengan Alif-laam-miim.",
+                     "audio_url":  "https://cdn.myquran.com/audio/surah/2.mp3"
+                 },
+                 {
+                     "number":  3,
+                     "name":  "Ali \u0027Imran",
+                     "name_latin":  "Ali \u0027Imran",
+                     "number_of_ayahs":  200,
+                     "translation":  "Keluarga Imran",
+                     "revelation":  "Madaniyah",
+                     "description":  "Surat Ali \u0027Imran yang terdiri dari 200 ayat ini adalah surat Madaniyyah.  Dinamakan Ali \u0027Imran karena memuat kisah keluarga \u0027Imran yang di dalam kisah itu disebutkan kelahiran Nabi Isa a.s., persamaan kejadiannya dengan Nabi Adam a. s., kenabian dan beberapa mukjizatnya, serta disebut pula kelahiran Maryam puteri \u0027Imran, ibu dari Nabi Isa a.s. Surat Al Baqarah dan Ali \u0027Imran ini dinamakan Az Zahrawaani (dua yang cemerlang), karena kedua surat ini menyingkapkan hal-hal yang disembunyikan oleh para Ahli Kitab, seperti kejadian dan kelahiran Nabi Isa a.s., kedatangan Nabi Muhammad s.a.w. dan sebagainya.",
+                     "audio_url":  "https://cdn.myquran.com/audio/surah/3.mp3"
+                 },
+                 {
+                     "number":  4,
+                     "name":  "An-Nisa\u0027",
+                     "name_latin":  "An-Nisa\u0027",
+                     "number_of_ayahs":  176,
+                     "translation":  "Wanita",
+                     "revelation":  "Madaniyah",
+                     "description":  "Surat An Nisaa\u0027 yang terdiri dari 176 ayat itu, adalah surat Madaniyyah yang terpanjang sesudah surat Al Baqarah. Dinamakan An Nisaa\u0027 karena dalam surat ini banyak dibicarakan hal-hal yang berhubungan dengan wanita serta merupakan surat yang paling membicarakan hal itu dibanding dengan surat-surat yang lain. Surat yang lain banyak juga yang membicarakan tentang hal wanita ialah surat Ath Thalaq. Dalam hubungan ini biasa disebut surat An Nisaa\u0027 dengan sebutan: Surat An Nisaa\u0027 Al Kubraa (surat An Nisaa\u0027 yang besar), sedang  surat Ath Thalaq disebut dengan sebutan: Surat An Nisaa\u0027 Ash Shughraa (surat An Nisaa\u0027 yang kecil).",
+                     "audio_url":  "https://cdn.myquran.com/audio/surah/4.mp3"
+                 },
+                 {
+                     "number":  5,
+                     "name":  "Al-Ma\u0027idah",
+                     "name_latin":  "Al-Ma\u0027idah",
+                     "number_of_ayahs":  120,
+                     "translation":  "Hidangan",
+                     "revelation":  "Madaniyah",
+                     "description":  "Surat Al Maa\u0027idah terdiri dari 120 ayat; termasuk golongan surat Madaniyyah. Sekalipun ada ayatnya yang turun di Mekah, namun ayat ini diturunkan sesudah Nabi Muhammad s.a.w. hijrah ke Medinah, yaitu di waktu haji wadaa\u0027. Surat ini dinamakan Al Maa\u0027idah (hidangan) karena memuat kisah pengikut-pengikut setia Nabi Isa a.s. meminta kepada Nabi Isa a.s. agar Allah menurunkan untuk mereka Al Maa\u0027idah (hidangan makanan) dari langit (ayat 112). Dan dinamakan Al Uqud (perjanjian), karena kata itu terdapat pada ayat pertama surat ini, dimana Allah menyuruh agar hamba-hamba-Nya memenuhi janji prasetia terhadap Allah dan perjanjian-perjanjian yang mereka buat sesamanya. Dinamakan juga Al Munqidz (yang menyelamatkan), karena akhir surat ini mengandung kisah tentang Nabi Isa a.s. penyelamat pengikut-pengikut setianya dari azab Allah.",
+                     "audio_url":  "https://cdn.myquran.com/audio/surah/5.mp3"
+                 },
+                 {
+                     "number":  6,
+                     "name":  "Al-An\u0027am",
+                     "name_latin":  "Al-An\u0027am",
+                     "number_of_ayahs":  165,
+                     "translation":  "Binatang Ternak",
+                     "revelation":  "Makkiyah",
+                     "description":  "Surat Al An\u0027aam (binatang ternak: unta, sapi, biri-biri dan kambing) yang terdiri atas 165 ayat, termasuk golongan surat Makkiyah, karena hampur seluruh ayat-ayat-Nya diturunkan di Mekah dekat sebelum hijrah. Dinamakan Al An\u0027aam karena di dalamnya disebut kata An\u0027aam dalam hubungan dengan adat-istiadat kaum musyrikin, yang menurut mereka binatang-binatang ternak itu dapat dipergunakan untuk mendekatkan diri kepada tuhan mereka. Juga dalam surat ini disebutkan hukum-hukum yang berkenaan dengan binatang ternak itu.",
+                     "audio_url":  "https://cdn.myquran.com/audio/surah/6.mp3"
+                 },
+                 {
+                     "number":  7,
+                     "name":  "Al-A\u0027raf",
+                     "name_latin":  "Al-A\u0027raf",
+                     "number_of_ayahs":  206,
+                     "translation":  "Tempat Tertinggi",
+                     "revelation":  "Makkiyah",
+                     "description":  "Surat Al A\u0027raaf yang berjumlah 206 ayat termasuk golongan surat Makkiyah, diturunkan sebelum turunnya surat Al An\u0027aam dan termasuk golongan surat Assab \u0027uththiwaal (tujuh surat yang panjang). Dinamakan Al A\u0027raaf karena perkataan Al A\u0027raaf terdapat dalam ayat 46 yang mengemukakan tentang keadaan orang-orang yang berada di atas Al A\u0027raaf yaitu: tempat yang tertinggi di batas surga dan neraka.",
+                     "audio_url":  "https://cdn.myquran.com/audio/surah/7.mp3"
+                 },
+                 {
+                     "number":  8,
+                     "name":  "Al-Anfal",
+                     "name_latin":  "Al-Anfal",
+                     "number_of_ayahs":  75,
+                     "translation":  "Rampasan Perang",
+                     "revelation":  "Madaniyah",
+                     "description":  "Surat Al Anfaal terdiri atas 75 ayat dan termasuk golongan surat-surat Madaniyyah, karena seluruh ayat-ayatnya diturunkan di Madinah. Surat ini dinamakan Al Anfaal yang berarti harta rampasan perang berhubung kata Al Anfaal terdapat pada permulaan surat ini dan juga persoalan yang menonjol dalam surat ini ialah tentang harta rampasan perang, hukum perang dan hal-hal yang berhubungan dengan peperangan pada umumnya. Menurut riwayat Ibnu Abbas r.a. surat ini diturunkan berkenaan dengan perang Badar Kubra yang terjadi pada tahun kedua hijrah. Peperangan ini sangat penting artinya, karena dialah yang menentukan jalan sejarah Perkembangan Islam. Pada waktu itu umat Islam dengan berkekuatan kecil untuk pertama kali dapat mengalahkan kaum musyrikin yang berjumlah besar, dan berperlengkapan yang cukup, dan mereka dalam peperangan ini memperoleh harta rampasan perang yang tidak sedikit. Oleh sebab itu timbullah masalah bagaimana membagi harta-harta rampasan perang itu, maka kemudian Allah menurunkan ayat pertama dari surat ini.",
+                     "audio_url":  "https://cdn.myquran.com/audio/surah/8.mp3"
+                 },
+                 {
+                     "number":  9,
+                     "name":  "At-Taubah",
+                     "name_latin":  "At-Taubah",
+                     "number_of_ayahs":  129,
+                     "translation":  "Pengampunan",
+                     "revelation":  "Madaniyah",
+                     "description":  "Surat At Taubah terdiri atas 129 ayat termasuk golongan surat-surat Madaniyyah. Surat ini dinamakan At Taubah yang berarti pengampunan berhubung kata At Taubah berulang kali disebut dalam surat ini. Dinamakan juga dengan Baraah yang berarti berlepas diri yang di sini maksudnya pernyataan pemutusan perhubungan, disebabkan kebanyakan pokok pembicaraannya tentang pernyataan pemutusan perjanjian damai dengan kaum musyrikin.  Di samping kedua nama yang masyhur itu ada lagi beberapa nama yang lain yang merupakan sifat dari surat ini.  Berlainan dengan surat-surat yang lain, maka pada permulaan surat ini tidak terdapat basmalah, karena surat ini adalah pernyataan perang dengan arti bahwa segenap kaum muslimin dikerahkan untuk memerangi seluruh kaum musyrikin, sedangkan basmalah bernafaskan perdamaian dan cinta kasih Allah.  Surat ini diturunkan sesudah Nabi Muhammad s.a.w. kembali dari peperangan Tabuk yang terjadi pada tahun 9 H. Pengumuman ini disampaikan oleh Saidina \u0027Ali r.a. pada musim haji tahun itu juga.",
+                     "audio_url":  "https://cdn.myquran.com/audio/surah/9.mp3"
+                 },
+                 {
+                     "number":  10,
+                     "name":  "Yunus",
+                     "name_latin":  "Yunus",
+                     "number_of_ayahs":  109,
+                     "translation":  "Yunus",
+                     "revelation":  "Makkiyah",

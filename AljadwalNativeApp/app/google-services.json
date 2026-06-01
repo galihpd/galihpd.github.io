@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "704540253863",
+    "project_id": "aljadwal-abefe",
+    "storage_bucket": "aljadwal-abefe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704540253863:android:03d2d85a6c0f344aae8582",
+        "android_client_info": {
+          "package_name": "com.afaliun.aljadwal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "704540253863-lceq5nnna8u6837v16cgvhnpcc7pm0ff.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afaliun.aljadwal",
+            "certificate_hash": "90c59a6e17585e7b57ec249ff2ee7affe38c0319"
+          }
+        },
+        {
+          "client_id": "704540253863-rkpr55nts0vp5icdvoqddtq13o1su2fu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHxpD8sZwQGt3gkM8RWr4PJr2F9F4W1K8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "704540253863-rkpr55nts0vp5icdvoqddtq13o1su2fu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
