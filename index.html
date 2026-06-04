@@ -362,6 +362,107 @@
       color: var(--ink3);
     }
 
+    /* ── GALLERY (3D Artwork) ── */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .gallery-item {
+      border: 0.5px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.25s;
+      background: var(--bg2);
+    }
+
+    .gallery-item:hover {
+      border-color: var(--border2);
+      transform: translateY(-3px);
+    }
+
+    .gallery-item:hover .item-overlay {
+      opacity: 1;
+    }
+
+    .gallery-item.wide {
+      grid-column: span 2;
+    }
+
+    .gallery-thumb {
+      aspect-ratio: 1;
+      background: var(--bg2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery-item.wide .gallery-thumb {
+      aspect-ratio: 2/1;
+    }
+
+    .gallery-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      position: absolute;
+      inset: 0;
+    }
+
+    .item-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: flex-end;
+      padding: 14px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .item-info { display: flex; flex-direction: column; gap: 3px; }
+    .item-label { font-size: 12px; color: #fff; font-weight: 500; }
+    .item-tag   { font-family: var(--fm); font-size: 10px; color: rgba(255,255,255,0.55); letter-spacing: 0.08em; }
+
+    .gallery-meta {
+      padding: 10px 12px;
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .meta-name { font-size: 12px; font-weight: 500; }
+    .meta-tag  { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.06em; }
+
+    /* sub-section divider inside a section */
+    .sub-section {
+      margin-top: 3rem;
+    }
+
+    .sub-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .sub-section-title {
+      font-family: var(--fm);
+      font-size: 10.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink3);
+    }
+
+    @media (max-width: 700px) {
+      .gallery { grid-template-columns: 1fr 1fr; }
+      .gallery-item.wide { grid-column: span 2; }
+    }
+
     /* ── PROJECT CARDS ── */
     .projects-grid {
       display: grid;
@@ -1187,149 +1288,334 @@
     <section id="work">
       <div class="section-header">
         <span class="section-title">Selected Work</span>
-        <span class="section-count">06 Projects</span>
       </div>
-      <div class="projects-grid">
 
-        <!-- FEATURED: Dantist -->
-        <div class="project-card featured">
-          <div class="project-thumb">
-            <div class="project-thumb-placeholder">
-              <span class="project-thumb-label">Dantist &mdash; Network Simulator</span>
+      <!-- 3D ARTWORK -->
+      <div class="sub-section-header">
+        <span class="sub-section-title">3D Artwork</span>
+        <span class="section-count">06 Pieces</span>
+      </div>
+      <div class="gallery">
+
+        <div class="gallery-item wide">
+          <div class="gallery-thumb">
+            <img src="assets/images/main1.jpg" alt="Modular City Block">
+            <div class="item-overlay">
+              <div class="item-info">
+                <span class="item-label">Modular City Block</span>
+                <span class="item-tag">Environment &middot; Props &middot; Real-Time</span>
+              </div>
             </div>
           </div>
-          <div class="project-body">
-            <div class="project-tags">
-              <span class="project-tag">JavaScript</span>
-              <span class="project-tag">Tailwind CSS</span>
-              <span class="project-tag">Network Sim</span>
-              <span class="project-tag">WebGL</span>
-            </div>
-            <div class="project-name">Dantist &mdash; Network Simulator</div>
-            <div class="project-case">
-              <div class="case-row">
-                <span class="case-label">Problem</span>
-                <span class="case-text">Teaching network topology concepts requires expensive physical hardware or abstract diagrams that don&rsquo;t simulate real behavior.</span>
-              </div>
-              <div class="case-row">
-                <span class="case-label">Solution</span>
-                <span class="case-text">Built a browser-based interactive network simulator: drag-and-drop nodes, configurable links, real-time packet routing visualization, and a built-in CLI. Solo build.</span>
-              </div>
-              <div class="case-row">
-                <span class="case-label">Impact</span>
-                <span class="case-text">Zero installation required &mdash; runs entirely in the browser. Demonstrates complex networking logic without any backend infrastructure.</span>
-              </div>
-            </div>
-            <div class="project-links">
-              <a href="../dantist/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
-            </div>
+          <div class="gallery-meta">
+            <span class="meta-name">Modular City Block</span>
+            <span class="meta-tag">Environment + Props</span>
           </div>
         </div>
 
-        <!-- Nova -->
-        <div class="project-card">
-          <div class="project-thumb">
-            <div class="project-thumb-placeholder">
-              <span class="project-thumb-label">Nova &mdash; Mission Dashboard</span>
+        <div class="gallery-item">
+          <div class="gallery-thumb">
+            <img src="assets/images/main2.jpg" alt="Hard Surface Prop">
+            <div class="item-overlay">
+              <div class="item-info">
+                <span class="item-label">Hard Surface Prop</span>
+                <span class="item-tag">Hard Surface &middot; PBR</span>
+              </div>
             </div>
           </div>
-          <div class="project-body">
-            <div class="project-tags">
-              <span class="project-tag">Three.js</span>
-              <span class="project-tag">D3.js</span>
-              <span class="project-tag">Chart.js</span>
-              <span class="project-tag">TopoJSON</span>
-            </div>
-            <div class="project-name">Nova &mdash; Mission Control Dashboard</div>
-            <div class="project-case">
-              <div class="case-row">
-                <span class="case-label">Problem</span>
-                <span class="case-text">Satellite tracking data is dense and hard to visualize across multiple simultaneous data streams in a single interface.</span>
-              </div>
-              <div class="case-row">
-                <span class="case-label">Solution</span>
-                <span class="case-text">Built a real-time mission control dashboard with a 3D interactive Earth (Three.js), live telemetry panels, and multi-chart data visualization.</span>
-              </div>
-              <div class="case-row">
-                <span class="case-label">Impact</span>
-                <span class="case-text">Demonstrates ability to combine 3D rendering, real-time data, and complex UI in a single coherent product.</span>
-              </div>
-            </div>
-            <div class="project-links">
-              <a href="../nova/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
-            </div>
+          <div class="gallery-meta">
+            <span class="meta-name">Hard Surface Prop</span>
+            <span class="meta-tag">Hard Surface</span>
           </div>
         </div>
 
-        <!-- Al-Jadwal -->
-        <div class="project-card">
-          <div class="project-thumb">
-            <div class="project-thumb-placeholder">
-              <span class="project-thumb-label">Al-Jadwal &mdash; Prayer Scheduler</span>
+        <div class="gallery-item">
+          <div class="gallery-thumb">
+            <img src="assets/images/main3.jpg" alt="Armored Vehicle">
+            <div class="item-overlay">
+              <div class="item-info">
+                <span class="item-label">Armored Vehicle</span>
+                <span class="item-tag">Hard Surface &middot; Game Asset</span>
+              </div>
             </div>
           </div>
-          <div class="project-body">
-            <div class="project-tags">
-              <span class="project-tag">JavaScript</span>
-              <span class="project-tag">Leaflet.js</span>
-              <span class="project-tag">REST API</span>
-              <span class="project-tag">Geolocation</span>
-            </div>
-            <div class="project-name">Al-Jadwal &mdash; Prayer Time Scheduler</div>
-            <div class="project-case">
-              <div class="case-row">
-                <span class="case-label">Problem</span>
-                <span class="case-text">Generic prayer apps don&rsquo;t account for precise local coordinates, giving inaccurate prayer times for users in smaller cities or rural areas.</span>
-              </div>
-              <div class="case-row">
-                <span class="case-label">Solution</span>
-                <span class="case-text">Built a web app using geolocation API + an external prayer time API, with an interactive map to let users fine-tune their exact location.</span>
-              </div>
-              <div class="case-row">
-                <span class="case-label">Impact</span>
-                <span class="case-text">Accurate to GPS coordinates. Fully client-side, no account required, works offline after first load.</span>
-              </div>
-            </div>
-            <div class="project-links">
-              <a href="../aljadwal/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
-            </div>
+          <div class="gallery-meta">
+            <span class="meta-name">Armored Vehicle</span>
+            <span class="meta-tag">Hard Surface</span>
           </div>
         </div>
 
-        <!-- BillBuddy -->
-        <div class="project-card">
-          <div class="project-thumb">
-            <div class="project-thumb-placeholder">
-              <span class="project-thumb-label">Bills &mdash; Expense Tracker</span>
+        <div class="gallery-item wide">
+          <div class="gallery-thumb">
+            <img src="assets/images/main4.jpg" alt="Industrial Zone Scene">
+            <div class="item-overlay">
+              <div class="item-info">
+                <span class="item-label">Industrial Zone Scene</span>
+                <span class="item-tag">Environment &middot; Props &middot; Lighting</span>
+              </div>
             </div>
           </div>
-          <div class="project-body">
-            <div class="project-tags">
-              <span class="project-tag">JavaScript</span>
-              <span class="project-tag">Chart.js</span>
-              <span class="project-tag">Google OAuth</span>
-              <span class="project-tag">Local Storage</span>
-            </div>
-            <div class="project-name">Bills &mdash; Personal Finance Tracker</div>
-            <div class="project-case">
-              <div class="case-row">
-                <span class="case-label">Problem</span>
-                <span class="case-text">Tracking shared and personal expenses across multiple categories is tedious without a dedicated tool that also visualizes spending patterns.</span>
-              </div>
-              <div class="case-row">
-                <span class="case-label">Solution</span>
-                <span class="case-text">Built a full-featured finance tracker with Google Sign-In, category breakdown charts, multi-currency support, and export functionality.</span>
-              </div>
-              <div class="case-row">
-                <span class="case-label">Impact</span>
-                <span class="case-text">Persistent data via local storage. Used as personal daily finance tool since launch.</span>
-              </div>
-            </div>
-            <div class="project-links">
-              <a href="../bills/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
-            </div>
+          <div class="gallery-meta">
+            <span class="meta-name">Industrial Zone Scene</span>
+            <span class="meta-tag">Environment</span>
           </div>
         </div>
+
+        <div class="gallery-item">
+          <div class="gallery-thumb">
+            <img src="assets/images/main5.jpg" alt="Forest Environment">
+            <div class="item-overlay">
+              <div class="item-info">
+                <span class="item-label">Forest Environment</span>
+                <span class="item-tag">Environment &middot; Nature</span>
+              </div>
+            </div>
+          </div>
+          <div class="gallery-meta">
+            <span class="meta-name">Forest Environment</span>
+            <span class="meta-tag">Environment</span>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="gallery-thumb">
+            <img src="assets/images/main6.jpg" alt="Sci-Fi Console">
+            <div class="item-overlay">
+              <div class="item-info">
+                <span class="item-label">Sci-Fi Console</span>
+                <span class="item-tag">Hard Surface &middot; Real-Time</span>
+              </div>
+            </div>
+          </div>
+          <div class="gallery-meta">
+            <span class="meta-name">Sci-Fi Console</span>
+            <span class="meta-tag">Hard Surface</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SOFTWARE PROJECTS -->
+      <div class="sub-section">
+        <div class="sub-section-header">
+          <span class="sub-section-title">Software Projects</span>
+          <span class="section-count">06 Apps</span>
+        </div>
+        <div class="projects-grid">
+
+          <!-- FEATURED: Dantist -->
+          <div class="project-card featured">
+            <div class="project-thumb">
+              <div class="project-thumb-placeholder">
+                <span class="project-thumb-label">Dantist &mdash; Network Simulator</span>
+              </div>
+            </div>
+            <div class="project-body">
+              <div class="project-tags">
+                <span class="project-tag">JavaScript</span>
+                <span class="project-tag">Tailwind CSS</span>
+                <span class="project-tag">Network Sim</span>
+                <span class="project-tag">WebGL</span>
+              </div>
+              <div class="project-name">Dantist &mdash; Network Simulator</div>
+              <div class="project-case">
+                <div class="case-row">
+                  <span class="case-label">Problem</span>
+                  <span class="case-text">Teaching network topology concepts requires expensive hardware or abstract diagrams that don&rsquo;t simulate real behavior.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Solution</span>
+                  <span class="case-text">Built a browser-based interactive network simulator: drag-and-drop nodes, configurable links, real-time packet routing visualization, and a built-in CLI. Solo build.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Impact</span>
+                  <span class="case-text">Zero installation required &mdash; runs entirely in the browser. Demonstrates complex networking logic without any backend infrastructure.</span>
+                </div>
+              </div>
+              <div class="project-links">
+                <a href="../dantist/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nova -->
+          <div class="project-card">
+            <div class="project-thumb">
+              <div class="project-thumb-placeholder">
+                <span class="project-thumb-label">Nova &mdash; Mission Dashboard</span>
+              </div>
+            </div>
+            <div class="project-body">
+              <div class="project-tags">
+                <span class="project-tag">Three.js</span>
+                <span class="project-tag">D3.js</span>
+                <span class="project-tag">Chart.js</span>
+                <span class="project-tag">TopoJSON</span>
+              </div>
+              <div class="project-name">Nova &mdash; Mission Control Dashboard</div>
+              <div class="project-case">
+                <div class="case-row">
+                  <span class="case-label">Problem</span>
+                  <span class="case-text">Satellite tracking data is dense and hard to visualize across multiple simultaneous data streams in a single interface.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Solution</span>
+                  <span class="case-text">Built a real-time mission control dashboard with a 3D interactive Earth (Three.js), live telemetry panels, and multi-chart data visualization.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Impact</span>
+                  <span class="case-text">Demonstrates ability to combine 3D rendering, real-time data, and complex UI in a single coherent product.</span>
+                </div>
+              </div>
+              <div class="project-links">
+                <a href="../nova/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Al-Jadwal -->
+          <div class="project-card">
+            <div class="project-thumb">
+              <div class="project-thumb-placeholder">
+                <span class="project-thumb-label">Al-Jadwal &mdash; Prayer Scheduler</span>
+              </div>
+            </div>
+            <div class="project-body">
+              <div class="project-tags">
+                <span class="project-tag">JavaScript</span>
+                <span class="project-tag">Leaflet.js</span>
+                <span class="project-tag">REST API</span>
+                <span class="project-tag">Geolocation</span>
+              </div>
+              <div class="project-name">Al-Jadwal &mdash; Prayer Time Scheduler</div>
+              <div class="project-case">
+                <div class="case-row">
+                  <span class="case-label">Problem</span>
+                  <span class="case-text">Generic prayer apps don&rsquo;t account for precise local coordinates, giving inaccurate prayer times for users outside major cities.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Solution</span>
+                  <span class="case-text">Built a web app using geolocation + a prayer time API, with an interactive map for users to fine-tune their exact location.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Impact</span>
+                  <span class="case-text">Accurate to GPS coordinates. Fully client-side, no account required, works offline after first load.</span>
+                </div>
+              </div>
+              <div class="project-links">
+                <a href="../aljadwal/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bills -->
+          <div class="project-card">
+            <div class="project-thumb">
+              <div class="project-thumb-placeholder">
+                <span class="project-thumb-label">Bills &mdash; Expense Tracker</span>
+              </div>
+            </div>
+            <div class="project-body">
+              <div class="project-tags">
+                <span class="project-tag">JavaScript</span>
+                <span class="project-tag">Chart.js</span>
+                <span class="project-tag">Google OAuth</span>
+                <span class="project-tag">Local Storage</span>
+              </div>
+              <div class="project-name">Bills &mdash; Personal Finance Tracker</div>
+              <div class="project-case">
+                <div class="case-row">
+                  <span class="case-label">Problem</span>
+                  <span class="case-text">Tracking personal expenses across multiple categories is tedious without a tool that also visualizes spending patterns over time.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Solution</span>
+                  <span class="case-text">Built a full-featured finance tracker with Google Sign-In, category breakdown charts, multi-currency support, and export functionality.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Impact</span>
+                  <span class="case-text">Persistent data via local storage. Used as a personal daily finance tool since launch.</span>
+                </div>
+              </div>
+              <div class="project-links">
+                <a href="../bills/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- PegForge -->
+          <div class="project-card">
+            <div class="project-thumb">
+              <div class="project-thumb-placeholder">
+                <span class="project-thumb-label">PegForge &mdash; Dev Tool</span>
+              </div>
+            </div>
+            <div class="project-body">
+              <div class="project-tags">
+                <span class="project-tag">JavaScript</span>
+                <span class="project-tag">Node.js</span>
+                <span class="project-tag">CLI Tool</span>
+              </div>
+              <div class="project-name">PegForge &mdash; Developer Productivity CLI</div>
+              <div class="project-case">
+                <div class="case-row">
+                  <span class="case-label">Problem</span>
+                  <span class="case-text">Scaffolding new projects from scratch is repetitive and inconsistent, wasting setup time across every new initiative.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Solution</span>
+                  <span class="case-text">Built a CLI tool to scaffold, configure, and manage project templates from a central hub. Solo build in 2 weeks.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Impact</span>
+                  <span class="case-text">Now used as the standard internal workflow for all new builds, significantly reducing project setup time.</span>
+                </div>
+              </div>
+              <div class="project-links">
+                <a href="../pegforge/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- DashF1 -->
+          <div class="project-card">
+            <div class="project-thumb">
+              <div class="project-thumb-placeholder">
+                <span class="project-thumb-label">DashF1 &mdash; Racing Analytics</span>
+              </div>
+            </div>
+            <div class="project-body">
+              <div class="project-tags">
+                <span class="project-tag">JavaScript</span>
+                <span class="project-tag">PapaParse</span>
+                <span class="project-tag">Tailwind CSS</span>
+                <span class="project-tag">Data Viz</span>
+              </div>
+              <div class="project-name">DashF1 &mdash; Racing Data Dashboard</div>
+              <div class="project-case">
+                <div class="case-row">
+                  <span class="case-label">Problem</span>
+                  <span class="case-text">F1 season statistics are scattered across sources with no unified view for comparing driver and team performance.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Solution</span>
+                  <span class="case-text">Built a CSV-powered analytics dashboard that parses raw race data and renders comparative performance charts on the fly.</span>
+                </div>
+                <div class="case-row">
+                  <span class="case-label">Impact</span>
+                  <span class="case-text">Fully static &mdash; no server, no API calls. Demonstrates data processing and visualization from raw CSV inputs.</span>
+                </div>
+              </div>
+              <div class="project-links">
+                <a href="../dashf1/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
 
         <!-- PegForge -->
         <div class="project-card">
