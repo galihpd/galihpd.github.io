@@ -205,6 +205,32 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
 .client-name { font-size: 13px; font-weight: 500; }
 .client-for { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.06em; margin-top: 3px; }
 
+/* ── CLIENT LOGOS ── */
+.logo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5rem;
+  padding: 1.5rem 0;
+}
+.logo-grid img {
+  height: clamp(24px, 4.5vw, 34px);
+  width: auto;
+  max-width: 130px;
+  object-fit: contain;
+  filter: grayscale(100%) contrast(0.85) opacity(0.4);
+  transition: filter 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+.logo-grid img:hover {
+  filter: grayscale(0%) contrast(1) opacity(0.95);
+  transform: scale(1.05);
+}
+@media (max-width: 700px) {
+  .logo-grid { gap: 2.2rem; justify-content: center; }
+  .logo-grid img { height: 26px; }
+}
+
 /* ── EXPERIENCE ── */
 .exp-list { display: flex; flex-direction: column; }
 .exp-item { display: grid; grid-template-columns: 160px 1fr; gap: 2.5rem; padding: 2rem 0; border-bottom: 0.5px solid var(--border); }
@@ -479,6 +505,24 @@ footer {
       <div class="client-item"><span class="client-num">10</span><div><div class="client-name">Nordson VR Training</div><div class="client-for">KenVue Indonesia · 2025</div></div></div>
       <div class="client-item"><span class="client-num">11</span><div><div class="client-name">Smart LMS</div><div class="client-for">Client X · 2025</div></div></div>
       <div class="client-item"><span class="client-num">12</span><div><div class="client-name">Virtual Combat Tactic Simulator</div><div class="client-for">Client X · 2026</div></div></div>
+    </div>
+  </section>
+
+  <!-- CLIENT LOGOS -->
+  <section id="partner-logos">
+    <div class="section-header">
+      <span class="section-title">Clients & Partners</span>
+    </div>
+    <div class="logo-grid">
+      <img src="assets/logos/pnj.png" alt="Politeknik Negeri Jakarta">
+      <img src="assets/logos/muspen.png" alt="Museum Penerangan">
+      <img src="assets/logos/Logo_Badan_Nasional_Penanggulangan_Terorisme.png" alt="Badan Nasional Penanggulangan Terorisme">
+      <img src="assets/logos/56logo-satlantas-png-2.png" alt="Satlantas Polantas">
+      <img src="assets/logos/sungame.png" alt="SunGame Studio">
+      <img src="assets/logos/kenvue-logo-black-rgb.svg" alt="Kenvue Indonesia">
+      <img src="assets/logos/Yakult-Logo.svg" alt="Yakult">
+      <img src="assets/logos/dragongrup-bg-putih.png" alt="Dragon Group">
+      <img src="assets/logos/Image_B806F5AA_AA8F_0300_41D8_6C4687F5CBE3.png" alt="Partner Logo">
     </div>
   </section>
 
