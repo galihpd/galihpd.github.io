@@ -1,0 +1,186 @@
+/* dantist/style.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f8fafc;
+  color: #1e293b;
+  overflow: hidden;
+}
+
+/* Sidebar Styling */
+.sidebar-link {
+  transition: all 0.2s ease;
+}
+
+.sidebar-link.active {
+  background-color: #eef2ff;
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+/* Canvas Styling */
+.canvas-container {
+  background-color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  border-radius: 12px;
+}
+
+/* Custom device node styling */
+.device-node {
+  transition: filter 0.2s ease;
+  cursor: grab;
+}
+
+.device-node:active {
+  cursor: grabbing;
+}
+
+.device-node.selected .device-bg {
+  stroke: #4f46e5;
+  stroke-width: 3px;
+  filter: drop-shadow(0 0 6px rgba(79, 70, 229, 0.4));
+}
+
+/* Cable indicators */
+.port-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  fill: #64748b;
+  pointer-events: none;
+}
+
+.link-indicator {
+  stroke-width: 2.5;
+  transition: stroke 0.3s;
+}
+
+.link-indicator.up {
+  stroke: #10b981;
+}
+
+.link-indicator.down {
+  stroke: #ef4444;
+}
+
+.link-indicator.cable-straight {
+  stroke-dasharray: none;
+}
+
+.link-indicator.cable-crossover {
+  stroke-dasharray: 6, 4;
+}
+
+/* Triangle green/red link status indicators */
+.link-light {
+  stroke: none;
+  pointer-events: none;
+}
+.link-light.up {
+  fill: #10b981;
+  filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.5));
+}
+.link-light.down {
+  fill: #ef4444;
+  filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.5));
+}
+
+/* Packet Animation */
+.sim-packet {
+  filter: drop-shadow(0 0 4px var(--packet-glow, #3b82f6));
+}
+
+@keyframes packet-flow {
+  0% {
+    offset-distance: 0%;
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+.packet-animate {
+  animation: packet-flow 2s linear forwards;
+}
+
+/* CLI styling */
+.terminal-window {
+  font-family: var(--font-mono);
+  background-color: #0f172a;
+  color: #38bdf8;
+  border-radius: 8px;
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background-color: #38bdf8;
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Scrollbar tweaks */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Card glass borders and shadows matching mockup */
+.card-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+}
+
+.card-border {
+  border: 1px solid #f1f5f9;
+}
+
+/* Mini charts/sparklines SVG animation */
+@keyframes draw-sparkline {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.sparkline-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-sparkline 2s ease-out forwards;
+}
+
+/* Wireless / WiFi connection line indicator */
+.cable-wireless {
+  stroke: #ea580c;
+  stroke-dasharray: 6, 4;
+  animation: wifiPulse 1.5s linear infinite;
+  stroke-width: 2.5;
+  opacity: 0.8;
+}
+
+@keyframes wifiPulse {
+  to {
+    stroke-dashoffset: -20;
+  }
+}

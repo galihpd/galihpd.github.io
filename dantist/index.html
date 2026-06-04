@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50 text-slate-800">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetSim - Network Simulator</title>
+  <!-- Inline SVG Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+  <!-- Tailwind CSS v4 via CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Style Sheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="h-full flex flex-col font-sans antialiased bg-slate-50 overflow-hidden select-none">
+
+  <!-- TOP HEADER BAR -->
+  <header class="bg-white border-b border-slate-200/80 px-6 py-3 flex items-center justify-between z-10 shrink-0">
+    <!-- Brand Logo -->
+    <div class="flex items-center gap-3">
+      <div class="bg-indigo-600 text-white p-1.5 rounded-lg flex items-center justify-center shadow-sm shadow-indigo-600/35">
+        <i class="fa-solid fa-circle-nodes text-lg"></i>
+      </div>
+      <div>
+        <h1 class="text-md font-bold tracking-tight text-slate-900">NetSim</h1>
+        <p class="text-[9px] text-slate-500 font-semibold tracking-wider uppercase">Network Simulator</p>
+      </div>
+    </div>
+
+    <!-- Search input -->
+    <div class="w-80 relative hidden md:block" id="global-search-container">
+      <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+      </div>
+      <input type="text" id="global-search-input" class="w-full bg-slate-100/80 border-0 rounded-lg py-1.5 pl-9 pr-8 text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Search anything... ⌘K" autocomplete="off">
+      <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[10px] font-semibold text-slate-400">
+        ⌘K
+      </div>
+      <!-- Dropdown Results -->
+      <div id="global-search-results" class="absolute left-0 right-0 mt-1.5 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 hidden z-50 text-xs"></div>
+    </div>
+
+    <!-- Scenario Dropdown & Simulation Controls -->
+    <div class="flex items-center gap-4">
+      
+      <!-- Scenario Select -->
+      <div class="relative">
+        <select id="scenario-select" class="bg-slate-100 hover:bg-slate-200 border-0 text-xs font-semibold text-slate-700 py-1.5 px-3 pr-8 rounded-lg appearance-none focus:outline-none cursor-pointer">
+          <option value="lan">Scenario: Standard LAN</option>
+          <option value="routing">Scenario: Static Route LAN</option>
+          <option value="webserver">Scenario: HTTP Web Server</option>
+          <option value="enterprise">Scenario: Complex Enterprise</option>
+        </select>
+        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-500 text-[10px]">
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+      </div>
+
+      <!-- Playback Controls -->
+      <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+        <button id="btn-play-sim" onclick="playSimulation()" class="hover:bg-white text-emerald-600 hover:text-emerald-700 py-1.5 px-3 rounded-md text-xs font-bold transition flex items-center gap-1.5" title="Run Simulation">
+          <i class="fa-solid fa-play text-[10px]"></i> Run
+        </button>
+        <button id="btn-pause-sim" onclick="pauseSimulation()" class="hover:bg-white text-amber-500 hover:text-amber-600 py-1.5 px-2.5 rounded-md text-xs font-bold transition" title="Pause Simulation">
+          <i class="fa-solid fa-pause text-[10px]"></i> Pause
+        </button>
+      </div>
+
+      <!-- Zoom to Fit, Notifications & Profile -->
+      <div class="flex items-center gap-3 border-l border-slate-200 pl-4">
+        <button onclick="resetZoomPan()" class="text-slate-400 hover:text-slate-600 transition" title="Reset Zoom">
+          <i class="fa-solid fa-expand text-sm"></i>
+        </button>
+        <button class="text-slate-400 hover:text-slate-600 transition relative">
+          <i class="fa-solid fa-bell text-sm"></i>
+          <span class="absolute top-0 right-0 block w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+        </button>
+        <div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden border border-slate-200">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Avatar" class="w-full h-full object-cover">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- WORKSPACE WRAPPER -->
+  <div class="flex-1 flex overflow-hidden">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-60 bg-white border-r border-slate-200/80 flex flex-col shrink-0">
+      
+      <!-- MENU SECTIONS -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-6">
+        
+        <!-- Dashboard Header Link -->
+        <div>
+          <button class="sidebar-link active w-full text-left py-2 px-3 rounded-lg text-xs flex items-center gap-2.5">
+            <i class="fa-solid fa-chart-line text-sm"></i> Dashboard
+          </button>
+        </div>
+
+        <!-- Section: Design -->
+        <div>
+          <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Design</h3>
+          <div class="space-y-4">
+            
+            <!-- Devices Accordion Drawer -->
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-500 px-3 py-1 font-semibold">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-server text-[11px]"></i> Devices</span>
+              </div>
+              
+              <!-- Devices Cabinet Grid -->
+              <div class="grid grid-cols-2 gap-2 mt-2 px-1">
+                <div class="cabinet-item border border-slate-100 hover:border-indigo-500 bg-slate-50/50 p-2.5 rounded-xl cursor-pointer text-center flex flex-col items-center justify-center transition" draggable="true" data-type="router">
+                  <div class="text-indigo-600 mb-1 text-md"><i class="fa-solid fa-cube"></i></div>
+                  <div class="text-[9px] font-bold text-slate-700">Router</div>
+                </div>
+
+                <div class="cabinet-item border border-slate-100 hover:border-indigo-500 bg-slate-50/50 p-2.5 rounded-xl cursor-pointer text-center flex flex-col items-center justify-center transition" draggable="true" data-type="switch">
+                  <div class="text-teal-600 mb-1 text-md"><i class="fa-solid fa-network-wired"></i></div>
+                  <div class="text-[9px] font-bold text-slate-700">Switch</div>
+                </div>
+
+                <div class="cabinet-item border border-slate-100 hover:border-indigo-500 bg-slate-50/50 p-2.5 rounded-xl cursor-pointer text-center flex flex-col items-center justify-center transition" draggable="true" data-type="pc">
+                  <div class="text-slate-600 mb-1 text-md"><i class="fa-solid fa-desktop"></i></div>
+                  <div class="text-[9px] font-bold text-slate-700">PC Host</div>
+                </div>
+
+                <div class="cabinet-item border border-slate-100 hover:border-indigo-500 bg-slate-50/50 p-2.5 rounded-xl cursor-pointer text-center flex flex-col items-center justify-center transition" draggable="true" data-type="server">
+                  <div class="text-purple-600 mb-1 text-md"><i class="fa-solid fa-database"></i></div>
+                  <div class="text-[9px] font-bold text-slate-700">Server</div>
+                </div>
+
+                <div class="cabinet-item border border-slate-100 hover:border-indigo-500 bg-slate-50/50 p-2.5 rounded-xl cursor-pointer text-center flex flex-col items-center justify-center transition" draggable="true" data-type="access_point">
+                  <div class="text-orange-600 mb-1 text-md"><i class="fa-solid fa-wifi"></i></div>
+                  <div class="text-[9px] font-bold text-slate-700">Access Point</div>
+                </div>
+
+                <div class="cabinet-item border border-slate-100 hover:border-indigo-500 bg-slate-50/50 p-2.5 rounded-xl cursor-pointer text-center flex flex-col items-center justify-center transition" draggable="true" data-type="laptop">
+                  <div class="text-slate-600 mb-1 text-md"><i class="fa-solid fa-laptop"></i></div>
+                  <div class="text-[9px] font-bold text-slate-700">Laptop</div>
+                </div>
+
+                <div class="cabinet-item border border-slate-100 hover:border-indigo-500 bg-slate-50/50 p-2.5 rounded-xl cursor-pointer text-center flex flex-col items-center justify-center transition" draggable="true" data-type="smartphone">
+                  <div class="text-sky-600 mb-1 text-md"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                  <div class="text-[9px] font-bold text-slate-700">Smart Phone</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connections Drawer -->
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-500 px-3 py-1 font-semibold">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-link text-[11px]"></i> Connections</span>
+              </div>
+              <div class="space-y-1.5 mt-2 px-1">
+                <button id="tool-cable-straight" class="w-full bg-slate-50/60 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-100 text-left text-[10px] text-slate-600 py-1.5 px-2.5 rounded-lg flex items-center gap-2 transition">
+                  <span class="w-3.5 h-0.5 bg-emerald-500 block"></span>
+                  <span>Straight Cable</span>
+                </button>
+                <button id="tool-cable-crossover" class="w-full bg-slate-50/60 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-100 text-left text-[10px] text-slate-600 py-1.5 px-2.5 rounded-lg flex-1 flex items-center gap-2 transition">
+                  <span class="w-3.5 h-0.5 border-t border-dashed border-red-500 block"></span>
+                  <span>Crossover Cable</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Topology Link -->
+            <button class="sidebar-link w-full text-left py-1.5 px-3 rounded-lg text-xs text-slate-600 flex items-center gap-2.5">
+              <i class="fa-solid fa-diagram-project"></i> Topology
+            </button>
+          </div>
+        </div>
+
+        <!-- Section: Simulation -->
+        <div>
+          <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Simulation</h3>
+          <div class="space-y-1">
+            <button class="sidebar-link w-full text-left py-1.5 px-3 rounded-lg text-xs text-slate-600 flex items-center gap-2.5"><i class="fa-solid fa-map"></i> Scenarios</button>
+            <button class="sidebar-link w-full text-left py-1.5 px-3 rounded-lg text-xs text-slate-600 flex items-center gap-2.5"><i class="fa-solid fa-chart-simple"></i> Traffic</button>
+            <button class="sidebar-link w-full text-left py-1.5 px-3 rounded-lg text-xs text-slate-600 flex items-center gap-2.5"><i class="fa-solid fa-calendar-check"></i> Events</button>
+          </div>
+        </div>
+
+        <!-- Section: Analysis -->
+        <div>
+          <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Analysis</h3>
+          <div class="space-y-1">
+            <button class="sidebar-link w-full text-left py-1.5 px-3 rounded-lg text-xs text-slate-600 flex items-center gap-2.5"><i class="fa-solid fa-file-invoice"></i> Reports</button>
+            <button class="sidebar-link w-full text-left py-1.5 px-3 rounded-lg text-xs text-slate-600 flex items-center gap-2.5"><i class="fa-solid fa-gauge-high"></i> Performance</button>
+            <button class="sidebar-link w-full text-left py-1.5 px-3 rounded-lg text-xs text-slate-600 flex items-center gap-2.5"><i class="fa-solid fa-clock-rotate-left"></i> Logs</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BOTTOM SIMULATION STATUS CARD -->
+      <div class="p-4 border-t border-slate-100 bg-slate-50/50 shrink-0">
+        <div class="bg-white p-3 rounded-xl border border-slate-200/70 card-shadow flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Simulation Status</span>
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+          </div>
+          <div class="text-sm font-bold text-slate-800" id="sim-status-text">Running</div>
+          <div class="text-xs font-semibold text-slate-500" id="sim-time-text">00:15:30</div>
+          
+          <!-- Real-time mode Toggle -->
+          <div class="flex items-center justify-between border-t border-slate-100 pt-2 mt-1">
+            <span class="text-[9px] font-bold text-slate-400 uppercase">Real-time Mode</span>
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="realtime-toggle" class="sr-only peer" checked>
+              <div class="relative w-8 h-4.5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-indigo-600"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTER WORKSPACE -->
+    <main class="flex-1 flex flex-col overflow-y-auto p-6 space-y-6">
+      
+      <!-- TOP METRICS ROW -->
+      <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        
+        <!-- Card 1: Total Devices -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 card-shadow flex items-center justify-between">
+          <div>
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Total Devices</span>
+            <span class="text-xl font-bold text-slate-800" id="metric-devices-count">0</span>
+            <span class="text-[9px] font-semibold text-emerald-500 block mt-1"><i class="fa-solid fa-arrow-up"></i> Live Count</span>
+          </div>
+          <div class="bg-indigo-50 p-2.5 rounded-xl text-indigo-500 text-lg"><i class="fa-solid fa-cube"></i></div>
+        </div>
+
+        <!-- Card 2: Active Connections -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 card-shadow flex items-center justify-between">
+          <div>
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Active Connections</span>
+            <span class="text-xl font-bold text-slate-800" id="metric-links-count">0</span>
+            <span class="text-[9px] font-semibold text-indigo-500 block mt-1"><i class="fa-solid fa-link text-[8px]"></i> Linked Cables</span>
+          </div>
+          <div class="bg-indigo-50 p-2.5 rounded-xl text-indigo-500 text-lg"><i class="fa-solid fa-link"></i></div>
+        </div>
+
+        <!-- Card 3: Network Traffic -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 card-shadow flex items-center justify-between">
+          <div>
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Network Traffic</span>
+            <span class="text-xl font-bold text-slate-800" id="metric-traffic-rate">50 Mbps</span>
+            <span class="text-[9px] font-semibold text-emerald-500 block mt-1" id="metric-traffic-status"><i class="fa-solid fa-arrow-down-long"></i> Idle (Background)</span>
+          </div>
+          <div class="bg-blue-50 p-2.5 rounded-xl text-blue-500 text-lg"><i class="fa-solid fa-wave-square"></i></div>
+        </div>
+
+        <!-- Card 4: Packet Loss -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 card-shadow flex items-center justify-between">
+          <div>
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Packet Loss</span>
+            <span class="text-xl font-bold text-slate-800" id="metric-packet-loss">0.0%</span>
+            <span class="text-[9px] font-semibold text-emerald-500 block mt-1" id="metric-packet-loss-status"><i class="fa-solid fa-circle-check"></i> Excellent</span>
+          </div>
+          <div class="bg-rose-50 p-2.5 rounded-xl text-rose-500 text-lg"><i class="fa-solid fa-circle-exclamation"></i></div>
+        </div>
+
+        <!-- Card 5: Latency -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 card-shadow flex items-center justify-between">
+          <div>
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Latency</span>
+            <span class="text-xl font-bold text-slate-800" id="metric-latency">0.0 ms</span>
+            <span class="text-[9px] font-semibold text-emerald-500 block mt-1" id="metric-latency-status"><i class="fa-solid fa-bolt"></i> Low Latency</span>
+          </div>
+          <div class="bg-teal-50 p-2.5 rounded-xl text-teal-500 text-lg"><i class="fa-solid fa-clock"></i></div>
+        </div>
+
+        <!-- Card 6: Simulation speed -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 card-shadow flex items-center justify-between">
+          <div class="w-full">
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Simulation Delay</span>
+            <span class="text-sm font-bold text-slate-800" id="sim-delay-display">500 ms</span>
+            <input type="range" id="sim-speed" min="200" max="4000" value="500" class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer mt-3">
+          </div>
+        </div>
+
+      </section>
+
+      <!-- NETWORK TOPOLOGY CARD -->
+      <section class="bg-white rounded-2xl border border-slate-200/80 card-shadow flex flex-col flex-1 min-h-[450px] relative overflow-hidden">
+        
+        <!-- Canvas Toolbar -->
+        <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white z-10">
+          <h2 class="text-xs font-bold text-slate-800">Network Topology</h2>
+          
+          <!-- Toolbar tools -->
+          <div class="flex items-center gap-3">
+            
+            <!-- Tools cluster -->
+            <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
+              <button id="tool-select" class="toolbar-btn bg-indigo-600 text-white p-1.5 rounded-md text-xs font-medium transition" title="Select / Drag">
+                <i class="fa-solid fa-mouse-pointer"></i>
+              </button>
+              <button id="tool-delete" class="toolbar-btn text-slate-500 hover:text-slate-800 hover:bg-white p-1.5 rounded-md text-xs font-medium transition" title="Delete Device/Link">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+              <button id="tool-hand" class="toolbar-btn text-slate-500 hover:text-slate-800 hover:bg-white p-1.5 rounded-md text-xs font-medium transition" title="Pan Workspace">
+                <i class="fa-solid fa-hand text-[11px]"></i>
+              </button>
+              <button onclick="zoomIn()" class="text-slate-500 hover:text-slate-800 hover:bg-white p-1.5 rounded-md text-xs font-medium transition" title="Zoom In">
+                <i class="fa-solid fa-magnifying-glass-plus"></i>
+              </button>
+              <button onclick="zoomOut()" class="text-slate-500 hover:text-slate-800 hover:bg-white p-1.5 rounded-md text-xs font-medium transition" title="Zoom Out">
+                <i class="fa-solid fa-magnifying-glass-minus"></i>
+              </button>
+            </div>
+
+            <!-- Add Device Dropdown Trigger -->
+            <div class="relative">
+              <button id="add-device-dropdown-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                <i class="fa-solid fa-plus text-[10px]"></i> Add Device
+              </button>
+              <!-- Dropdown Menu -->
+              <div id="add-device-dropdown-menu" class="absolute right-0 mt-2 w-40 bg-white border border-slate-150 rounded-xl shadow-lg py-1.5 hidden z-20 text-xs">
+                <button onclick="addDevice('router', 300, 200)" class="w-full text-left px-4 py-2 hover:bg-slate-50 transition flex items-center gap-2"><span class="text-indigo-500"><i class="fa-solid fa-cube"></i></span> Router</button>
+                <button onclick="addDevice('switch', 300, 200)" class="w-full text-left px-4 py-2 hover:bg-slate-50 transition flex items-center gap-2"><span class="text-teal-500"><i class="fa-solid fa-network-wired"></i></span> Switch</button>
+                <button onclick="addDevice('pc', 300, 200)" class="w-full text-left px-4 py-2 hover:bg-slate-50 transition flex items-center gap-2"><span class="text-slate-500"><i class="fa-solid fa-desktop"></i></span> PC Host</button>
+                <button onclick="addDevice('server', 300, 200)" class="w-full text-left px-4 py-2 hover:bg-slate-50 transition flex items-center gap-2"><span class="text-purple-500"><i class="fa-solid fa-database"></i></span> Server</button>
+                <button onclick="addDevice('access_point', 300, 200)" class="w-full text-left px-4 py-2 hover:bg-slate-50 transition flex items-center gap-2"><span class="text-orange-500"><i class="fa-solid fa-wifi"></i></span> Access Point</button>
+                <button onclick="addDevice('laptop', 300, 200)" class="w-full text-left px-4 py-2 hover:bg-slate-50 transition flex items-center gap-2"><span class="text-slate-600"><i class="fa-solid fa-laptop"></i></span> Laptop</button>
+                <button onclick="addDevice('smartphone', 300, 200)" class="w-full text-left px-4 py-2 hover:bg-slate-50 transition flex items-center gap-2"><span class="text-sky-500"><i class="fa-solid fa-mobile-screen-button"></i></span> Smart Phone</button>
+              </div>
+            </div>
+
+            <button id="tool-ping-packet" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold py-1.5 px-3 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-envelope text-[11px]"></i> Add Ping (PDU)
+            </button>
+
+          </div>
+        </div>
+
+        <!-- SVG Canvas Area -->
+        <div class="canvas-container flex-1 h-full w-full min-h-[300px]">
+          <svg id="network-canvas" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <g id="canvas-inner">
+              <g id="wifi-range-group"></g>
+              <g id="cables-group"></g>
+              <g id="status-lights-group"></g>
+              <g id="packets-group"></g>
+              <g id="devices-group"></g>
+            </g>
+          </svg>
+
+          <!-- Floating Zoom Controller (Bottom-left) -->
+          <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm border border-slate-200/80 px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-2 text-xs font-semibold text-slate-600">
+            <button onclick="zoomOut()" class="hover:text-slate-900 transition"><i class="fa-solid fa-minus"></i></button>
+            <span id="zoom-level-text" class="w-12 text-center font-mono">100%</span>
+            <button onclick="zoomIn()" class="hover:text-slate-900 transition"><i class="fa-solid fa-plus"></i></button>
+            <button onclick="resetZoomPan()" class="border-l border-slate-200 pl-2 hover:text-slate-900 transition" title="Zoom to fit"><i class="fa-solid fa-expand"></i></button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- BOTTOM ROW: Simulation Log -->
+      <section id="simulation-log-panel" class="bg-white rounded-2xl border border-slate-200/80 card-shadow flex flex-col shrink-0 relative" style="height: 200px;">
+        <!-- Drag Handle for Resizing -->
+        <div id="log-resize-handle" class="absolute -top-1.5 left-0 right-0 h-3 cursor-ns-resize z-30 flex items-center justify-center group">
+          <div class="w-12 h-1 bg-slate-200 rounded-full group-hover:bg-indigo-500 transition duration-150"></div>
+        </div>
+        
+        <div class="p-5 flex flex-col h-full overflow-hidden flex-1">
+          <div class="flex items-center justify-between mb-3 shrink-0">
+            <h3 class="text-xs font-bold text-slate-800">Simulation Log</h3>
+            <button onclick="clearSimulation()" class="text-xs text-indigo-600 font-semibold hover:underline">Clear Logs</button>
+          </div>
+          <div id="sim-history-list" class="flex-1 overflow-y-auto space-y-2 pr-1 font-mono text-[10px] text-slate-600 leading-relaxed">
+            <div class="text-slate-400 text-xs italic text-center py-10 font-sans">No routing simulation processes recorded yet.</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT DYNAMIC PANEL (SIDE DRAWER) -->
+    <aside id="sidebar-panel" class="w-80 bg-white border-l border-slate-200/80 flex flex-col shrink-0 z-10 relative overflow-hidden">
+      <!-- Sidebar Resize Handle (Left edge) -->
+      <div id="sidebar-resize-handle" class="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-indigo-500/30 transition-colors z-20"></div>
+      
+      <!-- VIEW 1: SIMULATION EVENTS PANEL (DEFAULT) -->
+      <div id="panel-simulation-history" class="h-full flex flex-col">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+          <h3 class="text-xs font-bold text-slate-800">Simulation History</h3>
+          <span class="text-[9px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 py-0.5 px-2 rounded-full font-mono">PDU LIST</span>
+        </div>
+        <div id="sim-event-list" class="flex-1 overflow-y-auto p-4 space-y-2.5">
+          <!-- Simulation packages -->
+          <div class="text-slate-400 text-xs italic p-4 text-center py-10">No simulated traffic packets active</div>
+        </div>
+        <div class="p-4 border-t border-slate-100 bg-slate-50/50 text-[10px] text-slate-400 leading-relaxed text-center shrink-0">
+          💡 Double-click any device on the canvas to configure it, or click a running packet event block above to view details in the OSI Layer inspector.
+        </div>
+      </div>
+
+      <!-- VIEW 2: SELECTED DEVICE DETAIL DRAWER -->
+      <div id="panel-device-details" class="h-full flex flex-col hidden">
+        
+        <!-- Header -->
+        <div id="device-details-header" class="p-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/30 select-none">
+          <div class="flex items-center gap-2">
+            <span class="text-indigo-600 text-sm" id="detail-device-icon"><i class="fa-solid fa-cube"></i></span>
+            <div>
+              <h3 class="text-xs font-bold text-slate-800" id="detail-device-name">DeviceName</h3>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                <span class="text-[9px] text-slate-400 font-bold uppercase">Online</span>
+              </div>
+            </div>
+          </div>
+          <!-- Window Controls -->
+          <div class="flex items-center gap-2.5">
+            <button id="btn-toggle-float" onclick="toggleDeviceDetailsFloat()" class="text-slate-400 hover:text-indigo-600 transition" title="Float Window">
+              <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
+            </button>
+            <button onclick="closeDeviceDetailsPanel()" class="text-slate-400 hover:text-slate-600 transition" title="Close">
+              <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Links -->
+        <div class="flex border-b border-slate-100 px-3 bg-slate-50/20 text-[10px] font-bold text-slate-500 shrink-0">
+          <button id="side-tab-overview" onclick="selectSideTab('overview')" class="flex-1 text-center py-2.5 border-b-2 border-indigo-600 text-indigo-600">Overview</button>
+          <button id="side-tab-interfaces" onclick="selectSideTab('interfaces')" class="flex-1 text-center py-2.5 border-b-2 border-transparent hover:text-slate-800">Interfaces</button>
+          <button id="side-tab-cli" onclick="selectSideTab('cli')" class="flex-1 text-center py-2.5 border-b-2 border-transparent hover:text-slate-800">CLI</button>
+          <button id="side-tab-desktop" onclick="selectSideTab('desktop')" class="flex-1 text-center py-2.5 border-b-2 border-transparent hover:text-slate-800">Desktop</button>
+          <button id="side-tab-services" onclick="selectSideTab('services')" class="flex-1 text-center py-2.5 border-b-2 border-transparent hover:text-slate-800 hidden">Services</button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto p-4">
+          
+          <!-- SUB-VIEW 1: OVERVIEW -->
+          <div id="side-content-overview" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3.5 text-xs">
+              <div>
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Type</span>
+                <span class="font-semibold text-slate-800" id="overview-device-type">-</span>
+              </div>
+              <div>
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">OS Version</span>
+                <span class="font-semibold text-slate-700">DantistOS 1.0</span>
+              </div>
+              <div class="col-span-2 border-t border-slate-100 pt-3">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gateway IP</span>
+                <input type="text" id="overview-gateway-ip" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-semibold text-slate-700" placeholder="e.g. 192.168.1.1">
+              </div>
+              <div class="col-span-2 border-t border-slate-100 pt-3">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Uptime</span>
+                <span class="font-semibold text-slate-700">00:15:30</span>
+              </div>
+            </div>
+            
+            <!-- Quick Configuration settings -->
+            <div class="border-t border-slate-100 pt-4 mt-2">
+              <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Host Device Name</label>
+              <input type="text" id="overview-hostname" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-semibold text-slate-700">
+            </div>
+            
+            <!-- Wireless/WLAN Settings Container -->
+            <div id="side-overview-wireless-container"></div>
+          </div>
+
+          <!-- SUB-VIEW 2: INTERFACES -->
+          <div id="side-content-interfaces" class="space-y-4 hidden">
+            <!-- Port interfaces list injected dynamically -->
+            <div id="side-interfaces-container" class="space-y-3"></div>
+          </div>
+
+          <!-- SUB-VIEW 3: CLI -->
+          <div id="side-content-cli" class="hidden h-full flex flex-col min-h-[300px]">
+            <div class="flex-1 flex flex-col bg-slate-900 rounded-xl overflow-hidden border border-slate-800 p-3 text-xs leading-relaxed font-mono">
+              <div id="cli-output" class="flex-1 overflow-y-auto whitespace-pre-wrap text-sky-400 mb-2 font-mono scroll-smooth max-h-[220px]"></div>
+              <div class="flex items-center text-slate-200 border-t border-slate-800/60 pt-2 shrink-0">
+                <span id="cli-prompt" class="text-indigo-400 font-bold mr-1 font-mono"></span>
+                <input type="text" id="cli-input" class="flex-1 bg-transparent outline-none border-none text-slate-100 font-mono text-xs" autocomplete="off">
+              </div>
+            </div>
+            <div class="text-[9px] text-slate-400 text-center mt-2 font-semibold">
+              Type Cisco IOS inspired commands (e.g. <code>show ip route</code>, <code>enable</code>)
+            </div>
+          </div>
+
+          <!-- SUB-VIEW 4: DESKTOP -->
+          <div id="side-content-desktop" class="hidden">
+            <!-- Desktop applications view -->
+            <div id="desktop-tools-grid" class="grid grid-cols-2 gap-3">
+              <!-- Shortcuts -->
+              <button onclick="openSidebarDesktopTool('ipconfig')" class="flex flex-col items-center gap-1.5 p-3.5 bg-slate-50 border border-slate-200 hover:border-indigo-500 rounded-xl transition">
+                <div class="text-xl text-indigo-600"><i class="fa-solid fa-sliders"></i></div>
+                <span class="text-[10px] font-bold text-slate-700">IP Settings</span>
+              </button>
+              <button onclick="openSidebarDesktopTool('cmd')" class="flex flex-col items-center gap-1.5 p-3.5 bg-slate-50 border border-slate-200 hover:border-indigo-500 rounded-xl transition">
+                <div class="text-xl text-slate-700"><i class="fa-solid fa-terminal"></i></div>
+                <span class="text-[10px] font-bold text-slate-700">Command Cmd</span>
+              </button>
+              <button onclick="openSidebarDesktopTool('browser')" class="flex flex-col items-center gap-1.5 p-3.5 bg-slate-50 border border-slate-200 hover:border-indigo-500 rounded-xl transition">
+                <div class="text-xl text-teal-600"><i class="fa-solid fa-globe"></i></div>
+                <span class="text-[10px] font-bold text-slate-700">Web Browser</span>
+              </button>
+              <button onclick="openSidebarDesktopTool('email')" class="flex flex-col items-center gap-1.5 p-3.5 bg-slate-50 border border-slate-200 hover:border-indigo-500 rounded-xl transition">
+                <div class="text-xl text-rose-500"><i class="fa-solid fa-envelope"></i></div>
+                <span class="text-[10px] font-bold text-slate-700">Email Client</span>
+              </button>
+            </div>
+
+            <!-- Tool Panel Render Frame -->
+            <div id="desktop-tool-frame" class="mt-4 border border-slate-100 bg-slate-50/50 p-3 rounded-xl hidden">
+              <!-- Inline content injected dynamically -->
+            </div>
+          </div>
+
+          <!-- SUB-VIEW 5: SERVICES (Server only) -->
+          <div id="side-content-services" class="hidden space-y-4">
+            <!-- Dynamic services content -->
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="p-3 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-2 shrink-0">
+          <button onclick="closeDeviceDetailsPanel()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold py-1.5 px-4 rounded-lg transition">
+            Save Details
+          </button>
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- PORT SELECTION FLOATING CARD -->
+  <div id="port-select-modal" class="fixed z-50 bg-white border border-slate-200 w-80 rounded-2xl p-5 shadow-xl animate-scale-up hidden">
+    <h3 class="font-bold text-slate-800 text-xs mb-3.5 flex items-center justify-between">
+      <span class="flex items-center gap-1.5"><i class="fa-solid fa-ethernet text-indigo-600"></i> Connect Cable</span>
+      <span id="port-select-device-name" class="text-[9px] text-indigo-600 bg-indigo-50 border border-indigo-100 py-0.5 px-2 rounded-full font-mono">Device</span>
+    </h3>
+
+    <!-- Dropdown Selection -->
+    <div class="mb-3">
+      <label class="block text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Interface</label>
+      <div class="relative">
+        <select id="port-select-dropdown" class="w-full bg-slate-100 border-0 rounded-lg py-1.5 px-3 pr-8 text-[11px] text-slate-700 font-semibold focus:outline-none cursor-pointer">
+          <!-- Options dynamic -->
+        </select>
+        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-500 text-[10px]">
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual Chassis Sockets Illustration -->
+    <div class="mb-4">
+      <label class="block text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Visual Device Ports (Front Panel)</label>
+      <div id="port-visual-chassis" class="bg-slate-900 border border-slate-950 rounded-xl p-3 flex flex-wrap gap-2 justify-center shadow-inner">
+        <!-- Sockets dynamic -->
+      </div>
+      <div id="port-select-hover-info" class="text-[9px] font-semibold text-slate-400 block text-center mt-2">
+        Hover over ports to inspect connections
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center pt-1 shrink-0">
+      <button id="port-select-confirm" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-lg text-[10px] font-bold transition">
+        Confirm Port
+      </button>
+      <button id="port-select-cancel" class="bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 px-3.5 py-1.5 rounded-lg text-[10px] font-bold transition">
+        Cancel Cable
+      </button>
+    </div>
+  </div>
+
+  <!-- CUSTOM DEVICE CONTEXT MENU -->
+  <div id="device-context-menu" class="fixed z-50 bg-white/95 backdrop-blur-md border border-slate-200/60 w-44 rounded-xl py-1.5 shadow-lg animate-scale-up hidden">
+    <div class="px-3 py-1 border-b border-slate-100 mb-1">
+      <span id="context-menu-device-name" class="font-bold text-[9px] text-slate-400 uppercase tracking-wider">Device Menu</span>
+    </div>
+    <button id="context-menu-cable" class="w-full text-left px-3 py-1.5 hover:bg-indigo-50/50 hover:text-indigo-600 text-slate-700 text-[11px] font-semibold transition flex items-center gap-2">
+      <i class="fa-solid fa-ethernet text-[10px]"></i> Connect Cable
+    </button>
+    <button id="context-menu-delete" class="w-full text-left px-3 py-1.5 hover:bg-rose-50/50 hover:text-rose-600 text-slate-700 text-[11px] font-semibold transition flex items-center gap-2">
+      <i class="fa-solid fa-trash text-[10px]"></i> Delete Device
+    </button>
+  </div>
+
+  <!-- OSI 7-LAYER INSPECTOR MODAL (LIGHT THEME) -->
+  <div id="osi-inspector-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <div class="bg-white border border-slate-200 w-[720px] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+      
+      <!-- Header -->
+      <div class="bg-slate-50 px-5 py-3 border-b border-slate-200/80 flex justify-between items-center">
+        <div>
+          <h3 class="font-bold text-slate-900 text-xs">PDU Packet Layer Inspector</h3>
+          <p class="text-[9px] text-slate-500">Step-by-step OSI layer validation analysis</p>
+        </div>
+        <button onclick="closeOsiInspector()" class="text-slate-400 hover:text-slate-600 transition">
+          <i class="fa-solid fa-xmark text-md"></i>
+        </button>
+      </div>
+
+      <!-- Info Bar -->
+      <div class="bg-slate-100/50 px-5 py-2.5 border-b border-slate-150 grid grid-cols-4 gap-4 text-[10px]">
+        <div>
+          <span class="block text-[8px] text-slate-400 uppercase font-semibold">Packet Type</span>
+          <span id="osi-pdu-type" class="font-bold text-indigo-600">N/A</span>
+        </div>
+        <div>
+          <span class="block text-[8px] text-slate-400 uppercase font-semibold">Payload Info</span>
+          <span id="osi-pdu-info" class="font-semibold text-slate-700">N/A</span>
+        </div>
+        <div>
+          <span class="block text-[8px] text-slate-400 uppercase font-semibold">Source node</span>
+          <span id="osi-pdu-src" class="font-semibold text-slate-700">N/A</span>
+        </div>
+        <div>
+          <span class="block text-[8px] text-slate-400 uppercase font-semibold">Destination node</span>
+          <span id="osi-pdu-dest" class="font-semibold text-slate-700">N/A</span>
+        </div>
+      </div>
+
+      <!-- Main Columns -->
+      <div class="flex overflow-hidden h-[300px]">
+        <!-- Left: OSI Layers List -->
+        <div class="w-48 bg-slate-50 border-r border-slate-200/80 p-3 overflow-y-auto space-y-1.5">
+          <h4 class="text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-2">OSI Model Layers</h4>
+          
+          <button id="osi-l7" onclick="selectOsiLayer(7)" class="osi-layer-row w-full text-left bg-white text-slate-500 hover:bg-slate-100 border border-slate-100 px-3 py-1.5 rounded-lg text-[10px] font-semibold flex items-center justify-between transition">
+            <span>Layer 7: Application</span>
+          </button>
+          <button id="osi-l6" onclick="selectOsiLayer(6)" class="osi-layer-row w-full text-left bg-white text-slate-500 hover:bg-slate-100 border border-slate-100 px-3 py-1.5 rounded-lg text-[10px] font-semibold flex items-center justify-between transition">
+            <span>Layer 6: Presentation</span>
+          </button>
+          <button id="osi-l5" onclick="selectOsiLayer(5)" class="osi-layer-row w-full text-left bg-white text-slate-500 hover:bg-slate-100 border border-slate-100 px-3 py-1.5 rounded-lg text-[10px] font-semibold flex items-center justify-between transition">
+            <span>Layer 5: Session</span>
+          </button>
+          <button id="osi-l4" onclick="selectOsiLayer(4)" class="osi-layer-row w-full text-left bg-white text-slate-500 hover:bg-slate-100 border border-slate-100 px-3 py-1.5 rounded-lg text-[10px] font-semibold flex items-center justify-between transition">
+            <span>Layer 4: Transport</span>
+          </button>
+          <button id="osi-l3" onclick="selectOsiLayer(3)" class="osi-layer-row w-full text-left bg-white text-slate-500 hover:bg-slate-100 border border-slate-100 px-3 py-1.5 rounded-lg text-[10px] font-semibold flex items-center justify-between transition">
+            <span>Layer 3: Network</span>
+          </button>
+          <button id="osi-l2" onclick="selectOsiLayer(2)" class="osi-layer-row w-full text-left bg-white text-slate-500 hover:bg-slate-100 border border-slate-100 px-3 py-1.5 rounded-lg text-[10px] font-semibold flex items-center justify-between transition">
+            <span>Layer 2: Data Link</span>
+          </button>
+          <button id="osi-l1" onclick="selectOsiLayer(1)" class="osi-layer-row w-full text-left bg-white text-slate-500 hover:bg-slate-100 border border-slate-100 px-3 py-1.5 rounded-lg text-[10px] font-semibold flex items-center justify-between transition">
+            <span>Layer 1: Physical</span>
+          </button>
+        </div>
+
+        <!-- Right: Layer Details -->
+        <div class="flex-1 p-5 flex flex-col gap-3 overflow-y-auto">
+          <div>
+            <h5 class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">In Layers (Processing)</h5>
+            <div id="osi-in-desc" class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl text-[10px] leading-relaxed text-slate-600 font-mono">
+              Select an OSI layer to inspect trace.
+            </div>
+          </div>
+          <div>
+            <h5 class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Out Layers (Encapsulation)</h5>
+            <div id="osi-out-desc" class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl text-[10px] leading-relaxed text-slate-600 font-mono">
+              Select an OSI layer to inspect trace.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-slate-50 px-5 py-3 border-t border-slate-200/80 flex justify-end shrink-0">
+        <button onclick="closeOsiInspector()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold py-1.5 px-4 rounded-lg transition">
+          Close Inspector
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="absolute bottom-4 right-4 flex flex-col gap-2 z-50 pointer-events-none"></div>
+
+  <!-- CORE SCRIPTS -->
+  <script src="js/network.js?v=2"></script>
+  <script src="js/cli.js"></script>
+  <script src="js/simulator.js?v=2"></script>
+  <script src="js/app.js?v=2"></script>
+</body>
+</html>
