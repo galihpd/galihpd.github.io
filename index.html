@@ -41,6 +41,12 @@
     --border:  rgba(240,239,236,0.10);
     --border2: rgba(240,239,236,0.18);
   }
+  .logo-dark-invert {
+    filter: invert(1) grayscale(60%) opacity(0.65) !important;
+  }
+  .logo-dark-invert:hover {
+    filter: invert(1) grayscale(0%) opacity(1) !important;
+  }
 }
 
 html { scroll-behavior: smooth; }
@@ -219,11 +225,11 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
   width: auto;
   max-width: 160px;
   object-fit: contain;
-  filter: grayscale(100%) contrast(0.85) opacity(0.4);
+  filter: grayscale(60%) opacity(0.65);
   transition: filter 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
 }
 .logo-grid img:hover {
-  filter: grayscale(0%) contrast(1) opacity(0.95);
+  filter: grayscale(0%) opacity(1);
   transform: scale(1.05);
 }
 @media (max-width: 700px) {
@@ -519,7 +525,7 @@ footer {
       <img src="assets/logos/Logo_Badan_Nasional_Penanggulangan_Terorisme.png" alt="Badan Nasional Penanggulangan Terorisme">
       <img src="assets/logos/56logo-satlantas-png-2.png" alt="Satlantas Polantas">
       <img src="assets/logos/sungame.png" alt="SunGame Studio">
-      <img src="assets/logos/kenvue-logo-black-rgb.svg" alt="Kenvue Indonesia">
+      <img src="assets/logos/kenvue-logo-black-rgb.svg" alt="Kenvue Indonesia" class="logo-dark-invert">
       <img src="assets/logos/Yakult-Logo.svg" alt="Yakult">
       <img src="assets/logos/dragongrup-bg-putih.png" alt="Dragon Group">
       <img src="assets/logos/Image_B806F5AA_AA8F_0300_41D8_6C4687F5CBE3.png" alt="Partner Logo">
