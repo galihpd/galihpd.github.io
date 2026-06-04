@@ -56,12 +56,12 @@ nav {
   border-bottom: 0.5px solid var(--border);
 }
 @media (prefers-color-scheme: dark) { nav { background: rgba(20,20,18,0.9); } }
-.logo { font-size: 13px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.logo { font-size: 14px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
 .nav-center { display: flex; gap: 2rem; list-style: none; }
-.nav-center a { font-size: 12px; color: var(--ink2); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; }
+.nav-center a { font-size: 13px; color: var(--ink2); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; }
 .nav-center a:hover { color: var(--ink); }
 .nav-hire {
-  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
   padding: 7px 16px; border: 0.5px solid var(--border2); border-radius: 2px;
   color: var(--ink); text-decoration: none; background: transparent;
   transition: background 0.2s, color 0.2s;
@@ -106,12 +106,12 @@ nav {
 }
 .avail-dot { width: 6px; height: 6px; border-radius: 50%; background: #5cb85c; display: inline-block; animation: blink 2s infinite; flex-shrink: 0; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
-.hero-name { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 300; line-height: 1.05; letter-spacing: -0.025em; margin-bottom: 1rem; }
+.hero-name { font-size: clamp(2.6rem, 6vw, 4.4rem); font-weight: 300; line-height: 1.05; letter-spacing: -0.025em; margin-bottom: 1rem; }
 .hero-name span { font-weight: 500; }
-.hero-desc { font-size: 14px; color: var(--ink2); line-height: 1.8; }
+.hero-desc { font-size: 16px; color: var(--ink2); line-height: 1.8; }
 .hero-cta {
   display: inline-block; margin-top: 2rem;
-  padding: 10px 22px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 11px 24px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
   border: 0.5px solid var(--border2); border-radius: 2px;
   text-decoration: none; color: var(--ink);
   transition: background 0.2s, color 0.2s;
@@ -134,8 +134,8 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
   display: flex; justify-content: space-between; align-items: baseline;
   margin-bottom: 2.5rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--border);
 }
-.section-title { font-family: var(--fm); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3); }
-.section-count { font-family: var(--fm); font-size: 10px; color: var(--ink3); }
+.section-title { font-family: var(--fm); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3); }
+.section-count { font-family: var(--fm); font-size: 11px; color: var(--ink3); }
 
 /* ── GALLERY ── */
 .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -172,13 +172,13 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
 
 /* ── ABOUT ── */
 .about-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; align-items: start; }
-.about-text { font-size: 14px; color: var(--ink2); line-height: 1.9; max-width: 680px; }
+.about-text { font-size: 16px; color: var(--ink2); line-height: 1.9; max-width: 680px; }
 .about-text p + p { margin-top: 1rem; }
 .about-stats { display: flex; flex-direction: column; }
 .stat-row { padding: 14px 0; border-bottom: 0.5px solid var(--border); }
 .stat-row:last-child { border-bottom: none; }
-.stat-val { font-size: 2rem; font-weight: 300; letter-spacing: -0.02em; line-height: 1; }
-.stat-lbl { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.10em; text-transform: uppercase; margin-top: 4px; }
+.stat-val { font-size: 2.5rem; font-weight: 300; letter-spacing: -0.02em; line-height: 1; }
+.stat-lbl { font-family: var(--fm); font-size: 11px; color: var(--ink3); letter-spacing: 0.10em; text-transform: uppercase; margin-top: 4px; }
 
 /* ── CERTS ── */
 .cert-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 1.5rem; }
@@ -187,8 +187,8 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
   background: var(--bg2); transition: border-color 0.2s;
 }
 .cert-item:hover { border-color: var(--border2); }
-.cert-name { font-size: 12px; font-weight: 500; }
-.cert-year { font-family: var(--fm); font-size: 10px; color: var(--ink3); margin-top: 3px; }
+.cert-name { font-size: 14px; font-weight: 500; }
+.cert-year { font-family: var(--fm); font-size: 11px; color: var(--ink3); margin-top: 3px; }
 
 /* ── CLIENT PROJECTS ── */
 .client-grid {
@@ -201,9 +201,9 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
   transition: background 0.15s;
 }
 .client-item:hover { background: var(--bg2); }
-.client-num { font-family: var(--fm); font-size: 10px; color: var(--ink3); flex-shrink: 0; margin-top: 2px; }
-.client-name { font-size: 13px; font-weight: 500; }
-.client-for { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.06em; margin-top: 3px; }
+.client-num { font-family: var(--fm); font-size: 11px; color: var(--ink3); flex-shrink: 0; margin-top: 2px; }
+.client-name { font-size: 15px; font-weight: 500; }
+.client-for { font-family: var(--fm); font-size: 11px; color: var(--ink3); letter-spacing: 0.06em; margin-top: 3px; }
 
 /* ── CLIENT LOGOS ── */
 .logo-grid {
@@ -234,11 +234,11 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
 /* ── EXPERIENCE ── */
 .exp-list { display: flex; flex-direction: column; }
 .exp-item { display: grid; grid-template-columns: 160px 1fr; gap: 2.5rem; padding: 2rem 0; border-bottom: 0.5px solid var(--border); }
-.exp-time { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.08em; padding-top: 2px; line-height: 1.6; }
-.exp-role { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
-.exp-company { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.08em; margin-bottom: 12px; }
+.exp-time { font-family: var(--fm); font-size: 11px; color: var(--ink3); letter-spacing: 0.08em; padding-top: 2px; line-height: 1.6; }
+.exp-role { font-size: 16px; font-weight: 500; margin-bottom: 2px; }
+.exp-company { font-family: var(--fm); font-size: 11.5px; color: var(--ink3); letter-spacing: 0.08em; margin-bottom: 12px; }
 .exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-.exp-bullets li { font-size: 13px; color: var(--ink2); line-height: 1.7; padding-left: 14px; position: relative; }
+.exp-bullets li { font-size: 14.5px; color: var(--ink2); line-height: 1.7; padding-left: 14px; position: relative; }
 .exp-bullets li::before { content: '—'; position: absolute; left: 0; color: var(--ink3); }
 
 /* ── SKILLS ── */
@@ -252,8 +252,8 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
   transition: background 0.15s;
 }
 .skill-item:hover { background: var(--bg2); }
-.skill-name { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
-.skill-level { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.06em; }
+.skill-name { font-size: 15px; font-weight: 500; margin-bottom: 3px; }
+.skill-level { font-family: var(--fm); font-size: 11px; color: var(--ink3); letter-spacing: 0.06em; }
 .skill-bar { height: 1.5px; background: var(--border2); border-radius: 1px; margin-top: 10px; overflow: hidden; }
 .skill-fill { height: 100%; background: var(--ink); border-radius: 1px; }
 
@@ -264,11 +264,11 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
   background: var(--bg2); transition: border-color 0.2s;
 }
 .edu-item:hover { border-color: var(--border2); }
-.edu-years { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.10em; margin-bottom: 10px; }
-.edu-school { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
-.edu-program { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.06em; margin-bottom: 10px; }
-.edu-desc { font-size: 13px; color: var(--ink2); line-height: 1.7; }
-.edu-badge { display: inline-block; margin-top: 10px; padding: 4px 10px; border: 0.5px solid var(--border2); border-radius: 100px; font-family: var(--fm); font-size: 10px; color: var(--ink3); }
+.edu-years { font-family: var(--fm); font-size: 11px; color: var(--ink3); letter-spacing: 0.10em; margin-bottom: 10px; }
+.edu-school { font-size: 16px; font-weight: 500; margin-bottom: 3px; }
+.edu-program { font-family: var(--fm); font-size: 11.5px; color: var(--ink3); letter-spacing: 0.06em; margin-bottom: 10px; }
+.edu-desc { font-size: 14.5px; color: var(--ink2); line-height: 1.7; }
+.edu-badge { display: inline-block; margin-top: 10px; padding: 4px 10px; border: 0.5px solid var(--border2); border-radius: 100px; font-family: var(--fm); font-size: 11px; color: var(--ink3); }
 
 /* ── VOLUNTEER ── */
 .vol-list { display: flex; flex-direction: column; }
@@ -276,10 +276,10 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
   display: grid; grid-template-columns: 160px 1fr; gap: 2.5rem;
   padding: 1.5rem 0; border-bottom: 0.5px solid var(--border);
 }
-.vol-time { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.08em; padding-top: 2px; }
-.vol-role { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
-.vol-org { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.08em; margin-bottom: 8px; }
-.vol-desc { font-size: 13px; color: var(--ink2); line-height: 1.7; }
+.vol-time { font-family: var(--fm); font-size: 11px; color: var(--ink3); letter-spacing: 0.08em; padding-top: 2px; }
+.vol-role { font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+.vol-org { font-family: var(--fm); font-size: 11px; color: var(--ink3); letter-spacing: 0.08em; margin-bottom: 8px; }
+.vol-desc { font-size: 14.5px; color: var(--ink2); line-height: 1.7; }
 
 /* ── COURSE ── */
 .course-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -288,24 +288,24 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
   background: var(--bg2); transition: border-color 0.2s;
 }
 .course-item:hover { border-color: var(--border2); }
-.course-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
-.course-org { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.06em; }
-.course-desc { font-size: 12px; color: var(--ink2); margin-top: 6px; line-height: 1.6; }
+.course-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+.course-org { font-family: var(--fm); font-size: 11px; color: var(--ink3); letter-spacing: 0.06em; }
+.course-desc { font-size: 13.5px; color: var(--ink2); margin-top: 6px; line-height: 1.6; }
 
 /* ── OTHER INTERESTS ── */
 .interests-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
 .interest-tag {
   padding: 7px 14px; border: 0.5px solid var(--border2); border-radius: 2px;
-  font-size: 12px; font-family: var(--fm); color: var(--ink2); letter-spacing: 0.04em;
+  font-size: 13px; font-family: var(--fm); color: var(--ink2); letter-spacing: 0.04em;
   transition: background 0.15s, color 0.15s;
 }
 .interest-tag:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
 /* ── CONTACT ── */
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
-.contact-cta { font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 300; line-height: 1.2; letter-spacing: -0.02em; }
+.contact-cta { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 300; line-height: 1.2; letter-spacing: -0.02em; }
 .contact-cta strong { font-weight: 500; }
-.contact-sub { font-size: 13px; color: var(--ink2); margin-top: 1rem; line-height: 1.8; }
+.contact-sub { font-size: 15px; color: var(--ink2); margin-top: 1rem; line-height: 1.8; }
 .contact-links { display: flex; flex-direction: column; }
 .contact-link {
   display: flex; justify-content: space-between; align-items: center;
@@ -314,9 +314,9 @@ section { padding: 4rem 0; border-bottom: 0.5px solid var(--border); }
   transition: padding-left 0.2s;
 }
 .contact-link:hover { padding-left: 6px; }
-.contact-platform { font-family: var(--fm); font-size: 10px; color: var(--ink3); letter-spacing: 0.10em; text-transform: uppercase; margin-bottom: 3px; }
-.contact-value { font-size: 13px; font-weight: 500; }
-.contact-arrow { font-size: 12px; color: var(--ink3); }
+.contact-platform { font-family: var(--fm); font-size: 11px; color: var(--ink3); letter-spacing: 0.10em; text-transform: uppercase; margin-bottom: 3px; }
+.contact-value { font-size: 15px; font-weight: 500; }
+.contact-arrow { font-size: 13px; color: var(--ink3); }
 
 /* ── FOOTER ── */
 footer {
