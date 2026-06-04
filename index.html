@@ -684,51 +684,80 @@
     }
 
     /* ── SKILLS ── */
-    .skills-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+    .skills-groups {
+      display: flex;
+      flex-direction: column;
       border: 0.5px solid var(--border);
       border-radius: 3px;
       overflow: hidden;
     }
 
-    .skill-item {
-      padding: 1.2rem;
-      background: var(--bg);
-      border-right: 0.5px solid var(--border);
+    .skill-group {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 0;
       border-bottom: 0.5px solid var(--border);
-      transition: background 0.15s;
+      align-items: start;
     }
 
-    .skill-item:hover {
-      background: var(--bg2);
+    .skill-group:last-child {
+      border-bottom: none;
     }
 
-    .skill-name {
-      font-size: 15px;
-      font-weight: 500;
-      margin-bottom: 3px;
-    }
-
-    .skill-level {
+    .skill-category-label {
+      padding: 1.1rem 1.25rem;
       font-family: var(--fm);
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--ink3);
-      letter-spacing: 0.06em;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      border-right: 0.5px solid var(--border);
+      background: var(--bg2);
+      line-height: 1.5;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
     }
 
-    .skill-bar {
-      height: 1.5px;
-      background: var(--border2);
-      border-radius: 1px;
-      margin-top: 10px;
-      overflow: hidden;
+    .skill-tags {
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: var(--bg);
     }
 
-    .skill-fill {
-      height: 100%;
-      background: var(--ink);
-      border-radius: 1px;
+    .skill-tag {
+      font-size: 13px;
+      font-weight: 450;
+      color: var(--ink2);
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: 2px;
+      padding: 4px 10px;
+      line-height: 1.4;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .skill-tag:hover {
+      border-color: var(--border2);
+      color: var(--ink);
+    }
+
+    .skill-tag.highlighted {
+      border-color: var(--border2);
+      color: var(--ink);
+    }
+
+    @media (max-width: 700px) {
+      .skill-group {
+        grid-template-columns: 1fr;
+      }
+      .skill-category-label {
+        border-right: none;
+        border-bottom: 0.5px solid var(--border);
+        align-self: auto;
+      }
     }
 
     /* ── EDUCATION ── */
@@ -1399,70 +1428,75 @@
       <div class="section-header">
         <span class="section-title">Skills &amp; Tools</span>
       </div>
-      <div class="skills-grid">
-        <div class="skill-item">
-          <div class="skill-name">Blender 3D</div>
-          <div class="skill-level">Advanced · v2.8, 4.0, 4.5</div>
-          <div class="skill-bar">
-            <div class="skill-fill" style="width:95%"></div>
+      <div class="skills-groups">
+
+        <div class="skill-group">
+          <span class="skill-category-label">Web Development</span>
+          <div class="skill-tags">
+            <span class="skill-tag highlighted">HTML</span>
+            <span class="skill-tag highlighted">CSS</span>
+            <span class="skill-tag highlighted">JavaScript (ES6+)</span>
+            <span class="skill-tag">Tailwind CSS</span>
+            <span class="skill-tag">Responsive Design</span>
+            <span class="skill-tag">DOM Manipulation</span>
+            <span class="skill-tag">REST API Integration</span>
+            <span class="skill-tag">Local Storage / IndexedDB</span>
+            <span class="skill-tag">Google OAuth</span>
           </div>
         </div>
-        <div class="skill-item">
-          <div class="skill-name">Substance Painter</div>
-          <div class="skill-level">Advanced · PBR Workflow</div>
-          <div class="skill-bar">
-            <div class="skill-fill" style="width:90%"></div>
+
+        <div class="skill-group">
+          <span class="skill-category-label">Data &amp; Visualization</span>
+          <div class="skill-tags">
+            <span class="skill-tag highlighted">Chart.js</span>
+            <span class="skill-tag highlighted">D3.js</span>
+            <span class="skill-tag">Three.js</span>
+            <span class="skill-tag">Leaflet.js</span>
+            <span class="skill-tag">PapaParse (CSV)</span>
+            <span class="skill-tag">Real-Time Data Monitoring</span>
+            <span class="skill-tag">Dashboard Design</span>
           </div>
         </div>
-        <div class="skill-item">
-          <div class="skill-name">Adobe Photoshop</div>
-          <div class="skill-level">Advanced</div>
-          <div class="skill-bar">
-            <div class="skill-fill" style="width:85%"></div>
+
+        <div class="skill-group">
+          <span class="skill-category-label">Interactive &amp; Simulation</span>
+          <div class="skill-tags">
+            <span class="skill-tag highlighted">Unity Engine</span>
+            <span class="skill-tag">Unity Certified Associate: Artist</span>
+            <span class="skill-tag">C# Scripting</span>
+            <span class="skill-tag">Network Simulation</span>
+            <span class="skill-tag">WebGL Rendering</span>
+            <span class="skill-tag">VR / Immersive Experiences</span>
+            <span class="skill-tag">Game Asset Optimization</span>
           </div>
         </div>
-        <div class="skill-item">
-          <div class="skill-name">Unity Engine</div>
-          <div class="skill-level">Certified · 2022 LTS, 6 LTS</div>
-          <div class="skill-bar">
-            <div class="skill-fill" style="width:85%"></div>
+
+        <div class="skill-group">
+          <span class="skill-category-label">3D &amp; Creative Pipeline</span>
+          <div class="skill-tags">
+            <span class="skill-tag highlighted">Blender 3D</span>
+            <span class="skill-tag highlighted">Substance Painter</span>
+            <span class="skill-tag">PBR Texturing</span>
+            <span class="skill-tag">Hard Surface Modeling</span>
+            <span class="skill-tag">Environment Design</span>
+            <span class="skill-tag">Character Rigging</span>
+            <span class="skill-tag">Adobe Photoshop</span>
+            <span class="skill-tag">FDM 3D Printing</span>
           </div>
         </div>
-        <div class="skill-item">
-          <div class="skill-name">Environment Design</div>
-          <div class="skill-level">Core Specialty</div>
-          <div class="skill-bar">
-            <div class="skill-fill" style="width:95%"></div>
+
+        <div class="skill-group">
+          <span class="skill-category-label">Dev Tools</span>
+          <div class="skill-tags">
+            <span class="skill-tag highlighted">Git &amp; GitHub</span>
+            <span class="skill-tag">GitHub Pages (Deployment)</span>
+            <span class="skill-tag">VS Code</span>
+            <span class="skill-tag">Browser DevTools</span>
+            <span class="skill-tag">Figma</span>
+            <span class="skill-tag">Linux (CLI)</span>
           </div>
         </div>
-        <div class="skill-item">
-          <div class="skill-name">Hard Surface Modeling</div>
-          <div class="skill-level">Core Specialty</div>
-          <div class="skill-bar">
-            <div class="skill-fill" style="width:92%"></div>
-          </div>
-        </div>
-        <div class="skill-item">
-          <div class="skill-name">Real-Time Asset Workflow</div>
-          <div class="skill-level">Advanced</div>
-          <div class="skill-bar">
-            <div class="skill-fill" style="width:90%"></div>
-          </div>
-        </div>
-        <div class="skill-item">
-          <div class="skill-name">Unreal Engine 5</div>
-          <div class="skill-level">Intermediate · v5.6</div>
-          <div class="skill-bar">
-            <div class="skill-fill" style="width:62%"></div>
-          </div>
-        </div>
-        <div class="skill-item">
-          <div class="skill-name">FDM 3D Printing</div>
-          <div class="skill-level">Intermediate</div>
-          <div class="skill-bar">
-            <div class="skill-fill" style="width:65%"></div>
-          </div>
-        </div>
+
       </div>
     </section>
 
