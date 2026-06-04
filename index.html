@@ -466,8 +466,8 @@
     /* ── PROJECT CARDS ── */
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
 
     .project-card {
@@ -485,23 +485,12 @@
       transform: translateY(-2px);
     }
 
-    .project-card.featured {
-      grid-column: span 2;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-
     .project-thumb {
-      aspect-ratio: 16/9;
+      aspect-ratio: 2.2/1;
       background: var(--bg2);
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
-    }
-
-    .project-card.featured .project-thumb {
-      aspect-ratio: auto;
-      min-height: 220px;
     }
 
     .project-thumb img {
@@ -526,7 +515,7 @@
     }
 
     .project-body {
-      padding: 1.25rem 1.35rem 1.35rem;
+      padding: 0.9rem 1.1rem 1.1rem;
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -535,73 +524,73 @@
     .project-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
-      margin-bottom: 0.85rem;
+      gap: 4px;
+      margin-bottom: 0.5rem;
     }
 
     .project-tag {
       font-family: var(--fm);
-      font-size: 9.5px;
+      font-size: 8.5px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--ink3);
-      border: 0.5px solid var(--border);
+      color: var(--ink2);
+      background: var(--bg2);
       border-radius: 2px;
-      padding: 2px 7px;
+      padding: 1.5px 5px;
     }
 
     .project-name {
-      font-size: 17px;
+      font-size: 13.5px;
       font-weight: 500;
       letter-spacing: -0.01em;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
 
     .project-case {
       display: flex;
       flex-direction: column;
-      gap: 0.55rem;
+      gap: 0.25rem;
       flex: 1;
     }
 
     .case-row {
       display: grid;
-      grid-template-columns: 58px 1fr;
-      gap: 0.6rem;
+      grid-template-columns: 48px 1fr;
+      gap: 0.35rem;
       align-items: baseline;
     }
 
     .case-label {
       font-family: var(--fm);
-      font-size: 9.5px;
-      letter-spacing: 0.10em;
+      font-size: 8px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--ink3);
       padding-top: 1px;
     }
 
     .case-text {
-      font-size: 13.5px;
+      font-size: 11px;
       color: var(--ink2);
-      line-height: 1.65;
+      line-height: 1.4;
     }
 
     .project-links {
       display: flex;
       gap: 10px;
-      margin-top: 1.1rem;
-      padding-top: 1rem;
+      margin-top: 0.6rem;
+      padding-top: 0.6rem;
       border-top: 0.5px solid var(--border);
     }
 
     .project-link {
       font-family: var(--fm);
-      font-size: 10px;
+      font-size: 8.5px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--ink2);
       text-decoration: none;
-      padding: 5px 12px;
+      padding: 3.5px 8px;
       border: 0.5px solid var(--border);
       border-radius: 2px;
       transition: border-color 0.15s, color 0.15s, background 0.15s;
@@ -622,12 +611,14 @@
       color: var(--bg);
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 950px) {
       .projects-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
       }
-      .project-card.featured {
-        grid-column: span 1;
+    }
+
+    @media (max-width: 650px) {
+      .projects-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -1403,8 +1394,8 @@
         </div>
         <div class="projects-grid">
 
-          <!-- FEATURED: PegForge -->
-          <div class="project-card featured">
+          <!-- PegForge -->
+          <div class="project-card">
             <div class="project-thumb">
               <img src="assets/images/screenshots/pegforge.png" alt="PegForge &mdash; 3D Pegboard Configurator">
             </div>
@@ -1415,19 +1406,19 @@
                 <span class="project-tag">3D Printing</span>
                 <span class="project-tag">Vanilla JS</span>
               </div>
-              <div class="project-name">PegForge &mdash; 3D Pegboard Configurator & STL Generator</div>
+              <div class="project-name">PegForge &mdash; 3D Pegboard Configurator</div>
               <div class="project-case">
                 <div class="case-row">
                   <span class="case-label">Problem</span>
-                  <span class="case-text">Finding pegboards in specific dimensions or standard spacing (like IKEA Sk&aring;dis) is difficult, and modeling them manually in CAD is slow and tedious for 3D printing.</span>
+                  <span class="case-text">CAD modeling custom pegboards or IKEA Sk&aring;dis spacing is slow and tedious for 3D printing.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Solution</span>
-                  <span class="case-text">Built a browser-based 3D configurator using Three.js and WebGL. Users can customize panel width/height, thickness, hole shape (circular std or IKEA Sk&aring;dis 1:1), stagger pattern, and material colors. Generates instant estimated print stats (weight in grams, print time) and outputs binary STL files directly from the browser.</span>
+                  <span class="case-text">Built a WebGL 3D configurator with customizable sizes, thickness, hole patterns, and material colors.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Impact</span>
-                  <span class="case-text">Provides a zero-install tool to generate custom, print-ready 3D pegboard files in seconds. Features shareable settings URLs and WhatsApp order integration.</span>
+                  <span class="case-text">Generates instant estimated print stats and exports ready-to-print binary STL files in seconds.</span>
                 </div>
               </div>
               <div class="project-links">
@@ -1448,19 +1439,19 @@
                 <span class="project-tag">Chart.js</span>
                 <span class="project-tag">Tailwind CSS</span>
               </div>
-              <div class="project-name">Nova View &mdash; Space Mission Dashboard & ISS Tracker</div>
+              <div class="project-name">Nova View &mdash; Space & ISS Tracker</div>
               <div class="project-case">
                 <div class="case-row">
                   <span class="case-label">Problem</span>
-                  <span class="case-text">Tracking rocket launches and spacecraft positions (like the ISS) requires navigating fragmented datasets and abstract telemetry without spatial context.</span>
+                  <span class="case-text">Tracking rocket launches and spacecraft positions requires navigating fragmented datasets without spatial context.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Solution</span>
-                  <span class="case-text">Developed a real-time space mission dashboard featuring an interactive 3D WebGL Earth (Three.js), live orbital tracking for ISS and Tiangong, launch site markers, and animated telemetry charts. Integrates public space data APIs for real-time mission countdowns and location updates.</span>
+                  <span class="case-text">Developed an interactive 3D WebGL Earth globe tracking live ISS and Tiangong orbits.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Impact</span>
-                  <span class="case-text">Combines 3D rendering with live streaming APIs into a high-density, glassmorphism dashboard. Offers immediate global tracking of human spaceflights.</span>
+                  <span class="case-text">Provides live high-density orbital paths, launch site markers, and telemetry feeds client-side.</span>
                 </div>
               </div>
               <div class="project-links">
@@ -1479,21 +1470,21 @@
                 <span class="project-tag">JavaScript</span>
                 <span class="project-tag">Tailwind CSS</span>
                 <span class="project-tag">HTML5 Canvas</span>
-                <span class="project-tag">Network Simulation</span>
+                <span class="project-tag">Simulation</span>
               </div>
-              <div class="project-name">NetSim &mdash; Interactive Network Builder & Simulator</div>
+              <div class="project-name">NetSim &mdash; Network Simulator</div>
               <div class="project-case">
                 <div class="case-row">
                   <span class="case-label">Problem</span>
-                  <span class="case-text">Visualizing network topology and packet routing is often restricted to complex, proprietary software, making learning and prototyping hard for beginners.</span>
+                  <span class="case-text">Visualizing network topologies and packet routing is often restricted to complex, proprietary software.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Solution</span>
-                  <span class="case-text">Built a client-side network simulator featuring an interactive drag-and-drop node canvas, configurable cables/links, a built-in mock terminal (CLI) for executing network commands, and real-time packet routing visualization (ping/traceroute simulations).</span>
+                  <span class="case-text">Built an interactive drag-and-drop node canvas with virtual link cables and a simulated Cisco CLI.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Impact</span>
-                  <span class="case-text">Run network architecture simulations client-side with zero backend overhead. Helps students and developers test and visualize packet hops instantly in the browser.</span>
+                  <span class="case-text">Runs interactive packet routing and ping/traceroute simulations completely in the browser.</span>
                 </div>
               </div>
               <div class="project-links">
@@ -1511,22 +1502,22 @@
               <div class="project-tags">
                 <span class="project-tag">JavaScript</span>
                 <span class="project-tag">Leaflet.js</span>
-                <span class="project-tag">Web Audio API</span>
+                <span class="project-tag">Web Audio</span>
                 <span class="project-tag">Tailwind CSS</span>
               </div>
-              <div class="project-name">Al-Jadwal &mdash; Interactive Prayer Times, Qibla, & Quran Hub</div>
+              <div class="project-name">Al-Jadwal &mdash; Islamic Utility Hub</div>
               <div class="project-case">
                 <div class="case-row">
                   <span class="case-label">Problem</span>
-                  <span class="case-text">Existing prayer utilities are often ad-heavy, lack precise coordinate adjustment for remote regions, or require separate apps for Quran reading and Qibla tracking.</span>
+                  <span class="case-text">Existing prayer utilities are often ad-heavy and lack precise GPS coordinates calibration.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Solution</span>
-                  <span class="case-text">Developed a unified, ad-free Islamic utility dashboard featuring Leaflet.js integration for pin-point coordinate mapping, a mathematical Qibla bearing compass, a monthly prayer table with a print-optimized stylesheet, and a built-in Quran reader with audio recitation playback and light/dark theme modes.</span>
+                  <span class="case-text">Integrated Leaflet.js coordinate mapping with prayer time APIs, Qibla compass, and a Quran reader.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Impact</span>
-                  <span class="case-text">Provides a lightweight, responsive, and privacy-respecting client-side application that works offline after the first load and renders perfectly on desktop, mobile, and print.</span>
+                  <span class="case-text">Provides a lightweight, ad-free, offline-first client-side app optimized for desktop and mobile.</span>
                 </div>
               </div>
               <div class="project-links">
@@ -1547,19 +1538,19 @@
                 <span class="project-tag">OAuth 2.0</span>
                 <span class="project-tag">Tailwind CSS</span>
               </div>
-              <div class="project-name">AutoTrack &mdash; Automated Gmail Receipt Parser & Expense Tracker</div>
+              <div class="project-name">AutoTrack &mdash; Gmail Expense Tracker</div>
               <div class="project-case">
                 <div class="case-row">
                   <span class="case-label">Problem</span>
-                  <span class="case-text">Manually logging daily expenses from digital transactions (Gojek, Grab, Tokopedia, Shopee, etc.) is tedious, time-consuming, and highly prone to omission.</span>
+                  <span class="case-text">Logging personal expenses manually from digital transaction emails is tedious and prone to omission.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Solution</span>
-                  <span class="case-text">Built a secure client-side workspace that integrates with the Google Gmail API to scan, decode, and parse e-Receipts automatically. Features custom regex matching to extract line items, prices, and merchants, an anti-promo filter to discard newsletters, and real-time category visualization using Chart.js.</span>
+                  <span class="case-text">Integrated Gmail API to scan and parse e-Receipts automatically with custom regex and anti-promo filters.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Impact</span>
-                  <span class="case-text">Automates the expense tracking loop directly from email receipts to local dashboard insights, removing manual entry and providing breakdown details per item.</span>
+                  <span class="case-text">Automates receipt database logs down to specific line items, visualized via Chart.js.</span>
                 </div>
               </div>
               <div class="project-links">
@@ -1576,23 +1567,23 @@
             <div class="project-body">
               <div class="project-tags">
                 <span class="project-tag">REST API</span>
-                <span class="project-tag">HTML5 Canvas</span>
+                <span class="project-tag">Canvas</span>
                 <span class="project-tag">IndexedDB</span>
                 <span class="project-tag">Tailwind CSS</span>
               </div>
-              <div class="project-name">OpenF1 Dash &mdash; Live F1 Telemetry Replay & Analytics</div>
+              <div class="project-name">OpenF1 Dash &mdash; Telemetry Replay</div>
               <div class="project-case">
                 <div class="case-row">
                   <span class="case-label">Problem</span>
-                  <span class="case-text">Raw Formula 1 telemetry, lap times, and tyre stints are difficult to visualize cohesively, often locked behind subscription packages or presented as raw JSON/CSV feeds.</span>
+                  <span class="case-text">Raw F1 telemetry, lap data, and tyre stints are difficult to visualize cohesively.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Solution</span>
-                  <span class="case-text">Built a dashboard that connects directly to the OpenF1 API (or parses uploaded telemetry CSV/JSON). Implements an IndexedDB caching layer (30-day TTL) for performance, an HTML5 Canvas playback engine to replay driver coordinates and track status in real-time, tyre stint tracking, and interactive constructor/driver standings histories.</span>
+                  <span class="case-text">Built an HTML5 Canvas playback engine that connects to the OpenF1 API with IndexedDB caching.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Impact</span>
-                  <span class="case-text">Enables interactive, synchronized race playback and telemetry comparisons for any session of the current or historical seasons, entirely client-side.</span>
+                  <span class="case-text">Replays synchronized driver track positions and tyre stint charts for any Grand Prix session.</span>
                 </div>
               </div>
               <div class="project-links">
@@ -1609,7 +1600,7 @@
             <div class="project-body">
               <div class="project-tags">
                 <span class="project-tag">JavaScript</span>
-                <span class="project-tag">Local Storage</span>
+                <span class="project-tag">LocalStorage</span>
                 <span class="project-tag">WhatsApp API</span>
                 <span class="project-tag">Vanilla JS</span>
               </div>
@@ -1617,15 +1608,15 @@
               <div class="project-case">
                 <div class="case-row">
                   <span class="case-label">Problem</span>
-                  <span class="case-text">Splitting group bills after dining or events is complex when dealing with individual menu items, tax/service charges, and shared discounts, leading to awkward manual math.</span>
+                  <span class="case-text">Splitting shared event bills with individual items, custom taxes, and shared discounts is complex.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Solution</span>
-                  <span class="case-text">Developed BillBuddy, a serverless group expense calculator that splits bills proportionally. Calculates itemized tax/service ratios, applies discount percentages per person, and generates individual and group bill breakdowns with WhatsApp share shortcuts.</span>
+                  <span class="case-text">Created a serverless app that splits service fees proportionally and deducts discounts per person.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Impact</span>
-                  <span class="case-text">Simplifies shared dining bill calculations down to individual menu assignments, allowing direct WhatsApp sharing of exact personal totals.</span>
+                  <span class="case-text">Outputs individual receipt items and totals with WhatsApp shortcuts for fast sharing.</span>
                 </div>
               </div>
               <div class="project-links">
@@ -1642,23 +1633,23 @@
             <div class="project-body">
               <div class="project-tags">
                 <span class="project-tag">Tailwind CSS</span>
-                <span class="project-tag">HTML5 Canvas</span>
+                <span class="project-tag">Canvas</span>
                 <span class="project-tag">jsPDF</span>
                 <span class="project-tag">Vanilla JS</span>
               </div>
-              <div class="project-name">Moodboard Studio &mdash; Creative Inspiration Canvas</div>
+              <div class="project-name">Moodboard Studio &mdash; Inspiration Canvas</div>
               <div class="project-case">
                 <div class="case-row">
                   <span class="case-label">Problem</span>
-                  <span class="case-text">Creative artists and designers need a lightweight, frictionless space to compile visual mood boards, drop hand-drawn annotations, and export layouts without complex accounts or heavy design suites.</span>
+                  <span class="case-text">Designers need a frictionless canvas to compile visual mood boards and annotations without signing up.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Solution</span>
-                  <span class="case-text">Built Moodboard Studio, a client-side digital board featuring infinite canvas dragging, drag-and-drop image uploads, custom text annotation boxes, freehand sketch brushes, and direct PDF/canvas layout generation (html2canvas, jsPDF).</span>
+                  <span class="case-text">Developed an infinite drag canvas supporting image uploads, sketch brushes, and text blocks.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Impact</span>
-                  <span class="case-text">Enables creative visual brainstorming, fast reference sketching, and layout sharing in a high-performance, dark-theme dashboard that operates entirely client-side.</span>
+                  <span class="case-text">Allows creative visual brainstorming and layout exports to PDF or images entirely client-side.</span>
                 </div>
               </div>
               <div class="project-links">
@@ -1675,23 +1666,23 @@
             <div class="project-body">
               <div class="project-tags">
                 <span class="project-tag">Vanilla CSS</span>
-                <span class="project-tag">HSL Variables</span>
+                <span class="project-tag">HSL Colors</span>
                 <span class="project-tag">A11y</span>
                 <span class="project-tag">Design System</span>
               </div>
-              <div class="project-name">Nova UI &mdash; CSS Variables Design System</div>
+              <div class="project-name">Nova UI &mdash; HSL CSS Design System</div>
               <div class="project-case">
                 <div class="case-row">
                   <span class="case-label">Problem</span>
-                  <span class="case-text">Modern web frameworks often rely on heavy JavaScript bundles or complex build processes, making fast UI prototyping slow and inconsistent across projects.</span>
+                  <span class="case-text">Framework UI libraries carry heavy compile times and styling configurations for fast dashboard prototypes.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Solution</span>
-                  <span class="case-text">Designed and built Nova UI, a lightweight, premium CSS variables framework using pure HSL variables. Features pre-built interactive components (modals, tooltips, accordions, and command palettes) styled with responsive utility grids and zero compile steps.</span>
+                  <span class="case-text">Designed a dark-theme HSL variable UI system with pre-built modals, accordions, and command palettes.</span>
                 </div>
                 <div class="case-row">
                   <span class="case-label">Impact</span>
-                  <span class="case-text">Provides a plug-and-play design system for developers to prototype premium, dark-mode-first interfaces with minimal styling overhead.</span>
+                  <span class="case-text">Enables rapid layout prototyping of modern, accessible dashboards with zero compile steps.</span>
                 </div>
               </div>
               <div class="project-links">
