@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Launcher — Galih Prakoso</title>
+    <title>Web Apps — Galih Prakoso</title>
     
-    <!-- Outfit & JetBrains Mono Fonts -->
+    <!-- Plus Jakarta Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -21,8 +21,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                     }
                 }
             }
@@ -30,443 +29,348 @@
     </script>
     
     <style>
-        body {
-            background-color: #030712;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
-                radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
-            background-size: 100% 100%, 100% 100%, 24px 24px;
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .glass-hover {
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .glass-hover:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--glow-color, rgba(99, 102, 241, 0.4));
-            box-shadow: 
-                0 0 30px -10px var(--glow-color, rgba(99, 102, 241, 0.3)),
-                inset 0 1px 1px rgba(255, 255, 255, 0.1);
-            transform: translateY(-4px) scale(1.01);
-        }
-
-        /* Ambient spotlight animation */
-        .spotlight {
-            position: fixed;
-            width: 40vw;
-            height: 40vw;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 70%);
-            filter: blur(80px);
-            pointer-events: none;
-            z-index: 0;
-            animation: float 20s infinite alternate ease-in-out;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(10vw, 10vh) scale(1.2); }
-        }
-
-        /* Search input glow */
-        .search-input:focus {
-            box-shadow: 0 0 20px -3px rgba(99, 102, 241, 0.25);
-            border-color: rgba(99, 102, 241, 0.4);
-        }
-
-        /* Layout view transition */
-        .app-list-container {
-            transition: all 0.3s ease;
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
     </style>
 </head>
-<body class="min-h-screen text-zinc-100 flex flex-col overflow-x-hidden">
-    
-    <!-- Ambient Spotlights -->
-    <div class="spotlight top-[-10vw] left-[10vw]"></div>
-    <div class="spotlight bottom-[-10vw] right-[10vw]" style="animation-delay: -7s; background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(168, 85, 247, 0) 70%);"></div>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
 
-    <!-- Header / Navbar -->
-    <header class="glass sticky top-0 z-50 border-b border-white/5 py-4 px-6 backdrop-blur-md">
+    <!-- Header Navbar -->
+    <header class="bg-white border-b border-slate-200 py-5 px-6 sticky top-0 z-50">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-                    <i class="ph-bold ph-square-half text-lg"></i>
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+                    <i class="ph-bold ph-squares-four text-base"></i>
                 </div>
                 <div>
-                    <span class="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Workspace</span>
-                    <h1 class="text-sm font-bold text-zinc-100 mt-0.5 leading-none">Galih Prakoso Hub</h1>
+                    <h1 class="text-sm font-bold text-slate-900 leading-none">Galih Prakoso</h1>
+                    <span class="text-[10px] text-slate-400 font-semibold tracking-wider">Aplikasi Web Aktif</span>
                 </div>
             </div>
-            <a href="../index.html" class="flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-indigo-400 border border-white/5 hover:border-indigo-500/30 px-4 py-2 rounded-xl transition-all duration-300 bg-white/[0.01]">
+            <a href="../index.html" class="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-indigo-600 border border-slate-200 hover:border-indigo-100 px-3.5 py-2 rounded-xl transition-all bg-slate-50/50">
                 <i class="ph ph-arrow-left"></i>
                 Kembali ke Portfolio
             </a>
         </div>
     </header>
 
-    <!-- Main Section -->
-    <main class="max-w-6xl w-full mx-auto px-6 py-12 flex-grow z-10 flex flex-col">
+    <!-- Main Workspace -->
+    <main class="max-w-6xl w-full mx-auto px-6 pt-16 pb-16 flex-grow flex flex-col">
         
         <!-- Welcome Hero -->
-        <div class="mb-12">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-4 animate-pulse">
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                Console Active
-            </div>
-            <h2 class="text-4xl md:text-5xl font-black tracking-tight text-white leading-none">
-                Web Applications <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Launcher</span>
+        <div class="mb-10">
+            <h2 class="text-3xl font-black text-slate-900 tracking-tight">
+                Web Applications Launcher
             </h2>
-            <p class="text-zinc-400 text-sm mt-3 max-w-xl leading-relaxed">
-                Pilih dan luncurkan berbagai modul utilitas web, dasbor visualisasi, dan simulator interaktif yang dirancang untuk kebutuhan taktis dan kreatif.
+            <p class="text-slate-500 text-sm mt-2 max-w-xl leading-relaxed">
+                Koleksi sistem simulator, utilitas finansial, serta instrumen desain 3D yang aktif dalam portofolio saya. Cari dan luncurkan modul di bawah ini.
             </p>
         </div>
 
-        <!-- Controls Toolbar -->
-        <div class="glass rounded-2xl p-4 mb-8 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-            <!-- Search & Filters -->
-            <div class="flex-1 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-                <!-- Search bar -->
-                <div class="relative flex-1">
-                    <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-base"></i>
-                    <input type="text" id="searchInput" placeholder="Cari aplikasi..." class="search-input w-full bg-white/[0.02] border border-white/10 rounded-xl py-3 pl-11 pr-14 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium">
-                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold font-mono text-zinc-500 bg-white/5 border border-white/10 px-2 py-0.5 rounded shadow-sm">/</span>
-                </div>
-                
-                <!-- Category Tabs -->
-                <div class="flex gap-1 bg-white/[0.02] border border-white/10 p-1.5 rounded-xl overflow-x-auto scrollbar-none shrink-0" id="filterTabs">
-                    <button onclick="filterCategory('all', this)" class="tab-btn px-4 py-2 text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-lg transition-all duration-300">Semua</button>
-                    <button onclick="filterCategory('utility', this)" class="tab-btn px-4 py-2 text-xs font-bold text-zinc-400 hover:text-zinc-200 rounded-lg transition-all duration-300">Utilitas</button>
-                    <button onclick="filterCategory('finance', this)" class="tab-btn px-4 py-2 text-xs font-bold text-zinc-400 hover:text-zinc-200 rounded-lg transition-all duration-300">Finansial</button>
-                    <button onclick="filterCategory('creative', this)" class="tab-btn px-4 py-2 text-xs font-bold text-zinc-400 hover:text-zinc-200 rounded-lg transition-all duration-300">Desain & 3D</button>
-                    <button onclick="filterCategory('space-sports', this)" class="tab-btn px-4 py-2 text-xs font-bold text-zinc-400 hover:text-zinc-200 rounded-lg transition-all duration-300">Sains & Olahraga</button>
-                </div>
+        <!-- Toolbar: Search & Filter Categories -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-8 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between shadow-sm">
+            <!-- Search bar -->
+            <div class="relative flex-1 max-w-md">
+                <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base"></i>
+                <input type="text" id="searchInput" placeholder="Cari modul aplikasi..." class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-11 pr-10 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">/</span>
             </div>
-
-            <!-- Layout View Switcher -->
-            <div class="flex items-center gap-2 shrink-0 border-t md:border-t-0 border-white/5 pt-3 md:pt-0">
-                <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider mr-2">Tampilan</span>
-                <div class="flex bg-white/[0.02] border border-white/10 p-1 rounded-xl">
-                    <button id="gridBtn" onclick="toggleView('grid')" class="p-2 text-indigo-400 bg-indigo-500/10 rounded-lg" title="Grid View">
-                        <i class="ph-bold ph-squares-four text-base"></i>
-                    </button>
-                    <button id="listBtn" onclick="toggleView('list')" class="p-2 text-zinc-500 hover:text-zinc-300 rounded-lg" title="List View">
-                        <i class="ph-bold ph-list text-base"></i>
-                    </button>
-                </div>
+            
+            <!-- Category Tabs -->
+            <div class="flex gap-1 bg-slate-50 border border-slate-200 p-1 rounded-xl overflow-x-auto scrollbar-none" id="filterTabs">
+                <button onclick="filterCategory('all', this)" class="tab-btn px-4 py-2 text-xs font-bold text-indigo-600 bg-white border border-slate-200/60 rounded-lg shadow-sm transition-all duration-200">Semua</button>
+                <button onclick="filterCategory('utility', this)" class="tab-btn px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-200">Utilitas</button>
+                <button onclick="filterCategory('finance', this)" class="tab-btn px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-200">Finansial</button>
+                <button onclick="filterCategory('creative', this)" class="tab-btn px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-200">Desain & 3D</button>
+                <button onclick="filterCategory('space-sports', this)" class="tab-btn px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-200">Sains & Olahraga</button>
             </div>
         </div>
 
-        <!-- Apps Launcher Grid / List -->
-        <div id="appsContainer" class="app-list-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Apps List Grid -->
+        <div id="appsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             
             <!-- aljadwal -->
-            <div class="app-card glass glass-hover rounded-2xl p-6 relative overflow-hidden group" data-category="utility" data-tags="jadwal sholat prayer prayer schedule quran al-quran" style="--glow-color: rgba(99, 102, 241, 0.35);">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all duration-500"></div>
-                <div class="flex flex-col h-full justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-all duration-300 shrink-0">
-                            <i class="ph-bold ph-mosque text-2xl"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">Al Jadwal</h3>
-                                <span class="text-[9px] font-mono font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">v1.4</span>
-                            </div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Utility & Prayer</span>
-                            <p class="text-zinc-400 text-xs mt-2.5 leading-relaxed max-w-sm">Jadwal sholat bulanan lengkap dengan hitung mundur real-time, arah kiblat berbasis peta kompas, dan modul Al-Quran digital.</p>
+            <div class="app-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-category="utility" data-tags="aljadwal jadwal sholat prayer schedule quran baca alquran">
+                <div>
+                    <!-- 16:9 Thumbnail (Gradient fallback + screenshot auto-load) -->
+                    <div class="relative aspect-[16/9] w-full bg-gradient-to-br from-indigo-500 to-teal-500 flex flex-col items-center justify-center p-4 text-center overflow-hidden border-b border-slate-100">
+                        <img src="../assets/images/thumb_aljadwal.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" alt="Al Jadwal Thumbnail">
+                        <div class="z-10 flex flex-col items-center text-white">
+                            <i class="ph-bold ph-mosque text-3xl mb-1.5 drop-shadow"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">Al Jadwal App</span>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <div class="flex gap-1.5 text-[10px] text-zinc-400 font-bold uppercase">
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Prayer</span>
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Quran</span>
+                    <!-- Details -->
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base font-bold text-slate-900">Al Jadwal</h3>
+                            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded">v1.4</span>
                         </div>
-                        <a href="../aljadwal/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl transition-all duration-300 shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20">
-                            Launch
-                            <i class="ph-bold ph-arrow-right"></i>
-                        </a>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Utilitas & Jadwal</span>
+                        <p class="text-slate-500 text-xs mt-2.5 leading-relaxed">Jadwal sholat bulanan lengkap dengan hitung mundur real-time, arah kiblat, serta bacaan Al-Quran digital.</p>
                     </div>
+                </div>
+                <div class="p-5 pt-0 mt-auto flex justify-between items-center">
+                    <span class="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">Utility</span>
+                    <a href="../aljadwal/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl transition-all">
+                        Buka
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
             <!-- bills (AutoTrack) -->
-            <div class="app-card glass glass-hover rounded-2xl p-6 relative overflow-hidden group" data-category="finance" data-tags="expense tracking gmail automation receipt e-receipt" style="--glow-color: rgba(16, 185, 129, 0.35);">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all duration-500"></div>
-                <div class="flex flex-col h-full justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-all duration-300 shrink-0">
-                            <i class="ph-bold ph-receipt text-2xl"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">AutoTrack</h3>
-                                <span class="text-[9px] font-mono font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">e-receipt</span>
-                            </div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Automation & Finance</span>
-                            <p class="text-zinc-400 text-xs mt-2.5 leading-relaxed max-w-sm">Sistem otomasi untuk mendeteksi, mengekstrak, dan mencatat data transaksi pengeluaran langsung dari inbox Gmail secara real-time.</p>
+            <div class="app-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-category="finance" data-tags="autotrack bills gmail automation expense tracker e-receipt">
+                <div>
+                    <div class="relative aspect-[16/9] w-full bg-gradient-to-br from-emerald-500 to-teal-500 flex flex-col items-center justify-center p-4 text-center overflow-hidden border-b border-slate-100">
+                        <img src="../assets/images/thumb_bills.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" alt="AutoTrack Thumbnail">
+                        <div class="z-10 flex flex-col items-center text-white">
+                            <i class="ph-bold ph-receipt text-3xl mb-1.5 drop-shadow"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">AutoTrack App</span>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <div class="flex gap-1.5 text-[10px] text-zinc-400 font-bold uppercase">
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Finance</span>
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">API</span>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base font-bold text-slate-900">AutoTrack</h3>
+                            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded">API</span>
                         </div>
-                        <a href="../bills/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-xl transition-all duration-300 shadow-lg shadow-emerald-600/10 hover:shadow-emerald-600/20">
-                            Launch
-                            <i class="ph-bold ph-arrow-right"></i>
-                        </a>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Automasi & Keuangan</span>
+                        <p class="text-slate-500 text-xs mt-2.5 leading-relaxed">Sistem otomasi pencatatan pengeluaran yang mengekstrak data e-Receipt langsung dari kotak masuk Gmail secara teratur.</p>
                     </div>
+                </div>
+                <div class="p-5 pt-0 mt-auto flex justify-between items-center">
+                    <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">Finance</span>
+                    <a href="../bills/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-xl transition-all">
+                        Buka
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
             <!-- dashf1 -->
-            <div class="app-card glass glass-hover rounded-2xl p-6 relative overflow-hidden group" data-category="space-sports" data-tags="formula 1 f1 telemetry dashboard racing race charts sports openf1" style="--glow-color: rgba(239, 68, 68, 0.35);">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-2xl group-hover:bg-red-500/10 transition-all duration-500"></div>
-                <div class="flex flex-col h-full justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center text-red-400 group-hover:scale-110 transition-all duration-300 shrink-0">
-                            <i class="ph-bold ph-flag text-2xl"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-white group-hover:text-red-300 transition-colors">OpenF1 Dash</h3>
-                                <span class="text-[9px] font-mono font-bold tracking-widest text-red-400 uppercase bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded">f1 data</span>
-                            </div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Telemetry & Sports</span>
-                            <p class="text-zinc-400 text-xs mt-2.5 leading-relaxed max-w-sm">Dasbor visualisasi data telemetri interaktif untuk Formula 1. Memantau posisi pembalap, grafik lap, dan perbandingan performa ban.</p>
+            <div class="app-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-category="space-sports" data-tags="openf1 dash formula 1 f1 telemetry dashboard racing lap charts">
+                <div>
+                    <div class="relative aspect-[16/9] w-full bg-gradient-to-br from-red-500 to-orange-500 flex flex-col items-center justify-center p-4 text-center overflow-hidden border-b border-slate-100">
+                        <img src="../assets/images/thumb_dashf1.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" alt="OpenF1 Thumbnail">
+                        <div class="z-10 flex flex-col items-center text-white">
+                            <i class="ph-bold ph-flag text-3xl mb-1.5 drop-shadow"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">OpenF1 Dash</span>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <div class="flex gap-1.5 text-[10px] text-zinc-400 font-bold uppercase">
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Telemetry</span>
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Charts</span>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base font-bold text-slate-900">OpenF1 Dash</h3>
+                            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded">F1 DATA</span>
                         </div>
-                        <a href="../dashf1/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-500 px-4 py-2 rounded-xl transition-all duration-300 shadow-lg shadow-red-600/10 hover:shadow-red-600/20">
-                            Launch
-                            <i class="ph-bold ph-arrow-right"></i>
-                        </a>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Telemetri & Olahraga</span>
+                        <p class="text-slate-500 text-xs mt-2.5 leading-relaxed">Dasbor visualisasi data telemetri interaktif untuk Formula 1. Memantau ban, grafik lap, dan perbandingan balapan pembalap.</p>
                     </div>
+                </div>
+                <div class="p-5 pt-0 mt-auto flex justify-between items-center">
+                    <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">Sports</span>
+                    <a href="../dashf1/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl transition-all">
+                        Buka
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
             <!-- nova -->
-            <div class="app-card glass glass-hover rounded-2xl p-6 relative overflow-hidden group" data-category="space-sports" data-tags="space rocket launch tracking iss tracker orbit 3d globe satellite" style="--glow-color: rgba(139, 92, 246, 0.35);">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all duration-500"></div>
-                <div class="flex flex-col h-full justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center text-purple-400 group-hover:scale-110 transition-all duration-300 shrink-0">
-                            <i class="ph-bold ph-rocket-launch text-2xl"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">Nova View</h3>
-                                <span class="text-[9px] font-mono font-bold tracking-widest text-purple-400 uppercase bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded">3d orbit</span>
-                            </div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Orbit Tracker & Space</span>
-                            <p class="text-zinc-400 text-xs mt-2.5 leading-relaxed max-w-sm">Monitor peluncuran roket dunia, stasiun angkasa (ISS & Tiangong), dan visualisasi satelit real-time di atas globe 3D interaktif.</p>
+            <div class="app-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-category="space-sports" data-tags="nova view space orbit tracker launch rocket satellite iss globe 3d">
+                <div>
+                    <div class="relative aspect-[16/9] w-full bg-gradient-to-br from-purple-500 to-indigo-600 flex flex-col items-center justify-center p-4 text-center overflow-hidden border-b border-slate-100">
+                        <img src="../assets/images/thumb_nova.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" alt="Nova View Thumbnail">
+                        <div class="z-10 flex flex-col items-center text-white">
+                            <i class="ph-bold ph-rocket-launch text-3xl mb-1.5 drop-shadow"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">Nova View</span>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <div class="flex gap-1.5 text-[10px] text-zinc-400 font-bold uppercase">
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Three.js</span>
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Space</span>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base font-bold text-slate-900">Nova View</h3>
+                            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded">3D GLOBE</span>
                         </div>
-                        <a href="../nova/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/20">
-                            Launch
-                            <i class="ph-bold ph-arrow-right"></i>
-                        </a>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Orbit Tracker & Space</span>
+                        <p class="text-slate-500 text-xs mt-2.5 leading-relaxed">Pelacak peluncuran roket dunia dan stasiun antariksa secara real-time di atas globe 3D interaktif berbasis Three.js.</p>
                     </div>
+                </div>
+                <div class="p-5 pt-0 mt-auto flex justify-between items-center">
+                    <span class="bg-purple-50 text-purple-600 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">Space</span>
+                    <a href="../nova/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl transition-all">
+                        Buka
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
             <!-- pegforge -->
-            <a href="../pegforge/" class="app-card glass glass-hover rounded-2xl p-6 relative overflow-hidden group block" data-category="creative" data-tags="pegboard 3d model generator stl export mesh print 3d print" style="--glow-color: rgba(245, 158, 11, 0.35);">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-all duration-500"></div>
-                <div class="flex flex-col h-full justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center text-amber-400 group-hover:scale-110 transition-all duration-300 shrink-0">
-                            <i class="ph-bold ph-cube text-2xl"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-white group-hover:text-amber-300 transition-colors">PegForge</h3>
-                                <span class="text-[9px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">stl tool</span>
-                            </div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">3D Modeling & Print</span>
-                            <p class="text-zinc-400 text-xs mt-2.5 leading-relaxed max-w-sm">Generator pegboard 3D interaktif. Kustomisasi panjang, lebar, pola lubang, dan ekspor file STL geometris siap cetak 3D.</p>
+            <div class="app-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-category="creative" data-tags="pegforge 3d model pegboard generator print stl mesh">
+                <div>
+                    <div class="relative aspect-[16/9] w-full bg-gradient-to-br from-amber-500 to-orange-500 flex flex-col items-center justify-center p-4 text-center overflow-hidden border-b border-slate-100">
+                        <img src="../assets/images/thumb_pegforge.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" alt="PegForge Thumbnail">
+                        <div class="z-10 flex flex-col items-center text-white">
+                            <i class="ph-bold ph-cube text-3xl mb-1.5 drop-shadow"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">PegForge 3D</span>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <div class="flex gap-1.5 text-[10px] text-zinc-400 font-bold uppercase">
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Three.js</span>
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">STL</span>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base font-bold text-slate-900">PegForge</h3>
+                            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded">STL</span>
                         </div>
-                        <button class="flex items-center gap-1.5 text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded-xl transition-all duration-300 shadow-lg shadow-amber-600/10 hover:shadow-amber-600/20">
-                            Launch
-                            <i class="ph-bold ph-arrow-right"></i>
-                        </button>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Desain & Cetak 3D</span>
+                        <p class="text-slate-500 text-xs mt-2.5 leading-relaxed">Generator pegboard 3D interaktif. Sesuaikan baris, kolom, ketebalan, dan ekspor instan file STL siap cetak 3D.</p>
                     </div>
                 </div>
-            </a>
+                <div class="p-5 pt-0 mt-auto flex justify-between items-center">
+                    <span class="bg-amber-50 text-amber-600 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">3D Design</span>
+                    <a href="../pegforge/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-xl transition-all">
+                        Buka
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
 
             <!-- split (BillBuddy) -->
-            <div class="app-card glass glass-hover rounded-2xl p-6 relative overflow-hidden group" data-category="finance" data-tags="split bills splitbill tagged bills buddy tagihan makan" style="--glow-color: rgba(6, 182, 212, 0.35);">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl group-hover:bg-cyan-500/10 transition-all duration-500"></div>
-                <div class="flex flex-col h-full justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-all duration-300 shrink-0">
-                            <i class="ph-bold ph-users text-2xl"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors">BillBuddy</h3>
-                                <span class="text-[9px] font-mono font-bold tracking-widest text-cyan-400 uppercase bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded">split bill</span>
-                            </div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Kalkulator & Finance</span>
-                            <p class="text-zinc-400 text-xs mt-2.5 leading-relaxed max-w-sm">Hitung dan bagi tagihan pembayaran makanan bersama teman dengan kalkulasi pajak, diskon, dan tip secara terperinci.</p>
+            <div class="app-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-category="finance" data-tags="billbuddy split bills tagged tagihan splitbill finance">
+                <div>
+                    <div class="relative aspect-[16/9] w-full bg-gradient-to-br from-cyan-500 to-blue-500 flex flex-col items-center justify-center p-4 text-center overflow-hidden border-b border-slate-100">
+                        <img src="../assets/images/thumb_split.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" alt="BillBuddy Thumbnail">
+                        <div class="z-10 flex flex-col items-center text-white">
+                            <i class="ph-bold ph-users text-3xl mb-1.5 drop-shadow"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">BillBuddy App</span>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <div class="flex gap-1.5 text-[10px] text-zinc-400 font-bold uppercase">
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Calculator</span>
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Finance</span>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base font-bold text-slate-900">BillBuddy</h3>
+                            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded">SPLIT</span>
                         </div>
-                        <a href="../split/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 px-4 py-2 rounded-xl transition-all duration-300 shadow-lg shadow-cyan-600/10 hover:shadow-cyan-600/20">
-                            Launch
-                            <i class="ph-bold ph-arrow-right"></i>
-                        </a>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kalkulator & Keuangan</span>
+                        <p class="text-slate-500 text-xs mt-2.5 leading-relaxed">Alat bagi tagihan makan bersama secara adil dan rinci dengan hitungan otomatis pajak, diskon, dan tip per orang.</p>
                     </div>
+                </div>
+                <div class="p-5 pt-0 mt-auto flex justify-between items-center">
+                    <span class="bg-cyan-50 text-cyan-600 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">Finance</span>
+                    <a href="../split/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded-xl transition-all">
+                        Buka
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
             <!-- board (Moodboard Studio) -->
-            <div class="app-card glass glass-hover rounded-2xl p-6 relative overflow-hidden group" data-category="creative" data-tags="moodboard studio canvas design transform pdf export pen tool sketch creative" style="--glow-color: rgba(37, 99, 235, 0.35);">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all duration-500"></div>
-                <div class="flex flex-col h-full justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-blue-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center text-blue-400 group-hover:scale-110 transition-all duration-300 shrink-0">
-                            <i class="ph-bold ph-palette text-2xl"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">Moodboard</h3>
-                                <span class="text-[9px] font-mono font-bold tracking-widest text-blue-400 uppercase bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded">design</span>
-                            </div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Canvas & Design Tool</span>
-                            <p class="text-zinc-400 text-xs mt-2.5 leading-relaxed max-w-sm">Kanvas kolase interaktif untuk merancang inspirasi visual dengan dukungan pen-tool gambar, transformasi objek, dan ekspor lembar PDF.</p>
+            <div class="app-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-category="creative" data-tags="moodboard studio canvas design pdf export pen tool sketch layout">
+                <div>
+                    <div class="relative aspect-[16/9] w-full bg-gradient-to-br from-blue-500 to-indigo-500 flex flex-col items-center justify-center p-4 text-center overflow-hidden border-b border-slate-100">
+                        <img src="../assets/images/thumb_board.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" alt="Moodboard Thumbnail">
+                        <div class="z-10 flex flex-col items-center text-white">
+                            <i class="ph-bold ph-palette text-3xl mb-1.5 drop-shadow"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">Moodboard Studio</span>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <div class="flex gap-1.5 text-[10px] text-zinc-400 font-bold uppercase">
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Canvas</span>
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">PDF</span>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base font-bold text-slate-900">Moodboard</h3>
+                            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded">CANVAS</span>
                         </div>
-                        <a href="../board/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/20">
-                            Launch
-                            <i class="ph-bold ph-arrow-right"></i>
-                        </a>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kanvas & Desain Visual</span>
+                        <p class="text-slate-500 text-xs mt-2.5 leading-relaxed">Papan ide tak terbatas untuk menyusun inspirasi kolase gambar dengan fitur coretan tangan bebas dan ekspor ke lembar PDF.</p>
                     </div>
+                </div>
+                <div class="p-5 pt-0 mt-auto flex justify-between items-center">
+                    <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">Design</span>
+                    <a href="../board/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl transition-all">
+                        Buka
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
             <!-- dantist (NetSim) -->
-            <div class="app-card glass glass-hover rounded-2xl p-6 relative overflow-hidden group" data-category="utility" data-tags="netsim dantist network simulator cisco router switch cli console osi layer topology" style="--glow-color: rgba(99, 102, 241, 0.35);">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all duration-500"></div>
-                <div class="flex flex-col h-full justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-all duration-300 shrink-0">
-                            <i class="ph-bold ph-terminal text-2xl"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">NetSim Simulator</h3>
-                                <span class="text-[9px] font-mono font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">cisco cli</span>
-                            </div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Networking & Simulator</span>
-                            <p class="text-zinc-400 text-xs mt-2.5 leading-relaxed max-w-sm">Simulator topologi jaringan komputer interaktif berbasis cisco. Menghubungkan router, melakukan konfigurasi CLI, dan menganalisis log paket OSI Layer.</p>
+            <div class="app-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-category="utility" data-tags="netsim dantist network simulator cisco router switch cli console osi layer topology">
+                <div>
+                    <div class="relative aspect-[16/9] w-full bg-gradient-to-br from-slate-600 to-indigo-800 flex flex-col items-center justify-center p-4 text-center overflow-hidden border-b border-slate-100">
+                        <img src="../assets/images/thumb_dantist.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" alt="NetSim Thumbnail">
+                        <div class="z-10 flex flex-col items-center text-white">
+                            <i class="ph-bold ph-terminal text-3xl mb-1.5 drop-shadow"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">NetSim Simulator</span>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <div class="flex gap-1.5 text-[10px] text-zinc-400 font-bold uppercase">
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Cisco CLI</span>
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">OSI Log</span>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base font-bold text-slate-900">NetSim Simulator</h3>
+                            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded">CLI</span>
                         </div>
-                        <a href="../dantist/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl transition-all duration-300 shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20">
-                            Launch
-                            <i class="ph-bold ph-arrow-right"></i>
-                        </a>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Jaringan & Simulator</span>
+                        <p class="text-slate-500 text-xs mt-2.5 leading-relaxed">Laboratorium simulasi topologi jaringan komputer interaktif berbasis command-line console cisco dan log OSI Layer.</p>
                     </div>
+                </div>
+                <div class="p-5 pt-0 mt-auto flex justify-between items-center">
+                    <span class="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">Simulator</span>
+                    <a href="../dantist/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl transition-all">
+                        Buka
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
             <!-- novaui -->
-            <div class="app-card glass glass-hover rounded-2xl p-6 relative overflow-hidden group" data-category="creative" data-tags="novaui framework css components design system ui layout video editor docs" style="--glow-color: rgba(236, 72, 153, 0.35);">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl group-hover:bg-pink-500/10 transition-all duration-500"></div>
-                <div class="flex flex-col h-full justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-pink-500/10 border border-pink-500/20 rounded-2xl flex items-center justify-center text-pink-400 group-hover:scale-110 transition-all duration-300 shrink-0">
-                            <i class="ph-bold ph-sparkle text-2xl"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-white group-hover:text-pink-300 transition-colors">Nova UI</h3>
-                                <span class="text-[9px] font-mono font-bold tracking-widest text-pink-400 uppercase bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded">v1.0</span>
-                            </div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Design System & Framework</span>
-                            <p class="text-zinc-400 text-xs mt-2.5 leading-relaxed max-w-sm">Sistem desain dan framework CSS UI modern berbasis variabel HSL murni. Ringan, responsif, dan menyertakan demo Video Editor interaktif.</p>
+            <div class="app-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-category="creative" data-tags="novaui framework css components design system ui layout video editor docs docs">
+                <div>
+                    <div class="relative aspect-[16/9] w-full bg-gradient-to-br from-pink-500 to-rose-500 flex flex-col items-center justify-center p-4 text-center overflow-hidden border-b border-slate-100">
+                        <img src="../assets/images/thumb_novaui.png" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" alt="Nova UI Thumbnail">
+                        <div class="z-10 flex flex-col items-center text-white">
+                            <i class="ph-bold ph-sparkle text-3xl mb-1.5 drop-shadow"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">Nova UI</span>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <div class="flex gap-1.5 text-[10px] text-zinc-400 font-bold uppercase">
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">Framework</span>
-                            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded-lg">CSS</span>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base font-bold text-slate-900">Nova UI</h3>
+                            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded">CSS</span>
                         </div>
-                        <a href="../novaui/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-pink-600 hover:bg-pink-500 px-4 py-2 rounded-xl transition-all duration-300 shadow-lg shadow-pink-600/10 hover:shadow-pink-600/20">
-                            Launch
-                            <i class="ph-bold ph-arrow-right"></i>
-                        </a>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Design System & Framework</span>
+                        <p class="text-slate-500 text-xs mt-2.5 leading-relaxed">Sistem desain dan framework UI CSS modern berbasis variabel HSL. Ringan, siap pakai, lengkap dengan demo Editor Video.</p>
                     </div>
+                </div>
+                <div class="p-5 pt-0 mt-auto flex justify-between items-center">
+                    <span class="bg-pink-50 text-pink-600 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">UI System</span>
+                    <a href="../novaui/" class="flex items-center gap-1.5 text-xs font-bold text-white bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-xl transition-all">
+                        Buka
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
         </div>
 
-        <!-- Empty State Search -->
-        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center glass rounded-2xl border border-white/5 bg-white/[0.01] my-auto">
-            <div class="w-16 h-16 rounded-full bg-zinc-800/50 flex items-center justify-center text-zinc-600 mb-4 border border-white/5">
-                <i class="ph ph-magnifying-glass text-3xl"></i>
+        <!-- Empty Search Result -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center bg-white border border-slate-200 rounded-2xl my-auto">
+            <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3 border border-slate-200">
+                <i class="ph ph-magnifying-glass text-2xl"></i>
             </div>
-            <h3 class="text-lg font-bold text-white">Tidak ada aplikasi ditemukan</h3>
-            <p class="text-xs text-zinc-500 mt-2 max-w-xs leading-relaxed">Coba ganti kata kunci pencarian Anda atau periksa tab filter kategori aktif.</p>
-            <button onclick="clearSearch()" class="mt-5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/15">Reset Pencarian</button>
+            <h3 class="text-base font-bold text-slate-900">Tidak ada aplikasi yang cocok</h3>
+            <p class="text-xs text-slate-400 mt-1.5 max-w-xs leading-relaxed">Cobalah mengganti kata kunci pencarian atau memilih kategori filter yang lain.</p>
+            <button onclick="clearSearch()" class="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">Reset Pencarian</button>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-white/5 py-6 mt-auto glass bg-black/40">
-        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-zinc-500 text-xs font-bold uppercase tracking-wider">
+    <footer class="border-t border-slate-200 py-6 mt-auto bg-white">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-slate-400 text-xs font-bold uppercase tracking-wider">
             <p>© 2026 Galih Prakoso</p>
-            <p class="font-mono text-[10px] text-zinc-600">Secure link active &middot; Status 200 OK</p>
+            <p class="text-[10px] text-slate-300">Status 200 OK</p>
         </div>
     </footer>
 
-    <!-- Interactive script -->
+    <!-- Script Interactions -->
     <script>
         let activeCategory = 'all';
-        let viewMode = 'grid';
 
-        // Keyboard hotkey to focus search
+        // Keyboard search focus '/'
         window.addEventListener('keydown', (e) => {
             if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
                 e.preventDefault();
@@ -475,31 +379,31 @@
             }
         });
 
-        // Search live filter
+        // Real-time search typing
         document.getElementById('searchInput').addEventListener('input', () => {
             performFiltering();
         });
 
-        // Clear search input
+        // Reset search field
         function clearSearch() {
             document.getElementById('searchInput').value = '';
             performFiltering();
         }
 
-        // Tab Filter
+        // Category click filter
         function filterCategory(category, button) {
             activeCategory = category;
             
             // Toggle active style
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = 'tab-btn px-4 py-2 text-xs font-bold text-zinc-400 hover:text-zinc-200 rounded-lg transition-all duration-300';
+                btn.className = 'tab-btn px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 rounded-lg transition-all duration-200';
             });
-            button.className = 'tab-btn px-4 py-2 text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-lg transition-all duration-300';
+            button.className = 'tab-btn px-4 py-2 text-xs font-bold text-indigo-600 bg-white border border-slate-200/60 rounded-lg shadow-sm transition-all duration-200';
 
             performFiltering();
         }
 
-        // Perform composite filtering (category + search)
+        // Core filter mechanism
         function performFiltering() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const cards = document.querySelectorAll('.app-card');
@@ -511,7 +415,7 @@
                 const title = card.querySelector('h3').textContent.toLowerCase();
                 const desc = card.querySelector('p').textContent.toLowerCase();
 
-                // Category match
+                // Category verification
                 let matchesCategory = false;
                 if (activeCategory === 'all') {
                     matchesCategory = true;
@@ -521,18 +425,18 @@
                     matchesCategory = (category === activeCategory);
                 }
 
-                // Search match
+                // Search query verification
                 const matchesSearch = title.includes(query) || desc.includes(query) || tags.includes(query);
 
                 if (matchesCategory && matchesSearch) {
-                    card.style.display = '';
+                    card.style.display = 'flex';
                     visibleCount++;
                 } else {
                     card.style.display = 'none';
                 }
             });
 
-            // Empty state display toggle
+            // Toggle empty placeholder UI
             const emptyState = document.getElementById('emptyState');
             const appsContainer = document.getElementById('appsContainer');
             if (visibleCount === 0) {
@@ -540,45 +444,8 @@
                 appsContainer.style.display = 'none';
             } else {
                 emptyState.style.display = 'none';
-                if (viewMode === 'grid') {
-                    appsContainer.style.display = 'grid';
-                } else {
-                    appsContainer.style.display = 'flex';
-                }
+                appsContainer.style.display = 'grid';
             }
-        }
-
-        // Layout Switcher
-        function toggleView(mode) {
-            viewMode = mode;
-            const container = document.getElementById('appsContainer');
-            const gridBtn = document.getElementById('gridBtn');
-            const listBtn = document.getElementById('listBtn');
-
-            if (mode === 'grid') {
-                container.className = 'app-list-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5';
-                
-                // Reset card layouts from list layout alterations
-                document.querySelectorAll('.app-card').forEach(card => {
-                    card.querySelector('.flex-grow').className = 'flex-grow';
-                    card.querySelector('.flex').className = 'flex items-start gap-4';
-                });
-
-                gridBtn.className = 'p-2 text-indigo-400 bg-indigo-500/10 rounded-lg';
-                listBtn.className = 'p-2 text-zinc-500 hover:text-zinc-300 rounded-lg';
-            } else {
-                container.className = 'app-list-container flex flex-col gap-4';
-                
-                // Adjust card classes for horizontal rows
-                document.querySelectorAll('.app-card').forEach(card => {
-                    card.querySelector('.flex-grow').className = 'flex-grow md:flex md:items-center md:justify-between md:gap-6';
-                    card.querySelector('.flex').className = 'flex items-start gap-4 w-full';
-                });
-
-                gridBtn.className = 'p-2 text-zinc-500 hover:text-zinc-300 rounded-lg';
-                listBtn.className = 'p-2 text-indigo-400 bg-indigo-500/10 rounded-lg';
-            }
-            performFiltering();
         }
     </script>
 </body>

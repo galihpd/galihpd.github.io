@@ -195,9 +195,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
         <span class="rval" id="vpy">25.4mm</span>
       </div>
       <div class="ctrl" id="ctrl-slotW">
-        <div class="clabel" id="label-slotW">Diameter lubang<small>hole diameter</small></div>
-        <input type="range" id="slotW" min="3" max="12" value="6" step="0.5" oninput="onR(this,'vsw','mm')">
-        <span class="rval" id="vsw">6mm</span>
+        <div class="clabel" id="label-slotW">Diameter lubang<small>Std: 1/4" (6.35mm) / 3/16" (4.76mm)</small></div>
+        <input type="range" id="slotW" min="3" max="12" value="6.35" step="0.05" oninput="onR(this,'vsw','mm')">
+        <span class="rval" id="vsw">6.35mm</span>
       </div>
       <div class="togrow">
         <span class="toglabel">Staggered (offset row)</span>
@@ -302,7 +302,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 <script>
 const S={
   cols:4,rows:4,tileSize:25,thickness:7,
-  pitchX:25.4,pitchY:25.4,slotW:6,
+  pitchX:25.4,pitchY:25.4,slotW:6.35,
   stagger:false,
   holeShape:'circle',
   slotH:15,
@@ -512,11 +512,18 @@ function updateHoleShapeUI() {
   const rowTileSize = document.getElementById('row-tileSize');
   const rowTileCount = document.getElementById('row-tileCount');
   
+  const inputW = document.getElementById('panelW');
+  const inputH = document.getElementById('panelH');
+  
   if (shape === 'circle') {
     if (stdCtrls) stdCtrls.style.display = 'block';
     if (skadisSpecs) skadisSpecs.style.display = 'none';
     if (rowTileSize) rowTileSize.style.display = 'flex';
     if (rowTileCount) rowTileCount.style.display = 'flex';
+    
+    // Restore standard slider attributes
+    if (inputW) { inputW.min = 25; inputW.step = 25; }
+    if (inputH) { inputH.min = 25; inputH.step = 25; }
     
     // Restore circle values from standard UI inputs
     S.pitchX = parseFloat(document.getElementById('pitchX').value);
@@ -528,6 +535,33 @@ function updateHoleShapeUI() {
     if (skadisSpecs) skadisSpecs.style.display = 'block';
     if (rowTileSize) rowTileSize.style.display = 'none';
     if (rowTileCount) rowTileCount.style.display = 'none';
+    
+    // Set Skådis slider attributes (W must be multiple of 40mm, H multiple of 20mm)
+    if (inputW) {
+      inputW.min = 80;
+      inputW.step = 40;
+      let valW = parseInt(inputW.value);
+      if (valW % 40 !== 0) {
+        valW = Math.round(valW / 40) * 40;
+        if (valW < 80) valW = 80;
+        inputW.value = valW;
+        document.getElementById('vpw').textContent = valW + 'mm';
+        S.panelW = valW;
+      }
+    }
+    
+    if (inputH) {
+      inputH.min = 60;
+      inputH.step = 20;
+      let valH = parseInt(inputH.value);
+      if (valH % 20 !== 0) {
+        valH = Math.round(valH / 20) * 20;
+        if (valH < 60) valH = 60;
+        inputH.value = valH;
+        document.getElementById('vph').textContent = valH + 'mm';
+        S.panelH = valH;
+      }
+    }
     
     // Lock values to exact IKEA Skådis 1:1 specs
     S.pitchX = 40;
@@ -561,70 +595,59 @@ function generateModel(){
   const W = (holeShape === 'skadis') ? S.panelW : cols * tileSize;
   const H = (holeShape === 'skadis') ? S.panelH : rows * tileSize;
   
-  const cornerR=Math.min(8,tileSize*0.2);
+  const cornerR = (holeShape === 'skadis') ? 8.0 : Math.min(8, tileSize * 0.2);
   const group=new THREE.Group();
   const boardShape=makeBoardShape(W,H,cornerR);
 
-  let hw = slotW;
-  let hh = slotW;
   if (holeShape === 'skadis') {
-    hw = slotW;
-    hh = slotH;
-  } else if (holeShape === 'oval') {
-    hh = slotH;
-  }
-  
-  let colsToUse = cols;
-  let rowsToUse = rows;
-  let tileSizeToUse = tileSize;
-  if (holeShape === 'skadis') {
-    colsToUse = 1;
-    rowsToUse = 1;
-    tileSizeToUse = W;
-  }
-  
-  const boundW = (holeShape === 'skadis') ? W : tileSize;
-  const boundH = (holeShape === 'skadis') ? H : tileSize;
-  
-  const nX=Math.max(1,Math.floor((boundW-hw)/pitchX)+1);
-  const nY=Math.max(1,Math.floor((boundH-hh)/pitchY)+1);
-  const gridSpanX=(nX-1)*pitchX;
-  const gridSpanY=(nY-1)*pitchY;
-  for(let tr=0;tr<rowsToUse;tr++){
-    for(let tc=0;tc<colsToUse;tc++){
-      const tcx=-W/2+tc*tileSizeToUse+tileSizeToUse/2;
-      const tcy=H/2-tr*tileSizeToUse-tileSizeToUse/2;
-      const startX=tcx-gridSpanX/2;
-      const startY=tcy+gridSpanY/2;
-      for(let sy=0;sy<nY;sy++){
-        for(let sx=0;sx<nX;sx++){
-          const offX=(stagger&&sy%2===1)?pitchX*0.5:0;
-          const cx=startX+sx*pitchX+offX;
-          const cy=startY-sy*pitchY;
-          const marginX=hw/2+1;
-          const marginY=hh/2+1;
-          const tx0=-W/2+tc*tileSizeToUse+marginX;
-          const tx1=-W/2+(tc+1)*tileSizeToUse-marginX;
-          const ty0=H/2-(tr+1)*tileSizeToUse+marginY;
-          const ty1=H/2-tr*tileSizeToUse-marginY;
-          if(cx<tx0||cx>tx1||cy<ty0||cy>ty1)continue;
-
-          let hole;
-          if (holeShape === 'circle') {
-            hole = makeCircleShape(cx, cy, slotW);
-          } else if (holeShape === 'skadis' || holeShape === 'oval') {
-            hole = makeSlotShape(cx, cy, slotW, slotH);
-          } else if (holeShape === 'square') {
-            hole = makeSquareShape(cx, cy, slotW, S.slotR);
-          } else if (holeShape === 'hexagon') {
-            hole = makeHexagonShape(cx, cy, slotW);
+    // Generate exact Skådis 1:1 holes
+    // Spaced exactly 20mm from top/bottom and left/right edges
+    for (let y = H/2 - 20; y >= -H/2 + 20; y -= 20) {
+      const rowIndex = Math.round((H/2 - 20 - y) / 20);
+      // Alternate rows are offset by 20mm horizontally
+      const startX = (rowIndex % 2 === 0) ? (W/2 - 20) : (W/2 - 40);
+      for (let x = startX; x >= -W/2 + 20; x -= 40) {
+        const hole = makeSlotShape(x, y, 5, 15);
+        boardShape.holes.push(hole);
+      }
+    }
+  } else {
+    // Original circular mode grid alignment (per tile)
+    const hw = slotW;
+    const hh = slotW;
+    const nX=Math.max(1,Math.floor((tileSize-hw)/pitchX)+1);
+    const nY=Math.max(1,Math.floor((tileSize-hh)/pitchY)+1);
+    const gridSpanX=(nX-1)*pitchX;
+    const gridSpanY=(nY-1)*pitchY;
+    for(let tr=0;tr<rows;tr++){
+      for(let tc=0;tc<cols;tc++){
+        const tcx=-W/2+tc*tileSize+tileSize/2;
+        const tcy=H/2-tr*tileSize-tileSize/2;
+        const startX=tcx-gridSpanX/2;
+        const startY=tcy+gridSpanY/2;
+        for(let sy=0;sy<nY;sy++){
+          for(let sx=0;sx<nX;sx++){
+            const offX=(stagger&&sy%2===1)?pitchX*0.5:0;
+            const cx=startX+sx*pitchX+offX;
+            const cy=startY-sy*pitchY;
+            const margin=hw/2+1;
+            const tx0=-W/2+tc*tileSize+margin;
+            const tx1=-W/2+(tc+1)*tileSize-margin;
+            const ty0=H/2-(tr+1)*tileSize+margin;
+            const ty1=H/2-tr*tileSize-margin;
+            if(cx<tx0||cx>tx1||cy<ty0||cy>ty1)continue;
+            const hole=makeCircleShape(cx, cy, slotW);
+            boardShape.holes.push(hole);
           }
-          boardShape.holes.push(hole);
         }
       }
     }
   }
-  const extOpts={depth:thickness,bevelEnabled:true,bevelThickness:0.8,bevelSize:0.6,bevelSegments:3,steps:1};
+  
+  // Edge fillet/bevel (IKEA Skådis has a 1mm fillet/bevel)
+  const bevelT = (holeShape === 'skadis') ? 1.0 : 0.8;
+  const bevelS = (holeShape === 'skadis') ? 1.0 : 0.6;
+  const extOpts={depth:thickness,bevelEnabled:true,bevelThickness:bevelT,bevelSize:bevelS,bevelSegments:3,steps:1};
   const boardGeo=new THREE.ExtrudeGeometry(boardShape,extOpts);
   boardGeo.translate(0,0,-thickness/2);
   const boardMesh=new THREE.Mesh(boardGeo,boardMat);
