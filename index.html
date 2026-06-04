@@ -4,17 +4,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galih Prakoso — Generalist 3D Artist</title>
+  <title>Galih Prakoso — Software Developer & Systems Builder</title>
 
   <!-- SEO & Open Graph -->
   <meta name="description"
-    content="Generalist 3D Artist spesialis environment design, hard surface modeling, dan PBR texturing. 3+ tahun pengalaman, 500+ aset terselesaikan.">
-  <meta property="og:title" content="Galih Prakoso — Generalist 3D Artist">
+    content="Software developer based in Depok, Indonesia. Builds web applications, dashboards, internal tools, and interactive simulations — end-to-end, from design to deployment.">
+  <meta property="og:title" content="Galih Prakoso — Software Developer">
   <meta property="og:description"
-    content="Membangun aset 3D realtime untuk game, digitalisasi museum, dan skenario interaktif.">
+    content="Building web applications, data dashboards, and interactive simulations. 6+ production systems shipped independently.">
   <meta property="og:type" content="website">
   <meta property="og:image"
-    content="https://placehold.co/1200x630/141412/f0efec?text=Galih+Prakoso+%E2%80%94+3D+Artist">
+    content="https://placehold.co/1200x630/141412/f0efec?text=Galih+Prakoso+%E2%80%94+Developer">
   <meta name="twitter:card" content="summary_large_image">
 
   <!-- Favicon inline SVG -->
@@ -362,106 +362,173 @@
       color: var(--ink3);
     }
 
-    /* ── GALLERY ── */
-    .gallery {
+    /* ── PROJECT CARDS ── */
+    .projects-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 12px;
     }
 
-    .gallery-item {
+    .project-card {
       border: 0.5px solid var(--border);
       border-radius: 3px;
       overflow: hidden;
-      cursor: pointer;
-      transition: border-color 0.2s, transform 0.25s;
-      background: var(--bg2);
+      background: var(--bg);
+      transition: border-color 0.2s, transform 0.2s;
+      display: flex;
+      flex-direction: column;
     }
 
-    .gallery-item:hover {
+    .project-card:hover {
       border-color: var(--border2);
-      transform: translateY(-3px);
+      transform: translateY(-2px);
     }
 
-    .gallery-item:hover .item-overlay {
-      opacity: 1;
-    }
-
-    .gallery-item.wide {
+    .project-card.featured {
       grid-column: span 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
     }
 
-    .gallery-thumb {
-      aspect-ratio: 1;
+    .project-thumb {
+      aspect-ratio: 16/9;
       background: var(--bg2);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .project-card.featured .project-thumb {
+      aspect-ratio: auto;
+      min-height: 220px;
+    }
+
+    .project-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .project-thumb-placeholder {
+      width: 100%; height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
     }
 
-    .gallery-item.wide .gallery-thumb {
-      aspect-ratio: 2/1;
+    .project-thumb-label {
+      font-family: var(--fm);
+      font-size: 9px;
+      color: var(--ink3);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
-    .gallery-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      position: absolute;
-      inset: 0;
-    }
-
-    .item-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.55);
-      display: flex;
-      align-items: flex-end;
-      padding: 14px;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .item-info {
+    .project-body {
+      padding: 1.25rem 1.35rem 1.35rem;
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      flex: 1;
     }
 
-    .item-label {
-      font-size: 12px;
-      color: #fff;
-      font-weight: 500;
-    }
-
-    .item-tag {
-      font-family: var(--fm);
-      font-size: 10px;
-      color: rgba(255, 255, 255, 0.55);
-      letter-spacing: 0.08em;
-    }
-
-    .gallery-meta {
-      padding: 10px 12px;
-      border-top: 0.5px solid var(--border);
+    .project-tags {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 0.85rem;
     }
 
-    .meta-name {
-      font-size: 12px;
+    .project-tag {
+      font-family: var(--fm);
+      font-size: 9.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      border: 0.5px solid var(--border);
+      border-radius: 2px;
+      padding: 2px 7px;
+    }
+
+    .project-name {
+      font-size: 17px;
       font-weight: 500;
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
     }
 
-    .meta-tag {
+    .project-case {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      flex: 1;
+    }
+
+    .case-row {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 0.6rem;
+      align-items: baseline;
+    }
+
+    .case-label {
+      font-family: var(--fm);
+      font-size: 9.5px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      padding-top: 1px;
+    }
+
+    .case-text {
+      font-size: 13.5px;
+      color: var(--ink2);
+      line-height: 1.65;
+    }
+
+    .project-links {
+      display: flex;
+      gap: 10px;
+      margin-top: 1.1rem;
+      padding-top: 1rem;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .project-link {
       font-family: var(--fm);
       font-size: 10px;
-      color: var(--ink3);
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink2);
+      text-decoration: none;
+      padding: 5px 12px;
+      border: 0.5px solid var(--border);
+      border-radius: 2px;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .project-link:hover {
+      border-color: var(--border2);
+      color: var(--ink);
+    }
+
+    .project-link.primary {
+      border-color: var(--border2);
+      color: var(--ink);
+    }
+
+    .project-link.primary:hover {
+      background: var(--ink);
+      color: var(--bg);
+    }
+
+    @media (max-width: 700px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+      .project-card.featured {
+        grid-column: span 1;
+        grid-template-columns: 1fr;
+      }
     }
 
     /* ── ABOUT ── */
@@ -1106,16 +1173,12 @@
     <!-- HERO -->
     <div class="hero">
       <div>
-        <p class="hero-label"><span class="avail-dot"></span>Available for Freelance &amp; Full-Time · Depok, Indonesia</p>
-        <h1 class="hero-name">Generalist<br><span>3D Artist</span></h1>
-        <p class="hero-desc">Crafting real-time 3D assets for games, interactive installations, and museum digitization projects. Specializing in environment design, hard surface modeling, and PBR texturing — with 500+ assets delivered across 6+ major productions.</p>
-        <a class="hero-cta" href="#work">View Work &rarr;</a>
+        <p class="hero-label"><span class="avail-dot"></span>Open to Opportunities · Depok, Indonesia</p>
+        <h1 class="hero-name">Software<br><span>Developer</span></h1>
+        <p class="hero-desc">I build web applications, data dashboards, and interactive simulations &mdash; end-to-end, from database design to deployment. 6+ production systems shipped independently for real clients.</p>
+        <a class="hero-cta" href="#work">View Projects &rarr;</a>
       </div>
       <div class="hero-visual">
-        <!--
-        GANTI FOTO: hapus tag <img> dummy di bawah, ganti src dengan foto/render lo.
-        Contoh: <img src="assets/images/hero-galih.jpg" alt="Galih Prakoso">
-      -->
         <img src="assets/images/hero.jpg" alt="Hero render placeholder">
       </div>
     </div>
@@ -1126,80 +1189,215 @@
         <span class="section-title">Selected Work</span>
         <span class="section-count">06 Projects</span>
       </div>
-      <div class="gallery">
+      <div class="projects-grid">
 
-        <!-- Ganti src tiap img dengan screenshot render lo -->
-
-        <div class="gallery-item wide">
-          <div class="gallery-thumb">
-            <img src="assets/images/main1.jpg" alt="Modular City Block">
-            <div class="item-overlay">
-              <div class="item-info"><span class="item-label">Modular City Block</span><span
-                  class="item-tag">Environment · Props · Real-Time</span></div>
+        <!-- FEATURED: Dantist -->
+        <div class="project-card featured">
+          <div class="project-thumb">
+            <div class="project-thumb-placeholder">
+              <span class="project-thumb-label">Dantist &mdash; Network Simulator</span>
             </div>
           </div>
-          <div class="gallery-meta"><span class="meta-name">Modular City Block</span><span class="meta-tag">Environment
-              + Props</span></div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">JavaScript</span>
+              <span class="project-tag">Tailwind CSS</span>
+              <span class="project-tag">Network Sim</span>
+              <span class="project-tag">WebGL</span>
+            </div>
+            <div class="project-name">Dantist &mdash; Network Simulator</div>
+            <div class="project-case">
+              <div class="case-row">
+                <span class="case-label">Problem</span>
+                <span class="case-text">Teaching network topology concepts requires expensive physical hardware or abstract diagrams that don&rsquo;t simulate real behavior.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Solution</span>
+                <span class="case-text">Built a browser-based interactive network simulator: drag-and-drop nodes, configurable links, real-time packet routing visualization, and a built-in CLI. Solo build.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Impact</span>
+                <span class="case-text">Zero installation required &mdash; runs entirely in the browser. Demonstrates complex networking logic without any backend infrastructure.</span>
+              </div>
+            </div>
+            <div class="project-links">
+              <a href="../dantist/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+            </div>
+          </div>
         </div>
 
-        <div class="gallery-item">
-          <div class="gallery-thumb">
-            <img src="assets/images/main2.jpg" alt="Hard Surface Prop">
-            <div class="item-overlay">
-              <div class="item-info"><span class="item-label">Hard Surface Prop</span><span class="item-tag">Hard
-                  Surface · PBR</span></div>
+        <!-- Nova -->
+        <div class="project-card">
+          <div class="project-thumb">
+            <div class="project-thumb-placeholder">
+              <span class="project-thumb-label">Nova &mdash; Mission Dashboard</span>
             </div>
           </div>
-          <div class="gallery-meta"><span class="meta-name">Hard Surface Prop</span><span class="meta-tag">Hard
-              Surface</span></div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">Three.js</span>
+              <span class="project-tag">D3.js</span>
+              <span class="project-tag">Chart.js</span>
+              <span class="project-tag">TopoJSON</span>
+            </div>
+            <div class="project-name">Nova &mdash; Mission Control Dashboard</div>
+            <div class="project-case">
+              <div class="case-row">
+                <span class="case-label">Problem</span>
+                <span class="case-text">Satellite tracking data is dense and hard to visualize across multiple simultaneous data streams in a single interface.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Solution</span>
+                <span class="case-text">Built a real-time mission control dashboard with a 3D interactive Earth (Three.js), live telemetry panels, and multi-chart data visualization.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Impact</span>
+                <span class="case-text">Demonstrates ability to combine 3D rendering, real-time data, and complex UI in a single coherent product.</span>
+              </div>
+            </div>
+            <div class="project-links">
+              <a href="../nova/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+            </div>
+          </div>
         </div>
 
-        <div class="gallery-item">
-          <div class="gallery-thumb">
-            <img src="assets/images/main3.jpg" alt="Armored Vehicle">
-            <div class="item-overlay">
-              <div class="item-info"><span class="item-label">Armored Vehicle</span><span class="item-tag">Hard Surface
-                  · Game Asset</span></div>
+        <!-- Al-Jadwal -->
+        <div class="project-card">
+          <div class="project-thumb">
+            <div class="project-thumb-placeholder">
+              <span class="project-thumb-label">Al-Jadwal &mdash; Prayer Scheduler</span>
             </div>
           </div>
-          <div class="gallery-meta"><span class="meta-name">Armored Vehicle</span><span class="meta-tag">Hard
-              Surface</span></div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">JavaScript</span>
+              <span class="project-tag">Leaflet.js</span>
+              <span class="project-tag">REST API</span>
+              <span class="project-tag">Geolocation</span>
+            </div>
+            <div class="project-name">Al-Jadwal &mdash; Prayer Time Scheduler</div>
+            <div class="project-case">
+              <div class="case-row">
+                <span class="case-label">Problem</span>
+                <span class="case-text">Generic prayer apps don&rsquo;t account for precise local coordinates, giving inaccurate prayer times for users in smaller cities or rural areas.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Solution</span>
+                <span class="case-text">Built a web app using geolocation API + an external prayer time API, with an interactive map to let users fine-tune their exact location.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Impact</span>
+                <span class="case-text">Accurate to GPS coordinates. Fully client-side, no account required, works offline after first load.</span>
+              </div>
+            </div>
+            <div class="project-links">
+              <a href="../aljadwal/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+            </div>
+          </div>
         </div>
 
-        <div class="gallery-item wide">
-          <div class="gallery-thumb">
-            <img src="assets/images/main4.jpg" alt="Industrial Zone Scene">
-            <div class="item-overlay">
-              <div class="item-info"><span class="item-label">Industrial Zone Scene</span><span
-                  class="item-tag">Environment · Props · Lighting</span></div>
+        <!-- BillBuddy -->
+        <div class="project-card">
+          <div class="project-thumb">
+            <div class="project-thumb-placeholder">
+              <span class="project-thumb-label">Bills &mdash; Expense Tracker</span>
             </div>
           </div>
-          <div class="gallery-meta"><span class="meta-name">Industrial Zone Scene</span><span
-              class="meta-tag">Environment</span></div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">JavaScript</span>
+              <span class="project-tag">Chart.js</span>
+              <span class="project-tag">Google OAuth</span>
+              <span class="project-tag">Local Storage</span>
+            </div>
+            <div class="project-name">Bills &mdash; Personal Finance Tracker</div>
+            <div class="project-case">
+              <div class="case-row">
+                <span class="case-label">Problem</span>
+                <span class="case-text">Tracking shared and personal expenses across multiple categories is tedious without a dedicated tool that also visualizes spending patterns.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Solution</span>
+                <span class="case-text">Built a full-featured finance tracker with Google Sign-In, category breakdown charts, multi-currency support, and export functionality.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Impact</span>
+                <span class="case-text">Persistent data via local storage. Used as personal daily finance tool since launch.</span>
+              </div>
+            </div>
+            <div class="project-links">
+              <a href="../bills/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+            </div>
+          </div>
         </div>
 
-        <div class="gallery-item">
-          <div class="gallery-thumb">
-            <img src="assets/images/main5.jpg" alt="Forest Environment">
-            <div class="item-overlay">
-              <div class="item-info"><span class="item-label">Forest Environment</span><span
-                  class="item-tag">Environment · Nature</span></div>
+        <!-- PegForge -->
+        <div class="project-card">
+          <div class="project-thumb">
+            <div class="project-thumb-placeholder">
+              <span class="project-thumb-label">PegForge &mdash; Dev Tool</span>
             </div>
           </div>
-          <div class="gallery-meta"><span class="meta-name">Forest Environment</span><span
-              class="meta-tag">Environment</span></div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">JavaScript</span>
+              <span class="project-tag">Node.js</span>
+              <span class="project-tag">CLI Tool</span>
+            </div>
+            <div class="project-name">PegForge &mdash; Developer Productivity CLI</div>
+            <div class="project-case">
+              <div class="case-row">
+                <span class="case-label">Problem</span>
+                <span class="case-text">Scaffolding new projects from scratch is repetitive and inconsistent, leading to wasted setup time on every new initiative.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Solution</span>
+                <span class="case-text">Built a CLI tool to scaffold, configure, and manage project templates from a central hub. Solo build in 2 weeks.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Impact</span>
+                <span class="case-text">Reduced project setup time significantly. Now used as the standard internal workflow for all new builds.</span>
+              </div>
+            </div>
+            <div class="project-links">
+              <a href="../pegforge/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+            </div>
+          </div>
         </div>
 
-        <div class="gallery-item">
-          <div class="gallery-thumb">
-            <img src="assets/images/main6.jpg" alt="Sci-Fi Console">
-            <div class="item-overlay">
-              <div class="item-info"><span class="item-label">Sci-Fi Console</span><span class="item-tag">Hard Surface ·
-                  Real-Time</span></div>
+        <!-- DashF1 -->
+        <div class="project-card">
+          <div class="project-thumb">
+            <div class="project-thumb-placeholder">
+              <span class="project-thumb-label">DashF1 &mdash; Racing Analytics</span>
             </div>
           </div>
-          <div class="gallery-meta"><span class="meta-name">Sci-Fi Console</span><span class="meta-tag">Hard
-              Surface</span></div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">JavaScript</span>
+              <span class="project-tag">PapaParse</span>
+              <span class="project-tag">Tailwind CSS</span>
+              <span class="project-tag">Data Viz</span>
+            </div>
+            <div class="project-name">DashF1 &mdash; Racing Data Dashboard</div>
+            <div class="project-case">
+              <div class="case-row">
+                <span class="case-label">Problem</span>
+                <span class="case-text">F1 season statistics are scattered across multiple sources with no unified view for performance comparison across drivers and seasons.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Solution</span>
+                <span class="case-text">Built a CSV-powered analytics dashboard that parses raw race data and renders comparative driver performance charts on the fly.</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Impact</span>
+                <span class="case-text">Fully static &mdash; no server, no API calls. Demonstrates data processing and visualization capability from raw CSV inputs.</span>
+              </div>
+            </div>
+            <div class="project-links">
+              <a href="../dashf1/" class="project-link primary" target="_blank">Live Demo &rarr;</a>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -1213,9 +1411,9 @@
       <div class="about-grid">
         <div>
           <div class="about-text">
-            <p>Generalist 3D Artist with over 3 years of experience producing real-time 3D assets for games, interactive simulations, and museum digitization. Proficient in full-cycle asset creation from concept to delivery.</p>
-            <p>Skilled in hard surface modeling and environment design in Blender, PBR texturing with Adobe Substance Painter, and real-time asset integration in Unity. Consistently delivers high-quality work optimized for performance-critical pipelines.</p>
-            <p>Graduate of D4 Digital Multimedia Technology at Politeknik Negeri Jakarta (GPA 3.8), holding a Unity Certified Associate: Artist credential. Currently open to freelance commissions and long-term collaborations.</p>
+            <p>Software developer based in Depok with a background spanning web applications, data dashboards, interactive simulations, and real-time 3D systems. I take projects from zero to deployed &mdash; independently, across the full stack.</p>
+            <p>What sets me apart is the combination of engineering and visual thinking. Years of building 3D assets for Unity &mdash; where polygon budgets, LOD hierarchies, and rendering pipelines are non-negotiable &mdash; shaped how I approach software: build lean, optimize deliberately, and never lose sight of the end-user experience.</p>
+            <p>Graduate of D4 Digital Multimedia Technology at Politeknik Negeri Jakarta (GPA 3.8), certified Unity Associate Artist, and co-founding Avelion Studio &mdash; a Jakarta-based data visualization studio. Open to full-time roles, freelance work, and long-term collaborations.</p>
           </div>
           <div style="margin-top:2.5rem">
             <div class="section-title" style="margin-bottom:1rem">Sertifikasi</div>
@@ -1245,12 +1443,12 @@
             <div class="stat-lbl">Years Experience</div>
           </div>
           <div class="stat-row">
-            <div class="stat-val">500+</div>
-            <div class="stat-lbl">3D Assets Made</div>
+            <div class="stat-val">6+</div>
+            <div class="stat-lbl">Apps Shipped</div>
           </div>
           <div class="stat-row">
-            <div class="stat-val">6+</div>
-            <div class="stat-lbl">Major Projects</div>
+            <div class="stat-val">12+</div>
+            <div class="stat-lbl">Client Projects</div>
           </div>
           <div class="stat-row">
             <div class="stat-val">3.8</div>
