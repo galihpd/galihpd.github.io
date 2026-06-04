@@ -1,0 +1,135 @@
+/* css/components/command-palette.css */
+/* Command Palette modal container overrides */
+.nl-command-palette-modal .nl-modal-content {
+  max-width: 36rem; /* 576px */
+  padding: 0;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.nl-command-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 24rem; /* 384px */
+  background-color: hsl(var(--background));
+}
+
+.nl-command-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 0 var(--space-4);
+  height: 3.5rem; /* 56px */
+  gap: var(--space-3);
+}
+
+.nl-command-header-icon {
+  color: hsl(var(--muted-foreground));
+  display: flex;
+  align-items: center;
+}
+
+.nl-command-header-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.nl-command-input {
+  flex-grow: 1;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  color: hsl(var(--foreground));
+  height: 100%;
+  outline: none;
+}
+
+.nl-command-input::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+.nl-command-results {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.nl-command-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2.5) var(--space-3);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  gap: var(--space-2);
+}
+
+.nl-command-item.nl-active {
+  background-color: hsl(var(--muted));
+}
+
+.nl-command-title {
+  flex-grow: 1;
+}
+
+.nl-command-category {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: hsl(var(--muted-foreground));
+  background-color: hsl(var(--secondary));
+  padding: var(--space-0.5) var(--space-1.5);
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nl-command-shortcut {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: hsl(var(--muted-foreground));
+  background-color: hsl(var(--secondary));
+  border: 1px solid hsl(var(--border));
+  padding: var(--space-0.5) var(--space-1.5);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.nl-command-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: hsl(var(--muted-foreground));
+  font-size: var(--text-sm);
+  user-select: none;
+}
+
+/* Footer / instructions badge inside command palette */
+.nl-command-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 2.25rem;
+  border-top: 1px solid hsl(var(--border));
+  padding: 0 var(--space-4);
+  background-color: hsla(var(--muted) / 0.3);
+  font-size: var(--text-xs);
+  color: hsl(var(--muted-foreground));
+  gap: var(--space-3);
+}
+
+.nl-command-key-guide {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}

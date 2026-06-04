@@ -1,0 +1,57 @@
+/* css/components/breadcrumb.css */
+.nl-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: hsl(var(--muted-foreground));
+}
+
+.nl-breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1.5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nl-breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1.5);
+}
+
+.nl-breadcrumb-link {
+  color: hsl(var(--muted-foreground));
+  transition: color var(--transition-fast);
+}
+
+.nl-breadcrumb-link:hover {
+  color: hsl(var(--foreground));
+  text-decoration: none;
+}
+
+.nl-breadcrumb-separator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--muted-foreground));
+  user-select: none;
+}
+
+.nl-breadcrumb-separator svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.nl-breadcrumb-page {
+  color: hsl(var(--foreground));
+  font-weight: var(--font-normal);
+  pointer-events: none;
+}

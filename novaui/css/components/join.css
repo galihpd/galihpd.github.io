@@ -1,0 +1,146 @@
+/* css/components/join.css */
+
+/* ─── Horizontal Join ────────────────────────────────────────────────────── */
+/*
+  Groups children (buttons, inputs, selects, etc.) into a seamless visual strip.
+  Adjacent borders are collapsed and intermediate border-radii are removed.
+
+  Usage:
+    <div class="nl-join">
+      <button class="nl-btn">One</button>
+      <button class="nl-btn">Two</button>
+      <button class="nl-btn">Three</button>
+    </div>
+*/
+.nl-join {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+/* All direct children & explicit join-items */
+.nl-join > *,
+.nl-join > .nl-join-item {
+  /* Collapse adjacent borders */
+  margin-left: -1px;
+  border-radius: 0;
+  position: relative;
+  /* Ensure focused / active items are visually on top */
+  z-index: 0;
+}
+
+.nl-join > *:focus,
+.nl-join > .nl-join-item:focus,
+.nl-join > *:focus-within,
+.nl-join > .nl-join-item:focus-within,
+.nl-join > *:hover,
+.nl-join > .nl-join-item:hover {
+  z-index: 1;
+}
+
+/* First child: restore left radius */
+.nl-join > *:first-child,
+.nl-join > .nl-join-item:first-child {
+  margin-left: 0;
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
+}
+
+/* Last child: restore right radius */
+.nl-join > *:last-child,
+.nl-join > .nl-join-item:last-child {
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+}
+
+/* Single child: full radius */
+.nl-join > *:only-child,
+.nl-join > .nl-join-item:only-child {
+  border-radius: var(--radius-md);
+  margin-left: 0;
+}
+
+/* ─── Vertical Join ──────────────────────────────────────────────────────── */
+/*
+  Usage:
+    <div class="nl-join nl-join-vertical">
+      <button class="nl-btn">Top</button>
+      <button class="nl-btn">Middle</button>
+      <button class="nl-btn">Bottom</button>
+    </div>
+*/
+.nl-join-vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.nl-join-vertical > *,
+.nl-join-vertical > .nl-join-item {
+  margin-left: 0;
+  margin-top: -1px;
+  border-radius: 0;
+}
+
+/* First child: restore top radius */
+.nl-join-vertical > *:first-child,
+.nl-join-vertical > .nl-join-item:first-child {
+  margin-top: 0;
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Last child: restore bottom radius */
+.nl-join-vertical > *:last-child,
+.nl-join-vertical > .nl-join-item:last-child {
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* Single child: full radius */
+.nl-join-vertical > *:only-child,
+.nl-join-vertical > .nl-join-item:only-child {
+  border-radius: var(--radius-md);
+  margin-top: 0;
+}
+
+/* ─── Rounded variant (pill ends) ────────────────────────────────────────── */
+.nl-join-rounded > *:first-child,
+.nl-join-rounded > .nl-join-item:first-child {
+  border-top-left-radius: var(--radius-full);
+  border-bottom-left-radius: var(--radius-full);
+}
+
+.nl-join-rounded > *:last-child,
+.nl-join-rounded > .nl-join-item:last-child {
+  border-top-right-radius: var(--radius-full);
+  border-bottom-right-radius: var(--radius-full);
+}
+
+.nl-join-vertical.nl-join-rounded > *:first-child,
+.nl-join-vertical.nl-join-rounded > .nl-join-item:first-child {
+  border-top-left-radius: var(--radius-full);
+  border-top-right-radius: var(--radius-full);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.nl-join-vertical.nl-join-rounded > *:last-child,
+.nl-join-vertical.nl-join-rounded > .nl-join-item:last-child {
+  border-bottom-left-radius: var(--radius-full);
+  border-bottom-right-radius: var(--radius-full);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* ─── Join Item (explicit class) ─────────────────────────────────────────── */
+/*
+  Use .nl-join-item directly on elements when the parent is not .nl-join
+  or when you need finer control.
+*/
+.nl-join-item {
+  /* inherits radius resets from parent .nl-join context */
+}

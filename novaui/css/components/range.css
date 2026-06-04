@@ -1,0 +1,254 @@
+/* css/components/range.css */
+
+/* ─────────────────────────────────────────
+   Range Input Component
+   Usage: <input type="range" class="nl-range" min="0" max="100" value="50" style="--nl-range-fill: 50%;" />
+ ───────────────────────────────────────── */
+
+/* ─── Base Range ─── */
+.nl-range {
+  /* Reset */
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  vertical-align: middle;
+
+  /* Sizing */
+  height: 1.25rem; /* Clickable area */
+  padding: 0;
+  margin: 0;
+  border: none;
+
+  /* Custom styling properties */
+  --nl-range-fill: 0%;
+  --range-color: var(--primary);
+  --range-ring: var(--ring);
+}
+
+/* ─── Focus Ring ─── */
+.nl-range:focus-visible {
+  outline: none;
+}
+
+.nl-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--range-ring));
+}
+
+.nl-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--range-ring));
+}
+
+/* ─────────────────────────────────────────
+   WEBKIT Track & Thumb
+   ───────────────────────────────────────── */
+
+.nl-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    to right,
+    hsl(var(--range-color)) var(--nl-range-fill, 0%),
+    hsl(var(--muted)) var(--nl-range-fill, 0%)
+  );
+  transition: background var(--transition-fast);
+}
+
+.nl-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;      /* 16px */
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background-color: hsl(var(--range-color));
+  border: none;
+  cursor: pointer;
+  margin-top: -6px; /* Center thumb on track ((1rem - 4px) / 2) */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: background-color var(--transition-fast),
+              transform var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+
+.nl-range::-webkit-slider-thumb:hover {
+  background-color: hsl(var(--range-color) / 0.85);
+  transform: scale(1.15);
+}
+
+.nl-range:active::-webkit-slider-thumb {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 3px hsl(var(--range-color) / 0.2);
+}
+
+/* ─────────────────────────────────────────
+   FIREFOX Track & Thumb
+   ───────────────────────────────────────── */
+
+.nl-range::-moz-range-track {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background-color: hsl(var(--muted));
+  border: none;
+}
+
+.nl-range::-moz-range-progress {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background-color: hsl(var(--range-color));
+}
+
+.nl-range::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background-color: hsl(var(--range-color));
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: background-color var(--transition-fast),
+              transform var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+
+.nl-range::-moz-range-thumb:hover {
+  background-color: hsl(var(--range-color) / 0.85);
+  transform: scale(1.15);
+}
+
+/* ─── Disabled State ─── */
+.nl-range:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nl-range:disabled::-webkit-slider-thumb {
+  cursor: not-allowed;
+  transform: none;
+}
+
+.nl-range:disabled::-moz-range-thumb {
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─────────────────────────────────────────
+   Range Wrapper (Tick marks & Datalist)
+   ───────────────────────────────────────── */
+.nl-range-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.nl-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  color: hsl(var(--muted-foreground));
+  font-family: var(--font-sans);
+  padding: 0 0.25rem;
+}
+
+/* ─────────────────────────────────────────
+   Color Modifiers
+   ───────────────────────────────────────── */
+
+/* Primary */
+.nl-range-primary {
+  --range-color: var(--primary);
+  --range-ring: var(--primary);
+}
+
+/* Secondary */
+.nl-range-secondary {
+  --range-color: var(--secondary-foreground);
+  --range-ring: var(--secondary-foreground);
+}
+
+/* Success */
+.nl-range-success {
+  --range-color: var(--success);
+  --range-ring: var(--success);
+}
+
+/* Warning */
+.nl-range-warning {
+  --range-color: var(--warning);
+  --range-ring: var(--warning);
+}
+
+/* Error / Destructive */
+.nl-range-error,
+.nl-range-destructive {
+  --range-color: var(--destructive);
+  --range-ring: var(--destructive);
+}
+
+/* Info */
+.nl-range-info {
+  --range-color: var(--info);
+  --range-ring: var(--info);
+}
+
+/* ─────────────────────────────────────────
+   Size Modifiers
+   ───────────────────────────────────────── */
+
+/* Small */
+.nl-range-sm {
+  height: 1rem;
+}
+
+.nl-range-sm::-webkit-slider-runnable-track {
+  height: 3px;
+}
+
+.nl-range-sm::-webkit-slider-thumb {
+  width: 0.75rem;  /* 12px */
+  height: 0.75rem;
+  margin-top: -4.5px;
+}
+
+.nl-range-sm::-moz-range-track {
+  height: 3px;
+}
+
+.nl-range-sm::-moz-range-progress {
+  height: 3px;
+}
+
+.nl-range-sm::-moz-range-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* Large */
+.nl-range-lg {
+  height: 1.5rem;
+}
+
+.nl-range-lg::-webkit-slider-runnable-track {
+  height: 6px;
+}
+
+.nl-range-lg::-webkit-slider-thumb {
+  width: 1.375rem; /* 22px */
+  height: 1.375rem;
+  margin-top: -8px;
+}
+
+.nl-range-lg::-moz-range-track {
+  height: 6px;
+}
+
+.nl-range-lg::-moz-range-progress {
+  height: 6px;
+}
+
+.nl-range-lg::-moz-range-thumb {
+  width: 1.375rem;
+  height: 1.375rem;
+}

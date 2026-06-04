@@ -1,0 +1,128 @@
+/* css/components/rating.css */
+
+/* ── Base Container ─────────────────────────────────────────── */
+.nl-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  line-height: 1;
+}
+
+/* ── Individual Star ────────────────────────────────────────── */
+.nl-rating-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem; /* 24px default */
+  line-height: 1;
+  color: hsl(var(--muted));
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  cursor: default;
+  user-select: none;
+}
+
+.nl-rating-star::before {
+  content: "★";
+}
+
+/* Active / filled star */
+.nl-rating-star.nl-rating-active {
+  color: hsl(43 96% 56%); /* amber-400 */
+}
+
+/* ── Interactive Rating (CSS :has() trick) ───────────────────── */
+/* Mark all stars when any star is hovered or the container has focus */
+.nl-rating-interactive .nl-rating-star {
+  cursor: pointer;
+}
+
+.nl-rating-interactive:has(.nl-rating-star:hover) .nl-rating-star {
+  color: hsl(43 96% 56%);
+}
+
+/* Un-fill stars that come AFTER the hovered star */
+.nl-rating-interactive .nl-rating-star:has(~ .nl-rating-star:hover) {
+  color: hsl(var(--muted));
+}
+
+/* Hover glow */
+.nl-rating-interactive .nl-rating-star:hover {
+  transform: scale(1.15);
+}
+
+/* ── Half-Star Modifier ─────────────────────────────────────── */
+.nl-rating-half .nl-rating-star.nl-rating-half-active {
+  /* Use a gradient clip to show half gold / half muted */
+  background: linear-gradient(
+    to right,
+    hsl(43 96% 56%) 50%,
+    hsl(var(--muted)) 50%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Size Variants ──────────────────────────────────────────── */
+.nl-rating-sm .nl-rating-star {
+  font-size: 1rem; /* 16px */
+  gap: calc(var(--space-1) * 0.5);
+}
+
+.nl-rating-sm {
+  gap: calc(var(--space-1) * 0.5);
+}
+
+.nl-rating-lg .nl-rating-star {
+  font-size: 2.25rem; /* 36px */
+}
+
+.nl-rating-lg {
+  gap: var(--space-2);
+}
+
+/* ── Display-only (readonly) ────────────────────────────────── */
+.nl-rating-readonly .nl-rating-star {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ── Input-based approach (hidden radio inputs) ─────────────── */
+.nl-rating-input {
+  display: inline-flex;
+  flex-direction: row-reverse; /* RTL trick for CSS-only fill */
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.nl-rating-input input[type="radio"] {
+  display: none;
+}
+
+.nl-rating-input label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: hsl(var(--muted));
+  cursor: pointer;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  user-select: none;
+}
+
+.nl-rating-input label::before {
+  content: "★";
+}
+
+/* Fill all labels from checked backward (RTL container trick) */
+.nl-rating-input input[type="radio"]:checked ~ label,
+.nl-rating-input label:hover,
+.nl-rating-input label:hover ~ label {
+  color: hsl(43 96% 56%);
+}
+
+.nl-rating-input label:hover {
+  transform: scale(1.15);
+}

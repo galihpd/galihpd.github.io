@@ -1,0 +1,385 @@
+/* css/homepage.css */
+
+/* Hero and Landing Page Layout */
+.landing-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: hsl(var(--background));
+  position: relative;
+  overflow: hidden;
+}
+
+/* Beautiful Background grid overlay */
+.landing-grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45rem;
+  background-image: radial-gradient(hsla(var(--primary) / 0.08) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.landing-container {
+  max-width: var(--breakpoint-xl);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+/* Hero Elements */
+.hero-section {
+  text-align: center;
+  padding: var(--space-20) 0 var(--space-16) 0;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: hsla(var(--primary) / 0.06);
+  border: 1px solid hsla(var(--primary) / 0.15);
+  padding: var(--space-1.5) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: hsl(var(--primary));
+  margin-bottom: var(--space-6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hero-title {
+  font-size: var(--text-5xl);
+  font-weight: var(--font-bold);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin-bottom: var(--space-6);
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 4rem;
+  }
+}
+
+.hero-title-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary)) 40%, hsla(var(--primary) / 0.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  font-size: var(--text-lg);
+  color: hsl(var(--muted-foreground));
+  line-height: 1.6;
+  max-width: 36rem;
+  margin: 0 auto var(--space-8) auto;
+}
+
+/* Installation Copy CLI widget */
+.hero-cli-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: hsl(var(--secondary));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-xl);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  max-width: 22rem;
+  margin: 0 auto var(--space-8) auto;
+  color: hsl(var(--foreground));
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-cli-box code {
+  user-select: all;
+}
+
+.hero-cli-box .cli-copy-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: hsl(var(--muted-foreground));
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+  outline: none;
+}
+
+.hero-cli-box .cli-copy-btn:hover {
+  color: hsl(var(--foreground));
+}
+
+/* Showcase Grid Layout */
+.showcase-section {
+  padding-bottom: var(--space-24);
+}
+
+.showcase-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+}
+
+.showcase-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-2);
+}
+
+.showcase-desc {
+  font-size: var(--text-sm);
+  color: hsl(var(--muted-foreground));
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .showcase-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .showcase-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Feature/Capability Card components styling */
+.showcase-card {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-xl);
+  background-color: hsl(var(--background));
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.showcase-card:hover {
+  border-color: hsla(var(--primary) / 0.2);
+  box-shadow: var(--shadow-md);
+}
+
+.showcase-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid hsl(var(--border));
+  padding: var(--space-3) var(--space-4);
+  background-color: hsla(var(--muted) / 0.15);
+}
+
+.showcase-card-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.showcase-card-title {
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+  color: hsl(var(--muted-foreground));
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.showcase-card-content {
+  padding: var(--space-6);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 12rem;
+  position: relative;
+}
+
+/* Grid Dots pattern inside preview box */
+.showcase-card-content.has-grid-bg {
+  background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: center;
+}
+
+/* Live slider customizer specific styles */
+.showcase-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.slider-row-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  color: hsl(var(--muted-foreground));
+}
+
+.slider-element {
+  width: 100%;
+  height: 5px;
+  background-color: hsl(var(--secondary));
+  border-radius: var(--radius-full);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.slider-element::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast);
+}
+
+.slider-element::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Features Grid */
+.features-section {
+  padding: var(--space-16) 0 var(--space-20) 0;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+}
+
+@media (min-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .features-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.feature-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2.5);
+}
+
+.feature-icon-wrapper {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+  background-color: hsla(var(--primary) / 0.06);
+  border: 1px solid hsla(var(--primary) / 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--primary));
+}
+
+.feature-icon-wrapper svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.feature-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.feature-text {
+  font-size: var(--text-sm);
+  color: hsl(var(--muted-foreground));
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Footer styling */
+.landing-footer {
+  border-top: 1px solid hsl(var(--border));
+  padding: var(--space-8) 0;
+  background-color: hsla(var(--muted) / 0.05);
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .footer-content {
+    flex-direction: row;
+  }
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+  color: hsl(var(--foreground));
+}
+
+.footer-links {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.footer-link {
+  font-size: var(--text-xs);
+  color: hsl(var(--muted-foreground));
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.footer-link:hover {
+  color: hsl(var(--foreground));
+}
+
+.footer-copy {
+  font-size: var(--text-xs);
+  color: hsl(var(--muted-foreground));
+}

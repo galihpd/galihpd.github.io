@@ -1,0 +1,82 @@
+/* css/components/alert.css */
+.nl-alert {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid hsl(var(--border));
+  padding: var(--space-4);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  font-family: var(--font-sans);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.nl-alert-icon {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 2px;
+  color: currentColor;
+}
+
+.nl-alert-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.nl-alert-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.nl-alert-title {
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+  line-height: 1.2;
+  margin-bottom: 0;
+}
+
+.nl-alert-description {
+  font-size: var(--text-xs);
+  color: hsl(var(--muted-foreground));
+  line-height: 1.5;
+}
+
+/* Variants */
+/* Default / Info */
+.nl-alert-default {
+  border-color: hsl(var(--border));
+  background-color: hsl(var(--background));
+}
+
+/* Destructive / Error */
+.nl-alert-destructive {
+  border-color: hsla(var(--destructive) / 0.2);
+  background-color: hsla(var(--destructive) / 0.05);
+  color: hsl(var(--destructive));
+}
+.nl-alert-destructive .nl-alert-description {
+  color: hsla(var(--destructive) / 0.85);
+}
+
+/* Success */
+.nl-alert-success {
+  border-color: hsla(var(--success) / 0.2);
+  background-color: hsla(var(--success) / 0.05);
+  color: hsl(var(--success));
+}
+.nl-alert-success .nl-alert-description {
+  color: hsla(var(--success) / 0.85);
+}
+
+/* Warning */
+.nl-alert-warning {
+  border-color: hsla(var(--warning) / 0.3);
+  background-color: hsla(var(--warning) / 0.05);
+  color: hsl(var(--warning));
+}
+.nl-alert-warning .nl-alert-description {
+  color: hsla(var(--warning) / 0.85);
+}

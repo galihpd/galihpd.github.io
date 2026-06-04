@@ -1,0 +1,57 @@
+/* css/components/input.css */
+
+/* Text Inputs, Textarea, Select */
+.nl-input,
+.nl-textarea,
+.nl-select {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid hsl(var(--input));
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  padding: 0 var(--space-3);
+  height: 2.5rem; /* 40px */
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.nl-textarea {
+  height: auto;
+  min-height: 5rem;
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+.nl-select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2371717a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+  background-size: 1.25rem;
+  padding-right: var(--space-8);
+}
+
+.nl-input:focus,
+.nl-textarea:focus,
+.nl-select:focus {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 1px hsl(var(--ring));
+}
+
+.nl-input:disabled,
+.nl-textarea:disabled,
+.nl-select:disabled {
+  opacity: 0.5;
+  background-color: hsl(var(--muted));
+  cursor: not-allowed;
+}
+
+.nl-input::placeholder,
+.nl-textarea::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+

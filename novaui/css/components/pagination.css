@@ -1,0 +1,67 @@
+/* css/components/pagination.css */
+.nl-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: var(--space-4) 0;
+  font-family: var(--font-sans);
+}
+
+.nl-pagination-list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.nl-pagination-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem; /* ~36px */
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: hsl(var(--foreground));
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.nl-pagination-link:hover {
+  background-color: hsl(var(--muted));
+  text-decoration: none;
+}
+
+.nl-pagination-link.nl-active {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+
+.nl-pagination-link.nl-disabled,
+.nl-pagination-link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Nav prev/next buttons (wider padding) */
+.nl-pagination-prev,
+.nl-pagination-next {
+  width: auto;
+  padding: 0 var(--space-3);
+  gap: var(--space-1);
+}
+
+.nl-pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: var(--text-sm);
+  color: hsl(var(--muted-foreground));
+  user-select: none;
+}

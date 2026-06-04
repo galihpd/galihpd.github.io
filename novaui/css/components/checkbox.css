@@ -1,0 +1,247 @@
+/* css/components/checkbox.css */
+
+/* ─────────────────────────────────────────
+   Checkbox Component
+   Usage: <label class="nl-checkbox-label">
+            <input type="checkbox" class="nl-checkbox" checked />
+            <span>Label text</span>
+          </label>
+ ───────────────────────────────────────── */
+
+.nl-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.4;
+}
+
+/* Styled native checkbox */
+.nl-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 1.125rem; /* 18px */
+  height: 1.125rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid hsl(var(--border));
+  background-color: hsl(var(--background));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+  cursor: pointer;
+  outline: none;
+  vertical-align: middle;
+  position: relative;
+  color: hsl(var(--primary-foreground));
+}
+
+/* Checkmark via CSS pseudo-element */
+.nl-checkbox::after {
+  content: "";
+  display: block;
+  width: 0.25rem;
+  height: 0.5rem;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-0.5px, -1px) scale(0);
+  transition: transform var(--transition-fast);
+}
+
+/* Checked state */
+.nl-checkbox:checked {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+
+.nl-checkbox:checked::after {
+  transform: rotate(45deg) translate(-0.5px, -1px) scale(1);
+}
+
+/* Indeterminate state */
+.nl-checkbox:indeterminate {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+
+.nl-checkbox:indeterminate::after {
+  width: 0.5rem;
+  height: 0;
+  border-width: 0 0 2px 0;
+  transform: rotate(0deg) translateY(0) scale(1);
+}
+
+/* Focus ring */
+.nl-checkbox:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+}
+
+/* Hover state */
+.nl-checkbox-label:hover .nl-checkbox,
+.nl-checkbox:hover:not(:disabled) {
+  border-color: hsl(var(--primary));
+}
+
+/* Disabled state */
+.nl-checkbox:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: hsl(var(--muted));
+  border-color: hsl(var(--border));
+}
+
+.nl-checkbox-label:has(.nl-checkbox:disabled) {
+  cursor: not-allowed;
+  color: hsl(var(--muted-foreground));
+}
+
+/* ─────────────────────────────────────────
+   Color Modifiers
+   ───────────────────────────────────────── */
+
+/* Primary */
+.nl-checkbox-primary:checked,
+.nl-checkbox-primary:indeterminate {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+.nl-checkbox-primary:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary));
+}
+.nl-checkbox-label:hover .nl-checkbox-primary,
+.nl-checkbox-primary:hover:not(:disabled) {
+  border-color: hsl(var(--primary));
+}
+
+/* Secondary */
+.nl-checkbox-secondary:checked,
+.nl-checkbox-secondary:indeterminate {
+  background-color: hsl(var(--secondary-foreground));
+  border-color: hsl(var(--secondary-foreground));
+  color: hsl(var(--secondary));
+}
+.nl-checkbox-secondary:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--secondary-foreground));
+}
+.nl-checkbox-label:hover .nl-checkbox-secondary,
+.nl-checkbox-secondary:hover:not(:disabled) {
+  border-color: hsl(var(--secondary-foreground));
+}
+
+/* Success */
+.nl-checkbox-success:checked,
+.nl-checkbox-success:indeterminate {
+  background-color: hsl(var(--success));
+  border-color: hsl(var(--success));
+  color: hsl(var(--success-foreground));
+}
+.nl-checkbox-success:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--success));
+}
+.nl-checkbox-label:hover .nl-checkbox-success,
+.nl-checkbox-success:hover:not(:disabled) {
+  border-color: hsl(var(--success));
+}
+
+/* Warning */
+.nl-checkbox-warning:checked,
+.nl-checkbox-warning:indeterminate {
+  background-color: hsl(var(--warning));
+  border-color: hsl(var(--warning));
+  color: hsl(var(--warning-foreground));
+}
+.nl-checkbox-warning:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--warning));
+}
+.nl-checkbox-label:hover .nl-checkbox-warning,
+.nl-checkbox-warning:hover:not(:disabled) {
+  border-color: hsl(var(--warning));
+}
+
+/* Error / Destructive */
+.nl-checkbox-error:checked,
+.nl-checkbox-error:indeterminate,
+.nl-checkbox-destructive:checked,
+.nl-checkbox-destructive:indeterminate {
+  background-color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+}
+.nl-checkbox-error:focus-visible,
+.nl-checkbox-destructive:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--destructive));
+}
+.nl-checkbox-label:hover .nl-checkbox-error,
+.nl-checkbox-label:hover .nl-checkbox-destructive,
+.nl-checkbox-error:hover:not(:disabled),
+.nl-checkbox-destructive:hover:not(:disabled) {
+  border-color: hsl(var(--destructive));
+}
+
+/* Info */
+.nl-checkbox-info:checked,
+.nl-checkbox-info:indeterminate {
+  background-color: hsl(var(--info));
+  border-color: hsl(var(--info));
+  color: hsl(var(--info-foreground));
+}
+.nl-checkbox-info:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--info));
+}
+.nl-checkbox-label:hover .nl-checkbox-info,
+.nl-checkbox-info:hover:not(:disabled) {
+  border-color: hsl(var(--info));
+}
+
+/* ─────────────────────────────────────────
+   Size Modifiers
+   ───────────────────────────────────────── */
+
+/* Small */
+.nl-checkbox-sm {
+  width: 0.875rem; /* 14px */
+  height: 0.875rem;
+  border-radius: 2px;
+}
+.nl-checkbox-sm::after {
+  width: 0.2rem;
+  height: 0.4rem;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg) translate(-0.5px, -0.5px) scale(0);
+}
+.nl-checkbox-sm:checked::after {
+  transform: rotate(45deg) translate(-0.5px, -0.5px) scale(1);
+}
+.nl-checkbox-label.nl-checkbox-sm {
+  font-size: var(--text-xs);
+  gap: var(--space-1);
+}
+
+/* Large */
+.nl-checkbox-lg {
+  width: 1.375rem; /* 22px */
+  height: 1.375rem;
+  border-radius: var(--radius-md);
+  border-width: 2px;
+}
+.nl-checkbox-lg::after {
+  width: 0.35rem;
+  height: 0.65rem;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg) translate(-0.5px, -1.5px) scale(0);
+}
+.nl-checkbox-lg:checked::after {
+  transform: rotate(45deg) translate(-0.5px, -1.5px) scale(1);
+}
+.nl-checkbox-label.nl-checkbox-lg {
+  font-size: var(--text-base);
+  gap: var(--space-3);
+}

@@ -1,0 +1,81 @@
+/* css/components/indicator.css */
+
+.nl-indicator {
+  position: relative;
+  display: inline-flex;
+  width: max-content;
+}
+
+.nl-indicator-item {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  
+  /* Defaults to top-right corner positioning */
+  top: 0;
+  right: 0;
+  left: auto;
+  bottom: auto;
+  transform: translate(50%, -50%);
+}
+
+/* --- Vertical Positions --- */
+
+.nl-indicator-item.nl-indicator-top {
+  top: 0;
+  bottom: auto;
+}
+
+.nl-indicator-item.nl-indicator-middle {
+  top: 50%;
+  bottom: auto;
+}
+
+.nl-indicator-item.nl-indicator-bottom {
+  top: auto;
+  bottom: 0;
+}
+
+/* --- Horizontal Positions --- */
+
+.nl-indicator-item.nl-indicator-start {
+  left: 0;
+  right: auto;
+}
+
+.nl-indicator-item.nl-indicator-center {
+  left: 50%;
+  right: auto;
+}
+
+.nl-indicator-item.nl-indicator-end {
+  left: auto;
+  right: 0;
+}
+
+/* --- Transform Translations Mapping --- */
+
+/* 1. Default/End horizontal combined with Top/Middle vertical */
+.nl-indicator-item {
+  transform: translate(50%, -50%);
+}
+
+/* 2. Start/Center horizontal combined with Top/Middle vertical */
+.nl-indicator-item.nl-indicator-start,
+.nl-indicator-item.nl-indicator-center {
+  transform: translate(-50%, -50%);
+}
+
+/* 3. Default/End horizontal combined with Bottom vertical */
+.nl-indicator-item.nl-indicator-bottom {
+  transform: translate(50%, 50%);
+}
+
+/* 4. Start/Center horizontal combined with Bottom vertical */
+.nl-indicator-item.nl-indicator-bottom.nl-indicator-start,
+.nl-indicator-item.nl-indicator-bottom.nl-indicator-center {
+  transform: translate(-50%, 50%);
+}

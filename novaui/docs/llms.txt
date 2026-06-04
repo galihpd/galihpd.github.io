@@ -1,0 +1,303 @@
+# Nova UI CSS Framework
+
+> Nova UI is a lightweight, pure CSS visual component framework built with CSS variables (HSL), utility-first layout classes, and fully styled modern components. It uses the custom class prefix `.nl-` and requires no preprocessor or build steps.
+
+## Core Reference Sheet
+
+This reference guides AI assistants in writing correct HTML markup and styling for Nova UI projects.
+
+### Naming Conventions & Prefix
+* All framework class names MUST be prefixed with `.nl-` (e.g., `.nl-btn`, `.nl-input`, `.nl-flex`).
+* Color modifier suffix uses standard semantic names: `-primary`, `-secondary`, `-success`, `-warning`, `-error` (or `-destructive`), `-info`.
+* Size modifiers: `-sm`, `-lg`.
+
+---
+
+### Design System Variables
+Override these custom properties in your local `:root` or custom scopes to update styles.
+
+#### 1. Color Variables (Declared as raw HSL values)
+* `--background`: Page background (e.g. `0 0% 100%`)
+* `--foreground`: Standard text (e.g. `240 10% 3.9%`)
+* `--primary`: Accent color (e.g. `240 5.9% 10%`)
+* `--primary-foreground`: Text color on primary background
+* `--secondary`: Muted background (e.g. `240 4.8% 95.9%`)
+* `--success`: Positive outcome state (e.g. `142.1 76.2% 36.3%`)
+* `--warning`: Cautionary outcome state (e.g. `38 92% 50%`)
+* `--destructive`: Critical/Error outcome state (e.g. `346.8 84.2% 50.2%`)
+* `--info`: Informative state (e.g. `212.8 11.5% 21.8%`)
+* `--border`: Default divider/border lines
+* `--ring`: Highlight/focus indicators ring glow
+
+#### 2. Spacing Scale
+Multiples of `0.25rem` (4px):
+* `--space-1`: `0.25rem` (4px)
+* `--space-2`: `0.5rem` (8px)
+* `--space-3`: `0.75rem` (12px)
+* `--space-4`: `1rem` (16px)
+* `--space-5`: `1.25rem` (20px)
+* `--space-6`: `1.5rem` (24px)
+* `--space-8`: `2rem` (32px)
+* `--space-10`: `2.5rem` (40px)
+* Fractional space tokens: `--space-0.5` (2px), `--space-1.5` (6px), `--space-2.5` (10px).
+
+#### 3. Border Radii
+* `--radius-sm`: Small corners
+* `--radius-md`: Medium corners (default for inputs and buttons)
+* `--radius-lg`: Large corners
+* `--radius-full`: Circle/pill corners (`9999px`)
+
+---
+
+### Layout & Utility Classes
+
+#### 1. Flexbox & Grid
+* `.nl-flex` - Flex container
+* `.nl-flex-col` - Vertical flex flow
+* `.nl-items-center` - Align items center
+* `.nl-justify-between` - Justify content space-between
+* `.nl-gap-[space]` - Sets gap spacing (e.g. `.nl-gap-3`)
+* `.nl-grid` - Grid container
+* `.nl-grid-cols-[1-4]` - Column layout count (e.g., `.nl-grid-cols-3`)
+* `.nl-container-[sm|md|lg|xl]` - Locked responsive containers
+* `.nl-container-fluid` - Fluid 100% width container with scaling paddings
+
+#### 2. Spacing Utilities
+* Margin: `.nl-m-[space]`, `.nl-mt-[space]`, `.nl-mb-[space]`, `.nl-my-[space]`, `.nl-mx-[space]`
+* Padding: `.nl-p-[space]`, `.nl-pt-[space]`, `.nl-pb-[space]`, `.nl-py-[space]`, `.nl-px-[space]`
+* E.g. `.nl-mt-4`, `.nl-px-6` (use values from spacing scale)
+
+---
+
+### Form Controls (Single-Element Markup)
+Form input states MUST NOT use secondary wrapper span classes to draw the graphics. They use direct `appearance: none` styling on the `<input>` element itself.
+
+#### 1. Checkbox
+```html
+<label class="nl-checkbox-label">
+  <input type="checkbox" class="nl-checkbox" checked>
+  <span>Accept terms</span>
+</label>
+```
+* Color modifiers: `.nl-checkbox-primary`, `.nl-checkbox-success`, `.nl-checkbox-error`, etc.
+* Sizes: `.nl-checkbox-sm`, `.nl-checkbox-lg`.
+
+#### 2. Radio
+```html
+<div class="nl-radio-group">
+  <label class="nl-radio-label">
+    <input type="radio" class="nl-radio nl-radio-primary" name="group1" checked>
+    <span>Option 1</span>
+  </label>
+</div>
+```
+* Row layout: `<div class="nl-radio-group nl-radio-group-row">`
+* Colors/Sizes: `.nl-radio-success`, `.nl-radio-sm`, `.nl-radio-lg`.
+
+#### 3. Toggle / Switch
+```html
+<label class="nl-toggle-label">
+  <input type="checkbox" class="nl-toggle nl-toggle-success" checked>
+  <span>Enable WiFi</span>
+</label>
+```
+* Colors/Sizes: `.nl-toggle-primary`, `.nl-toggle-error`, `.nl-toggle-sm`, `.nl-toggle-lg`.
+
+#### 4. Select Dropdown
+```html
+<select class="nl-select nl-select-primary">
+  <option value="1">Option A</option>
+  <option value="2">Option B</option>
+</select>
+```
+
+#### 5. Textarea
+```html
+<textarea class="nl-textarea nl-textarea-error" rows="3" placeholder="Describe..."></textarea>
+```
+
+#### 6. Range Input
+Uses custom property `--nl-range-fill` to paint active track lengths.
+```html
+<input type="range" class="nl-range nl-range-primary" min="0" max="100" value="60" style="--nl-range-fill: 60%;" oninput="this.style.setProperty('--nl-range-fill', this.value + '%')">
+```
+
+---
+
+### Key Component Library
+
+#### 1. Button
+```html
+<button class="nl-btn nl-btn-primary">Click me</button>
+<a href="#" class="nl-btn nl-btn-outline nl-btn-sm">Outline link</a>
+<button class="nl-btn nl-btn-ghost nl-btn-lg" disabled>Disabled ghost</button>
+```
+
+#### 2. Card
+```html
+<div class="nl-card">
+  <div class="nl-card-header">
+    <h3 class="nl-card-title">Card Title</h3>
+    <p class="nl-card-description">Short explanation paragraph.</p>
+  </div>
+  <div class="nl-card-body">
+    Main card block content.
+  </div>
+  <div class="nl-card-footer">
+    <button class="nl-btn">Action</button>
+  </div>
+</div>
+```
+
+#### 3. Badge & Indicator
+```html
+<!-- Badge -->
+<span class="nl-badge nl-badge-success">Active</span>
+
+<!-- Indicator: badge nested in corner of element -->
+<div class="nl-indicator-wrapper">
+  <span class="nl-indicator nl-indicator-top nl-indicator-right nl-badge nl-badge-error">9+</span>
+  <button class="nl-btn">Inbox</button>
+</div>
+```
+
+#### 4. Tabs (Pure CSS styling, toggle class active on click)
+```html
+<div class="nl-tabs-list">
+  <button class="nl-tab-btn active">Tab 1</button>
+  <button class="nl-tab-btn">Tab 2</button>
+</div>
+```
+
+#### 5. Accordion (Uses sibling grid logic to animate collapse height)
+```html
+<div class="nl-accordion">
+  <input type="checkbox" class="nl-accordion-toggle" id="acc-1">
+  <label for="acc-1" class="nl-accordion-header">
+    <span>Click to expand</span>
+    <svg class="nl-accordion-chevron" ...></svg>
+  </label>
+  <div class="nl-accordion-body">
+    <div class="nl-accordion-content">
+      Panel content here...
+    </div>
+  </div>
+</div>
+```
+
+#### 6. Collapse
+```html
+<div class="nl-collapse">
+  <input type="checkbox" class="nl-collapse-toggle" id="col-1">
+  <label for="col-1" class="nl-collapse-title nl-collapse-arrow">More Info</label>
+  <div class="nl-collapse-content">
+    <p>Collapsible details...</p>
+  </div>
+</div>
+```
+* Modified headers: Use `.nl-collapse-plus` for +/- toggle visual cues instead of chevrons.
+
+#### 7. Steps Indicator
+```html
+<ul class="nl-steps">
+  <li class="nl-step nl-step-complete">
+    <div class="nl-step-marker">✓</div>
+    <div class="nl-step-label">Billing</div>
+  </li>
+  <li class="nl-step nl-step-active">
+    <div class="nl-step-marker">2</div>
+    <div class="nl-step-label">Shipping</div>
+  </li>
+  <li class="nl-step nl-step-pending">
+    <div class="nl-step-marker">3</div>
+    <div class="nl-step-label">Review</div>
+  </li>
+</ul>
+```
+* Vertical step flow: `<ul class="nl-steps nl-steps-vertical">`.
+
+#### 8. Keyboard Key (Kbd)
+```html
+Press <kbd class="nl-kbd nl-kbd-sm">Ctrl</kbd> + <kbd class="nl-kbd nl-kbd-sm">K</kbd> to search.
+```
+
+#### 9. Divider
+```html
+<!-- Line only -->
+<div class="nl-divider"></div>
+
+<!-- Text with divider lines on side -->
+<div class="nl-divider">OR</div>
+
+<!-- Vertical line divider -->
+<div class="nl-flex nl-items-center">
+  <span>Left</span>
+  <div class="nl-divider-vertical"></div>
+  <span>Right</span>
+</div>
+```
+
+#### 10. Join Element (Remove intermediate borders on children)
+```html
+<div class="nl-join">
+  <input type="text" class="nl-input nl-join-item" placeholder="Search...">
+  <button class="nl-btn nl-btn-primary nl-join-item">Go</button>
+</div>
+```
+
+#### 11. Chat Bubble
+```html
+<div class="nl-chat nl-chat-start">
+  <div class="nl-chat-avatar">
+    <img src="avatar.jpg" class="nl-avatar">
+  </div>
+  <div class="nl-chat-bubble">Hello there!</div>
+</div>
+<div class="nl-chat nl-chat-end">
+  <div class="nl-chat-bubble nl-chat-bubble-primary">Hi! Nice to meet you.</div>
+</div>
+```
+
+#### 12. Diff (Side-by-side comparison slider)
+```html
+<div class="nl-diff" style="--diff-position: 50%;">
+  <div class="nl-diff-item-1">
+    <img src="before.jpg" alt="Before">
+  </div>
+  <div class="nl-diff-item-2">
+    <img src="after.jpg" alt="After">
+  </div>
+  <div class="nl-diff-resizer"></div>
+</div>
+```
+
+#### 13. Media Timeline (Visual timeline panel)
+```html
+<div class="nl-media-timeline">
+  <!-- Toolbar -->
+  <div class="nl-media-timeline-toolbar">
+    <button class="nl-media-timeline-tool-btn">Split</button>
+    <div class="nl-media-timeline-timecode">00:01:24:15</div>
+  </div>
+  
+  <!-- Tracks section -->
+  <div class="nl-media-timeline-tracks">
+    <div class="nl-media-timeline-track">
+      <div class="nl-media-timeline-track-header">Video 1</div>
+      <div class="nl-media-timeline-track-body">
+        <div class="nl-media-timeline-clip nl-media-timeline-clip-video" style="width: 120px; left: 10px;">
+          clip1.mp4
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+---
+
+### Core Prompt Guidelines for AI Generators
+1. **Never use Tailwind CSS** unless explicitly requested by the user. Use Nova UI's utility classes (`.nl-flex`, `.nl-grid`, `.nl-p-4`, `.nl-gap-3`, etc.).
+2. **Never output OS/macOS control dots** (red, yellow, green window actions) inside component code snippets or examples unless explicitly instructed.
+3. **Always use native elements** styled directly (like `<input type="checkbox" class="nl-checkbox">`) instead of custom secondary markup overlays (no `.nl-checkbox-box` sibling span).
+4. **Theming variables** must always be referenced via `hsl(var(--[variable]))` or HSL overrides (e.g. `color: hsl(var(--primary))`).

@@ -1,0 +1,64 @@
+/* css/components/tabs.css */
+.nl-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.nl-tabs-list {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: hsl(var(--muted));
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  gap: var(--space-1);
+}
+
+.nl-tabs-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  padding: var(--space-1.5) var(--space-3);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  font-weight: var(--font-medium);
+  color: hsl(var(--muted-foreground));
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.nl-tabs-trigger:hover {
+  color: hsl(var(--foreground));
+}
+
+.nl-tabs-trigger.nl-active {
+  background-color: hsla(var(--primary) / 0.12);
+  color: hsl(var(--primary));
+  box-shadow: var(--shadow-sm);
+}
+
+.nl-tabs-trigger:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+}
+
+.nl-tabs-content {
+  display: none;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  outline: none;
+}
+
+.nl-tabs-content.nl-active {
+  display: block;
+  animation: nl-fade-in var(--transition-normal) forwards;
+}

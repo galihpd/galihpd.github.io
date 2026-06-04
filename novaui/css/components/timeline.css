@@ -1,0 +1,113 @@
+/* css/components/timeline.css */
+
+.nl-timeline {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+}
+
+.nl-timeline-item {
+  display: flex;
+  gap: var(--space-4);
+  position: relative;
+  padding-bottom: var(--space-6);
+}
+
+.nl-timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+/* Node (Dot and Line separator) */
+.nl-timeline-separator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 1.25rem; /* ~20px */
+}
+
+.nl-timeline-dot {
+  width: 0.75rem; /* 12px */
+  height: 0.75rem;
+  border-radius: var(--radius-full);
+  background-color: hsl(var(--background));
+  border: 2px solid hsl(var(--border));
+  position: relative;
+  z-index: 2;
+  margin-top: 4px;
+  transition: transform var(--transition-fast);
+}
+
+.nl-timeline-line {
+  position: absolute;
+  top: 1.25rem;
+  bottom: 0;
+  left: calc(0.625rem - 1px);
+  width: 2px;
+  background-color: hsl(var(--border));
+  z-index: 1;
+}
+
+.nl-timeline-item:last-child .nl-timeline-line {
+  display: none;
+}
+
+/* Content block */
+.nl-timeline-content {
+  flex-grow: 1;
+  font-family: var(--font-sans);
+  padding-top: 1px;
+}
+
+.nl-timeline-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.nl-timeline-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: hsl(var(--foreground));
+  margin: 0;
+}
+
+.nl-timeline-time {
+  font-size: var(--text-xs);
+  color: hsl(var(--muted-foreground));
+  white-space: nowrap;
+}
+
+.nl-timeline-desc {
+  font-size: var(--text-xs);
+  color: hsl(var(--muted-foreground));
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Node Variants */
+.nl-timeline-dot-primary {
+  border-color: hsl(var(--primary));
+  background-color: hsl(var(--primary));
+}
+
+.nl-timeline-dot-secondary {
+  border-color: hsl(var(--ring));
+}
+
+.nl-timeline-dot-success {
+  border-color: hsl(var(--success));
+  background-color: hsl(var(--success));
+}
+
+.nl-timeline-dot-destructive {
+  border-color: hsl(var(--destructive));
+  background-color: hsl(var(--destructive));
+}
+
+.nl-timeline-dot-warning {
+  border-color: hsl(var(--warning));
+  background-color: hsl(var(--warning));
+}

@@ -1,0 +1,64 @@
+/* css/utilities/typography.css */
+
+/* Font Family */
+.nl-font-sans { font-family: var(--font-sans); }
+.nl-font-mono { font-family: var(--font-mono); }
+
+/* Font Size Utilities */
+.nl-text-xs { font-size: var(--text-xs); }
+.nl-text-sm { font-size: var(--text-sm); }
+.nl-text-base { font-size: var(--text-base); }
+.nl-text-lg { font-size: var(--text-lg); }
+.nl-text-xl { font-size: var(--text-xl); }
+.nl-text-2xl { font-size: var(--text-2xl); }
+.nl-text-3xl { font-size: var(--text-3xl); }
+.nl-text-4xl { font-size: var(--text-4xl); }
+.nl-text-5xl { font-size: var(--text-5xl); }
+
+/* Font Weight Utilities */
+.nl-font-normal { font-weight: var(--font-normal); }
+.nl-font-medium { font-weight: var(--font-medium); }
+.nl-font-semibold { font-weight: var(--font-semibold); }
+.nl-font-bold { font-weight: var(--font-bold); }
+
+/* Text Alignment Utilities */
+.nl-text-left { text-align: left; }
+.nl-text-center { text-align: center; }
+.nl-text-right { text-align: right; }
+.nl-text-justify { text-align: justify; }
+
+/* Text Color Utilities */
+.nl-text-foreground { color: hsl(var(--foreground)); }
+.nl-text-background { color: hsl(var(--background)); }
+.nl-text-primary { color: hsl(var(--primary)); }
+.nl-text-muted { color: hsl(var(--muted-foreground)); }
+.nl-text-destructive { color: hsl(var(--destructive)); }
+.nl-text-success { color: hsl(var(--success)); }
+.nl-text-warning { color: hsl(var(--warning)); }
+.nl-text-info { color: hsl(var(--info)); }
+
+/* Line Height Utilities */
+.nl-leading-none { line-height: 1; }
+.nl-leading-tight { line-height: 1.25; }
+.nl-leading-normal { line-height: 1.5; }
+.nl-leading-loose { line-height: 2; }
+
+/* Text Transformations */
+.nl-uppercase { text-transform: uppercase; }
+.nl-lowercase { text-transform: lowercase; }
+.nl-capitalize { text-transform: capitalize; }
+.nl-normal-case { text-transform: none; }
+
+/* Text Decoration */
+.nl-underline { text-decoration: underline; }
+.nl-line-through { text-decoration: line-through; }
+.nl-no-underline { text-decoration: none; }
+
+/* Text Wrap & Truncation */
+.nl-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nl-break-all { word-break: break-all; }
+.nl-break-words { overflow-wrap: break-word; }

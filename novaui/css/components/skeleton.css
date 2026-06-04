@@ -1,0 +1,28 @@
+/* css/components/skeleton.css */
+.nl-skeleton {
+  display: block;
+  width: 100%;
+  height: 1.25rem;
+  background-color: hsl(var(--muted));
+  border-radius: var(--radius-md);
+  animation: nl-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  pointer-events: none;
+  border: none;
+}
+
+/* Helper shapes for quick skeleton setups */
+.nl-skeleton-circle {
+  border-radius: var(--radius-full);
+  aspect-ratio: 1 / 1;
+  width: 2.5rem; /* ~40px */
+  height: 2.5rem;
+}
+
+.nl-skeleton-text {
+  height: 0.875rem; /* ~14px */
+}
+
+.nl-skeleton-title {
+  height: 1.25rem;
+  width: 60%;
+}

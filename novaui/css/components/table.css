@@ -1,0 +1,46 @@
+/* css/components/table.css */
+.nl-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background));
+}
+
+.nl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.nl-table th {
+  font-weight: var(--font-semibold);
+  color: hsl(var(--muted-foreground));
+  border-bottom: 1px solid hsl(var(--border));
+  background-color: hsla(var(--muted) / 0.5);
+  padding: var(--space-3) var(--space-4);
+  user-select: none;
+}
+
+.nl-table td {
+  padding: var(--space-4);
+  border-bottom: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+  transition: background-color var(--transition-fast);
+}
+
+.nl-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Hover Rows */
+.nl-table-hover tbody tr:hover td {
+  background-color: hsl(var(--muted));
+}
+
+/* Striped Rows */
+.nl-table-striped tbody tr:nth-child(even) td {
+  background-color: hsla(var(--muted) / 0.3);
+}

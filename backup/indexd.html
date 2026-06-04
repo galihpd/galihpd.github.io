@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gradient-to-tr from-slate-800 via-neutral-800 to-gray-900 poppins text-white">
+  
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Galih Prakoso</title>
+      <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.24/dist/full.min.css" rel="stylesheet" type="text/css" />
+      <link href="css/style.css" rel="stylesheet" type="text/css" />
+      <link rel="icon" type="image/x-icon" href="/content/etc/pavicon.ico">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="js/index.js" async></script>
+      <script src="js/jadwal.js" async></script>
+    </head>
+  <body>
+          <nav class="sticky top-4 z-50 px-4 font-bold">
+            <div class="mx-auto max-w-lg px-50 sm:px-6 backdrop-blur-3xl bg-gray-700/50 rounded-3xl m-5 lg:pr-2 md:pr-2">
+              <div class="relative flex h-12 items-center justify-between">
+                <div class="absolute inset-y-0 left-3 flex items-center sm:hidden">
+                  <!-- Mobile menu button-->
+                  <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="absolute -inset-0.5"></span>
+                    <span class="sr-only">Open main menu</span>
+
+                    <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+
+                    <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                  <div class="flex flex-shrink-0 items-center">
+                    <a href="index.html"> <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#FFF"><path d="M4 7v10M1 7h22M4 10h16M20 7v10" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+                  </div>
+                  <div class="hidden sm:ml-10 sm:block">
+                    <div class="flex space-x-4">
+                      <a href="https://www.artstation.com/galihpr" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium tracking-wider">Galeri</a>
+                      <a href="https://galihpd.github.io/resource" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium tracking-wider">Blog</a>
+                      <a href="https://galihpd.github.io/aljadwal" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium tracking-wider">Projects</a>
+                      <a href="https://galihpd.github.io/aljadwal" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium tracking-wider">Aljadwal</a>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-10 sm:pr-0">
+                  <a class="badge bg-gray-700 border-0 py-4 rounded-full hover:bg-gray-500 font-bold text-white" href="https://galihpd.github.io/doc/CV%20Galih%20Prakoso.pdf" > <!-- Adjust the font size as needed -->
+                    CV
+                    <svg width="18px" height="18px" stroke-width="1.4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
+                      <path d="M6 20h12M12 4v12m0 0l3.5-3.5M12 16l-3.5-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                  </a>
+                </div>
+                  
+                </div>
+              </div>
+            </div>
+          
+            <!-- Mobile menu, show/hide based on menu state. -->
+            <div class="sm:hidden backdrop-blur-3xl rounded-xl" id="mobile-menu">
+              <div class="space-y-1 px-2 pb-3 pt-2">
+                <a href="https://artstation.com/galihpr" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Galeri</a>
+                <a href="https://galihpd.github.io/resource" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Blog</a>
+                <a href="https://galihpd.github.io/aljadwal" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Projects</a>
+                <a href="https://galihpd.github.io/aljadwal" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Aljadwal</a>
+              </div>
+            </div>
+          </nav>
+          
+
+      <div class="hero mb-3">
+        <div class="hero-content text-center">
+          <div class="max-w">
+                <h1 class="lg:text-9xl text-6xl hover:animate-pulse mt-5 font-main pb-2">Galih Prakoso</h1>
+            
+          <div class="flex flex-wrap justify-center">  
+            <p class="pt-2 pr-2">A 3D Generalist and Computer Enthusiast.</p></br>
+            <div class="indicator">
+              <span class="indicator-item badge text-white badge-primary">Email</span>
+            <b class="px-2 py-1 border rounded-lg">galihpr@aol.com</b>
+            </div>
+          </div>
+
+          </div>
+        </div>
+      </div>  
+
+      <div style="display: flex; justify-content: center;" class="pb-5">
+        <div class="stats stats-vertical lg:stats-horizontal bg-gradient-to-l from-emerald-900 via-slate-700 to-gray-700 shadow-lg text-white">
+    
+          <div class="stat place-items-center">
+            <div class="stat-title">Project Involved</div>
+            <div class="stat-value">10+</div>
+            <div class="stat-desc">From 2021 to 2023</div>
+          </div>
+          
+          <div class="stat place-items-center">
+            <div class="stat-title">Experience</div>
+            <div class="stat-value">2 Years+</div>
+            <div class="stat-desc">From 2019</div>
+          </div>
+          
+          <div class="stat place-items-center">
+            <div class="stat-title">Current Status</div>
+            <div class="stat-value">CS Student</div>
+            <div class="stat-desc">Currently Study at State Polytechnic Of Jakarta.</div>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="collapse sm:px-10 px-4 pb-10 md:px-40 lg:px-50">
+        <input type="checkbox" class="peer" /> 
+        <div class="collapse-title text-center hover:animate-pulse text-xl peer-checked:bg-secondary peer-checked:text-secondary-content">
+          <span class="badge badge-primary text-white mr-2">Click</span>Tentang Saya
+        </div>
+        
+        <div class="collapse-content"> 
+          <p class="text-justify leading-loose">
+            Saat ini saya sedang berusaha lulus dari program studi Teknik Multimedia Digital (vokasi). Paham desain grafis, Koding, 3D dikit - dikit, 
+            Keamanan komputer dasar, Jaringan && apa aja deh pokoknya yang mau ngobrol bisa hubungi saya di galihpr@aol.com.
+            Saya bisa menginstal jaringan komputer terutama yang pake UTP, Bisa koding tapi konsol seperti shell bash dan C++, 
+            Bisa desain juga terutama desain feeds untuk postingan sosial media seperti Instagram dan twitter, Bisa motret juga yang penting kamera 
+            nya bisa full manual dan masih terus belajar 3D modelling yang hasilnya bisa diliat di sini. 
+            Kira-kira pengalaman diatas semua saya dapetin 4 tahun lalu, ketika saya mulai masuk sekolah menengah atas
+        </p>      
+        <div class="text-center pt-4 pb-2 font-bold"> Tech Stack Saya</div>
+        <div class="flex flex-wrap justify-center">
+        <div class="badge badge-neutral h-8 my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Blender_logo_no_text.svg">Blender 3D
+      </div>
+      <div class="badge badge-neutral h-8 my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/a/af/Adobe_Photoshop_CC_icon.svg">Adobe Photoshop
+      </div>
+      <div class="badge badge-neutral h-8 my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Adobe_After_Effects_CC_icon.svg">Adobe After Effect
+      </div>
+      <div class="badge badge-neutral h-8 my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Icons8_flat_linux.svg">Linux Bash
+      </div>
+      <div class="badge badge-neutral h-8 my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/9/95/Tailwind_CSS_logo.svg">
+      </div>
+      <div class="badge badge-neutral h-8 my-2 text-white rounded-lg mx-2">
+        <img class="h-4 pr-1" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Bootstrap_logo.svg"> Bootstrap
+      </div>
+      </div>
+      </div>
+
+        <div class="flex-wrap justify-center">
+
+          <div class="mockup-code mx-1 my-4">
+            <div class="sketchfab-embed-wrapper"> <iframe title="1991 - Honda NSX NA1 Powered by RB25 Engine" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share width="100%" height="400" src="https://sketchfab.com/models/8fb97ae77f3a4500b48c53ac6c48b30c/embed"> </iframe> </div>
+          </div>
+          </div>
+
+        <div class="flex flex-wrap justify-center">
+
+          <div class="mockup-code mx-1 my-4">
+            <pre data-prefix="$" class="pb-2"><code>Recent Involved Project</code></pre> 
+            <pre data-prefix=">" class="text-warning"><code><a href="https://galihpd.github.io/aljadwal">Aljadwal Pray Schedule</a></code></pre>  
+            <pre data-prefix=">" class="text-warning"><code><a href="https://mustajab-amar.itch.io/eliteunit">Elite Unit Game</a></code></pre>  
+            <pre data-prefix=">" class="text-warning"><code><a href="https://www.youtube.com/watch?v=u15WLJe9qak&t=2s">HIMATIK Eclipse Profile</a></code></pre>
+            <pre data-prefix=">" class="text-warning"><code><a href="https://www.artstation.com/artwork/xDxeer">Client Project 3D Model</a></code></pre>  
+            <pre data-prefix=">" class="text-warning"><code><a href="https://www.instagram.com/p/CwhRJ1hLoT0">Client Project Merch</a></code></pre>  
+            <pre data-prefix=">" class="text-warning"><code><a href="https://galihpr.itch.io/seaside-wave">Seaside Wave PC Game</a></code></pre>  
+          </div>
+          
+          <div class="mockup-code mx-1 my-4">
+            <div class=" bg-base-200"><iframe width="280" height="200" src="https://www.youtube-nocookie.com/embed/NqYSw1gKtqM?si=gYwVhFztRnz7j5uO" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+          </div>
+          
+          <div class="mockup-code mx-1 my-4">
+            <div class=" bg-base-200"><iframe width="280" height="200" src="https://www.youtube.com/embed/7Ld3dRVbQb8?si=Xu3kd1tf7rxBsLzA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+          </div>
+
+          <div class="mockup-code mx-1 my-4">
+            <div class=" bg-base-200"><iframe width="280" height="200" src="https://www.youtube.com/embed/k4Xi4gVAHz8?si=dUEA4QN56q2ywdqc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+          </div>
+          
+        </div>
+
+
+        </div> 
+    
+      <footer class="footer p-8 bgb rounded-t-3xl text-white bg-white/10 text-neutral-content">
+        <div>
+          <span class="font-bold text-lg">Sitemap</span> 
+          <a href="https://galihpd.github.io/3d" class="link link-hover">Galeri</a>
+          <a href="https://galihpd.github.io/resource" class="link link-hover">Blog</a>
+          <a href="https://galihpd.github.io" class="link link-hover">All Project</a>
+        </div> 
+        <div>
+          <span class="font-bold text-lg">Project</span> 
+          <a href="https://galihpr.itch.io/seaside-wave" class="link link-hover">Seaside Wave</a>
+          <a href="https://galihpd.github.io/aljadwal" class="link link-hover">Aljadwal Parser</a>
+          <a href="https://github.com/galihpd/tl-wr840PoC" class="link link-hover">TP-LINK840N_PoC</a>
+        </div> 
+        <div>
+          <span class="font-bold text-lg">Found me on</span> 
+          <a href="https://github.com/galihpd/" class="link link-hover">Github</a>
+          <a href="https://dribbble.com/wirewolf" class="link link-hover">Dribbble</a>
+          <a href="https://www.instagram.com/galih3d/" class="link link-hover">Instagram</a>
+        </div> 
+
+        <div class="footer justify-center items-center">
+          <p>Assalamualaikum, Barakallahu Fikh - Powered By Tailwind & Daisy UI</p>
+        </p>
+        </div>
+
+      </footer>
+
+  </body>
+  </html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova UI — Demo Showcase</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Nova UI CSS Framework -->
+  <link rel="stylesheet" href="css/main.css?v=11">
+  
+  <style>
+    
+    .hero-section {
+      text-align: center;
+      padding: var(--space-16) 0 var(--space-12) 0;
+      border-bottom: 1px solid hsl(var(--border));
+      margin-bottom: var(--space-12);
+    }
+
+    /* Sun/Moon Icons showing depending on theme */
+    [data-theme="dark"] .sun-icon { display: none !important; }
+    [data-theme="dark"] .moon-icon { display: block !important; }
+    [data-theme="light"] .sun-icon { display: block !important; }
+    [data-theme="light"] .moon-icon { display: none !important; }
+  </style>
+</head>
+<body class="nl-text-foreground">
+
+  <!-- 1. Sticky Navbar -->
+  <header class="nl-navbar">
+    <div class="nl-navbar-container">
+      <a href="#" class="nl-navbar-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.25rem; height: 1.25rem;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        <span>Nova UI Showcase</span>
+      </a>
+
+      <div class="nl-flex nl-items-center nl-gap-3">
+        <a href="docs/index.html" class="nl-navbar-link">Documentation</a>
+        
+        <!-- Search Trigger (Ctrl+K hint) -->
+        <button class="nl-btn nl-btn-outline nl-btn-sm nl-flex nl-items-center nl-gap-2 nl-text-muted" onclick="NovaCommandPalette.toggle()" style="width: 9rem; justify-content: space-between;">
+          <span class="nl-flex nl-items-center nl-gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <span>Search...</span>
+          </span>
+          <kbd class="nl-command-shortcut" style="margin:0; font-size: 9px;">Ctrl+K</kbd>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button class="nl-btn nl-btn-ghost nl-btn-sm" data-theme-toggle aria-label="Toggle Theme">
+          <svg class="sun-icon nl-w-5 nl-h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+          <svg class="moon-icon nl-w-5 nl-h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Grid Wrapper -->
+  <div class="nl-container-lg nl-py-12">
+    
+    <!-- 2. Hero Section -->
+    <section class="hero-section">
+      <div class="nl-mb-3">
+        <span class="nl-badge nl-badge-success">Release v1.0.0</span>
+      </div>
+      <h1 class="nl-text-5xl nl-font-bold nl-mb-4" style="letter-spacing: -0.04em;">A Beautiful CSS variables design system</h1>
+      <p class="nl-text-lg nl-text-muted nl-mx-auto nl-mb-6" style="max-width: 32rem; line-height: 1.5;">
+        Nova UI is a modern CSS framework. Built from scratch with pure HSL custom properties, clean utility classes, and custom interactive vanilla elements.
+      </p>
+      <div class="nl-flex nl-justify-center nl-gap-3">
+        <a href="docs/index.html" class="nl-btn nl-btn-primary">Read Documentation</a>
+        <button class="nl-btn nl-btn-outline" data-modal-trigger="demo-modal">Launch Modal</button>
+      </div>
+    </section>
+
+    <!-- 3. Cards Showcase Grid -->
+    <section class="nl-grid nl-grid-cols-1 nl-md-grid-cols-3 nl-gap-6 nl-mb-12">
+      
+      <!-- Card 1: Interactive Forms -->
+      <div class="nl-card">
+        <div class="nl-card-header">
+          <h3 class="nl-card-title">Setup Profile</h3>
+          <p class="nl-card-description">Simple form layout parameters.</p>
+        </div>
+        <div class="nl-card-content nl-flex nl-flex-col nl-gap-4">
+          <div>
+            <label class="nl-text-xs nl-font-semibold nl-mb-1 nl-block">Display Name</label>
+            <input type="text" class="nl-input" placeholder="novaui_dev">
+          </div>
+          <div>
+            <label class="nl-text-xs nl-font-semibold nl-mb-1 nl-block">Region</label>
+            <select class="nl-select">
+              <option>Jakarta, ID</option>
+              <option>Singapore, SG</option>
+              <option>Tokyo, JP</option>
+            </select>
+          </div>
+          <label class="nl-toggle-label">
+            <input type="checkbox" class="nl-toggle" checked>
+            <span>Receive push notifications</span>
+          </label>
+        </div>
+        <div class="nl-card-footer">
+          <button class="nl-btn nl-btn-primary nl-w-full" onclick="NovaToast.show({title:'Settings Saved', description:'Profile variables synchronized.', variant:'success'})">Save settings</button>
+        </div>
+      </div>
+
+      <!-- Card 2: Dropdowns & Badges -->
+      <div class="nl-card">
+        <div class="nl-card-header">
+          <h3 class="nl-card-title">Menu & Tags</h3>
+          <p class="nl-card-description">Interactive action triggers and labels.</p>
+        </div>
+        <div class="nl-card-content nl-flex nl-flex-col nl-gap-4">
+          <div class="nl-flex nl-flex-wrap nl-gap-2">
+            <span class="nl-badge nl-badge-default">Active</span>
+            <span class="nl-badge nl-badge-secondary">Pending</span>
+            <span class="nl-badge nl-badge-outline">Draft</span>
+            <span class="nl-badge nl-badge-destructive">Error</span>
+          </div>
+          
+          <div class="nl-border-t nl-my-2"></div>
+          
+          <div class="nl-flex nl-justify-between nl-items-center">
+            <span class="nl-text-sm">Manage Options:</span>
+            <!-- Dropdown Component -->
+            <div class="nl-dropdown">
+              <button class="nl-btn nl-btn-outline nl-btn-sm nl-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+                <span>Actions</span>
+                <span style="font-size: 8px; margin-left: 6px;">▼</span>
+              </button>
+              <div class="nl-dropdown-menu nl-dropdown-menu-right" role="menu">
+                <div class="nl-dropdown-header">Options</div>
+                <button class="nl-dropdown-item" onclick="NovaToast.show({title:'Reloading builds...'})">Rebuild Server</button>
+                <button class="nl-dropdown-item" onclick="NovaToast.show({title:'Syncing details...'})">Fetch commits</button>
+                <div class="nl-dropdown-divider"></div>
+                <button class="nl-dropdown-item nl-text-destructive" onclick="NovaToast.show({title:'Workspace purged', variant:'destructive'})">Delete Workspace</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="nl-card-footer">
+          <p class="nl-text-xs nl-text-muted">Hover badges or click dropdown actions menu list triggers.</p>
+        </div>
+      </div>
+
+      <!-- Card 3: Loaders & Progress -->
+      <div class="nl-card">
+        <div class="nl-card-header">
+          <h3 class="nl-card-title">Loaders & Skeletons</h3>
+          <p class="nl-card-description">Visual feedback loader states.</p>
+        </div>
+        <div class="nl-card-content nl-flex nl-flex-col nl-gap-4">
+          <!-- Skeleton card preview -->
+          <div class="nl-flex nl-items-center nl-gap-3">
+            <div class="nl-skeleton nl-skeleton-circle"></div>
+            <div class="nl-flex-1 nl-flex nl-flex-col nl-gap-2">
+              <div class="nl-skeleton nl-skeleton-text" style="width: 60%"></div>
+              <div class="nl-skeleton nl-skeleton-text" style="width: 40%"></div>
+            </div>
+          </div>
+          
+          <div class="nl-border-t nl-my-2"></div>
+          
+          <!-- Progress Bar component -->
+          <div>
+            <div class="nl-flex nl-justify-between nl-text-xs nl-mb-1">
+              <span>System compiling progress</span>
+              <span class="nl-font-bold">85%</span>
+            </div>
+            <div class="nl-progress">
+              <div class="nl-progress-value" style="width: 85%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="nl-card-footer">
+          <button class="nl-btn nl-btn-secondary nl-w-full" onclick="NovaToast.show({title:'Simulated check complete'})">Check Status</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 4. Interactive Toasts Center Callouts -->
+    <section class="nl-card nl-p-6 nl-mb-12">
+      <h3 class="nl-text-xl nl-font-bold nl-mb-2">Status Notification Service</h3>
+      <p class="nl-text-sm nl-text-muted nl-mb-4">Click the buttons below to trigger dynamic floating alert toasts in the bottom-right corner of your viewport.</p>
+      <div class="nl-flex nl-gap-3">
+        <button class="nl-btn nl-btn-success" onclick="NovaToast.show({title:'Operation Success', description:'Workspace variables updated in 12ms.', variant:'success'})">Success Toast</button>
+        <button class="nl-btn nl-btn-destructive" onclick="NovaToast.show({title:'Critical System Alert', description:'Workspace database sync failed.', variant:'destructive'})">Destructive Toast</button>
+        <button class="nl-btn nl-btn-outline" onclick="NovaToast.show({title:'Information update', description:'We will patch servers tonight.', variant:'info'})">Info Toast</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- 5. Modal Dialogue Markup -->
+  <div id="demo-modal" class="nl-modal" aria-hidden="true" role="dialog">
+    <div class="nl-modal-backdrop" data-modal-close></div>
+    <div class="nl-modal-content">
+      <button class="nl-modal-close" data-modal-close aria-label="Close dialog">&times;</button>
+      <div class="nl-modal-header">
+        <h4 class="nl-modal-title">Delete Project Repos</h4>
+        <p class="nl-modal-description">Are you sure you want to delete this workspace repository?</p>
+      </div>
+      <div class="nl-modal-body">
+        <p class="docs-paragraph" style="margin: 0;">This operation is permanent. All active deployments, staging environments, and hook variables will be disconnected.</p>
+      </div>
+      <div class="nl-modal-footer">
+        <button class="nl-btn nl-btn-outline" data-modal-close>Cancel</button>
+        <button class="nl-btn nl-btn-destructive" onclick="NovaToast.show({title:'Purged Repos', variant:'destructive'}); NovaModal.close(document.getElementById('demo-modal'))">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Command Palette Overlay Modal Markup -->
+  <div id="nl-command-palette" class="nl-modal nl-command-palette-modal" aria-hidden="true" role="dialog">
+    <div class="nl-modal-backdrop" data-modal-close></div>
+    <div class="nl-modal-content">
+      <div class="nl-command-wrapper">
+        <div class="nl-command-header">
+          <span class="nl-command-header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </span>
+          <input type="text" class="nl-command-input" placeholder="Type command name...">
+          <button class="nl-btn nl-btn-ghost nl-btn-sm" data-modal-close style="height: 2rem;">Close</button>
+        </div>
+        <div class="nl-command-results" role="listbox">
+          <!-- Searched items populated dynamically -->
+        </div>
+        <div class="nl-command-footer">
+          <div class="nl-command-key-guide"><kbd class="nl-command-shortcut">↑↓</kbd> <span>navigate</span></div>
+          <div class="nl-command-key-guide"><kbd class="nl-command-shortcut">Enter</kbd> <span>execute</span></div>
+          <div class="nl-command-key-guide"><kbd class="nl-command-shortcut">Esc</kbd> <span>close</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Framework Javascript Scripts -->
+  <script src="js/theme.js"></script>
+  <script src="js/dropdown.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/tabs.js"></script>
+  <script src="js/accordion.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/command-palette.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    // Initialize Command Palette items index for this demo page
+    document.addEventListener('DOMContentLoaded', () => {
+      const demoCommands = [
+        { category: 'General', title: 'Open Delete Dialog Modal', action: () => NovaModal.open('demo-modal'), keywords: ['launch', 'dialog', 'modal'] },
+        { category: 'System Action', title: 'Switch to Dark Mode', action: () => NovaTheme.set('dark'), keywords: ['theme', 'dark'] },
+        { category: 'System Action', title: 'Switch to Light Mode', action: () => NovaTheme.set('light'), keywords: ['theme', 'light'] },
+        { category: 'General', title: 'Navigate to Documentation Homepage', action: () => { window.location.href = 'docs/index.html'; }, keywords: ['docs', 'homepage'] }
+      ];
+      NovaCommandPalette.register(demoCommands);
+    });
+  </script>
+
+</body>
+</html>

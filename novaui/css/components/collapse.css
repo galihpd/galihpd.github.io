@@ -1,0 +1,127 @@
+/* css/components/collapse.css */
+
+/* ─── Hidden checkbox toggle ─────────────────────────────────────────────── */
+.nl-collapse-toggle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ─── Container ──────────────────────────────────────────────────────────── */
+.nl-collapse {
+  width: 100%;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-xl);
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  overflow: hidden;
+  transition: box-shadow var(--transition-normal);
+}
+
+.nl-collapse:focus-within {
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.35);
+}
+
+/* ─── Title / Trigger ────────────────────────────────────────────────────── */
+.nl-collapse-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-4) var(--space-5);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: hsl(var(--foreground));
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  /* Used as a <label> pointing at the toggle checkbox */
+  list-style: none;
+}
+
+.nl-collapse-title:hover {
+  background-color: hsl(var(--muted) / 0.5);
+  color: hsl(var(--foreground));
+}
+
+.nl-collapse-title:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: -2px;
+}
+
+/* ─── Arrow variant — chevron via ::after ────────────────────────────────── */
+.nl-collapse-arrow .nl-collapse-title::after {
+  content: "";
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+  margin-left: var(--space-3);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  transition: transform var(--transition-normal);
+}
+
+.nl-collapse-arrow .nl-collapse-toggle:checked ~ .nl-collapse-title::after {
+  transform: rotate(180deg);
+}
+
+/* ─── Plus / minus variant ───────────────────────────────────────────────── */
+.nl-collapse-plus .nl-collapse-title::after {
+  content: "+";
+  display: inline-block;
+  flex-shrink: 0;
+  margin-left: var(--space-3);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: hsl(var(--muted-foreground));
+  transition: transform var(--transition-normal), content var(--transition-fast);
+  line-height: 1;
+}
+
+.nl-collapse-plus .nl-collapse-toggle:checked ~ .nl-collapse-title::after {
+  content: "−";
+}
+
+/* ─── Content area ───────────────────────────────────────────────────────── */
+.nl-collapse-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows var(--transition-normal);
+}
+
+/* Inner wrapper needed so grid-template-rows trick works */
+.nl-collapse-content > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.nl-collapse-toggle:checked ~ .nl-collapse-content {
+  grid-template-rows: 1fr;
+}
+
+/* ─── Content body padding ───────────────────────────────────────────────── */
+.nl-collapse-body {
+  padding: 0 var(--space-5) 0 var(--space-5);
+  font-size: var(--text-sm);
+  color: hsl(var(--muted-foreground));
+  line-height: 1.6;
+  transition: padding var(--transition-normal);
+}
+
+.nl-collapse-toggle:checked ~ .nl-collapse-content .nl-collapse-body {
+  padding: var(--space-2) var(--space-5) var(--space-5);
+}
+
+/* ─── Bordered separator ─────────────────────────────────────────────────── */
+.nl-collapse-toggle:checked ~ .nl-collapse-content {
+  border-top: 1px solid hsl(var(--border));
+}

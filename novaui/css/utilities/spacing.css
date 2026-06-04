@@ -1,0 +1,147 @@
+/* css/utilities/spacing.css */
+
+/* Padding Utilities */
+.nl-p-0 { padding: var(--space-0); }
+.nl-p-1 { padding: var(--space-1); }
+.nl-p-2 { padding: var(--space-2); }
+.nl-p-3 { padding: var(--space-3); }
+.nl-p-4 { padding: var(--space-4); }
+.nl-p-5 { padding: var(--space-5); }
+.nl-p-6 { padding: var(--space-6); }
+.nl-p-8 { padding: var(--space-8); }
+.nl-p-10 { padding: var(--space-10); }
+.nl-p-12 { padding: var(--space-12); }
+.nl-p-16 { padding: var(--space-16); }
+
+/* Padding Horizontal (X) */
+.nl-px-0 { padding-left: var(--space-0); padding-right: var(--space-0); }
+.nl-px-1 { padding-left: var(--space-1); padding-right: var(--space-1); }
+.nl-px-2 { padding-left: var(--space-2); padding-right: var(--space-2); }
+.nl-px-3 { padding-left: var(--space-3); padding-right: var(--space-3); }
+.nl-px-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
+.nl-px-5 { padding-left: var(--space-5); padding-right: var(--space-5); }
+.nl-px-6 { padding-left: var(--space-6); padding-right: var(--space-6); }
+.nl-px-8 { padding-left: var(--space-8); padding-right: var(--space-8); }
+.nl-px-10 { padding-left: var(--space-10); padding-right: var(--space-10); }
+
+/* Padding Vertical (Y) */
+.nl-py-0 { padding-top: var(--space-0); padding-bottom: var(--space-0); }
+.nl-py-1 { padding-top: var(--space-1); padding-bottom: var(--space-1); }
+.nl-py-2 { padding-top: var(--space-2); padding-bottom: var(--space-2); }
+.nl-py-3 { padding-top: var(--space-3); padding-bottom: var(--space-3); }
+.nl-py-4 { padding-top: var(--space-4); padding-bottom: var(--space-4); }
+.nl-py-5 { padding-top: var(--space-5); padding-bottom: var(--space-5); }
+.nl-py-6 { padding-top: var(--space-6); padding-bottom: var(--space-6); }
+.nl-py-8 { padding-top: var(--space-8); padding-bottom: var(--space-8); }
+.nl-py-10 { padding-top: var(--space-10); padding-bottom: var(--space-10); }
+
+/* Padding Individual Directions */
+.nl-pt-0 { padding-top: var(--space-0); }
+.nl-pt-1 { padding-top: var(--space-1); }
+.nl-pt-2 { padding-top: var(--space-2); }
+.nl-pt-3 { padding-top: var(--space-3); }
+.nl-pt-4 { padding-top: var(--space-4); }
+.nl-pt-5 { padding-top: var(--space-5); }
+.nl-pt-6 { padding-top: var(--space-6); }
+.nl-pt-8 { padding-top: var(--space-8); }
+
+.nl-pb-0 { padding-bottom: var(--space-0); }
+.nl-pb-1 { padding-bottom: var(--space-1); }
+.nl-pb-2 { padding-bottom: var(--space-2); }
+.nl-pb-3 { padding-bottom: var(--space-3); }
+.nl-pb-4 { padding-bottom: var(--space-4); }
+.nl-pb-5 { padding-bottom: var(--space-5); }
+.nl-pb-6 { padding-bottom: var(--space-6); }
+.nl-pb-8 { padding-bottom: var(--space-8); }
+
+.nl-pl-0 { padding-left: var(--space-0); }
+.nl-pl-1 { padding-left: var(--space-1); }
+.nl-pl-2 { padding-left: var(--space-2); }
+.nl-pl-3 { padding-left: var(--space-3); }
+.nl-pl-4 { padding-left: var(--space-4); }
+.nl-pl-5 { padding-left: var(--space-5); }
+.nl-pl-6 { padding-left: var(--space-6); }
+.nl-pl-8 { padding-left: var(--space-8); }
+
+.nl-pr-0 { padding-right: var(--space-0); }
+.nl-pr-1 { padding-right: var(--space-1); }
+.nl-pr-2 { padding-right: var(--space-2); }
+.nl-pr-3 { padding-right: var(--space-3); }
+.nl-pr-4 { padding-right: var(--space-4); }
+.nl-pr-5 { padding-right: var(--space-5); }
+.nl-pr-6 { padding-right: var(--space-6); }
+.nl-pr-8 { padding-right: var(--space-8); }
+
+
+/* Margin Utilities */
+.nl-m-0 { margin: var(--space-0); }
+.nl-m-1 { margin: var(--space-1); }
+.nl-m-2 { margin: var(--space-2); }
+.nl-m-3 { margin: var(--space-3); }
+.nl-m-4 { margin: var(--space-4); }
+.nl-m-5 { margin: var(--space-5); }
+.nl-m-6 { margin: var(--space-6); }
+.nl-m-8 { margin: var(--space-8); }
+.nl-m-auto { margin: auto; }
+
+/* Margin Horizontal (X) */
+.nl-mx-0 { margin-left: var(--space-0); margin-right: var(--space-0); }
+.nl-mx-1 { margin-left: var(--space-1); margin-right: var(--space-1); }
+.nl-mx-2 { margin-left: var(--space-2); margin-right: var(--space-2); }
+.nl-mx-3 { margin-left: var(--space-3); margin-right: var(--space-3); }
+.nl-mx-4 { margin-left: var(--space-4); margin-right: var(--space-4); }
+.nl-mx-5 { margin-left: var(--space-5); margin-right: var(--space-5); }
+.nl-mx-6 { margin-left: var(--space-6); margin-right: var(--space-6); }
+.nl-mx-8 { margin-left: var(--space-8); margin-right: var(--space-8); }
+.nl-mx-auto { margin-left: auto; margin-right: auto; }
+
+/* Margin Vertical (Y) */
+.nl-my-0 { margin-top: var(--space-0); margin-bottom: var(--space-0); }
+.nl-my-1 { margin-top: var(--space-1); margin-bottom: var(--space-1); }
+.nl-my-2 { margin-top: var(--space-2); margin-bottom: var(--space-2); }
+.nl-my-3 { margin-top: var(--space-3); margin-bottom: var(--space-3); }
+.nl-my-4 { margin-top: var(--space-4); margin-bottom: var(--space-4); }
+.nl-my-5 { margin-top: var(--space-5); margin-bottom: var(--space-5); }
+.nl-my-6 { margin-top: var(--space-6); margin-bottom: var(--space-6); }
+.nl-my-8 { margin-top: var(--space-8); margin-bottom: var(--space-8); }
+
+/* Margin Individual Directions */
+.nl-mt-0 { margin-top: var(--space-0); }
+.nl-mt-1 { margin-top: var(--space-1); }
+.nl-mt-2 { margin-top: var(--space-2); }
+.nl-mt-3 { margin-top: var(--space-3); }
+.nl-mt-4 { margin-top: var(--space-4); }
+.nl-mt-5 { margin-top: var(--space-5); }
+.nl-mt-6 { margin-top: var(--space-6); }
+.nl-mt-8 { margin-top: var(--space-8); }
+.nl-mt-auto { margin-top: auto; }
+
+.nl-mb-0 { margin-bottom: var(--space-0); }
+.nl-mb-1 { margin-bottom: var(--space-1); }
+.nl-mb-2 { margin-bottom: var(--space-2); }
+.nl-mb-3 { margin-bottom: var(--space-3); }
+.nl-mb-4 { margin-bottom: var(--space-4); }
+.nl-mb-5 { margin-bottom: var(--space-5); }
+.nl-mb-6 { margin-bottom: var(--space-6); }
+.nl-mb-8 { margin-bottom: var(--space-8); }
+.nl-mb-auto { margin-bottom: auto; }
+
+.nl-ml-0 { margin-left: var(--space-0); }
+.nl-ml-1 { margin-left: var(--space-1); }
+.nl-ml-2 { margin-left: var(--space-2); }
+.nl-ml-3 { margin-left: var(--space-3); }
+.nl-ml-4 { margin-left: var(--space-4); }
+.nl-ml-5 { margin-left: var(--space-5); }
+.nl-ml-6 { margin-left: var(--space-6); }
+.nl-ml-8 { margin-left: var(--space-8); }
+.nl-ml-auto { margin-left: auto; }
+
+.nl-mr-0 { margin-right: var(--space-0); }
+.nl-mr-1 { margin-right: var(--space-1); }
+.nl-mr-2 { margin-right: var(--space-2); }
+.nl-mr-3 { margin-right: var(--space-3); }
+.nl-mr-4 { margin-right: var(--space-4); }
+.nl-mr-5 { margin-right: var(--space-5); }
+.nl-mr-6 { margin-right: var(--space-6); }
+.nl-mr-8 { margin-right: var(--space-8); }
+.nl-mr-auto { margin-right: auto; }

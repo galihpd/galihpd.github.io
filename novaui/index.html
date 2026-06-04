@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova UI — Modern CSS Variables Design System</title>
+  <meta name="description" content="A premium, lightweight CSS framework built from scratch with pure HSL variables, responsive utilities, and custom interactive vanilla elements.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Nova UI CSS -->
+  <link rel="stylesheet" href="css/main.css?v=11">
+  
+  <!-- Homepage Specific CSS -->
+  <link rel="stylesheet" href="css/homepage.css">
+</head>
+<body class="nl-text-foreground">
+
+  <div class="landing-shell">
+    <!-- Grid overlay background effect -->
+    <div class="landing-grid-overlay"></div>
+
+    <!-- Sticky Navbar -->
+    <header class="nl-navbar" style="z-index: 10;">
+      <div class="nl-navbar-container">
+        <a href="#" class="nl-navbar-brand">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          <span>Nova UI</span>
+        </a>
+
+        <div class="nl-flex nl-items-center nl-gap-3">
+          <a href="docs/index.html" class="nl-navbar-link">Documentation</a>
+          <a href="docs/index.html#/docs/button" class="nl-navbar-link">Components</a>
+          <a href="video_editor.html" class="nl-navbar-link">Video Editor Demo</a>
+
+          <!-- Command Palette Trigger Button -->
+          <button class="nl-btn nl-btn-outline nl-btn-sm nl-flex nl-items-center nl-gap-2 nl-text-muted" onclick="NovaCommandPalette.toggle()" style="width: 9.5rem; justify-content: space-between;">
+            <span class="nl-flex nl-items-center nl-gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <span>Search...</span>
+            </span>
+            <kbd class="nl-command-shortcut" style="margin: 0; font-size: 10px;">Ctrl+K</kbd>
+          </button>
+
+          <!-- Dark/Light Theme Toggle -->
+          <button class="nl-btn nl-btn-ghost nl-btn-sm" data-theme-toggle aria-label="Toggle Theme">
+            <svg class="sun-icon nl-w-5 nl-h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+            <svg class="moon-icon nl-w-5 nl-h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Content -->
+    <main class="nl-container-xl nl-relative" style="flex-grow: 1; z-index: 2;">
+      <section class="hero-section">
+        <span class="hero-badge">⚡ CSS Variables Design System</span>
+        <h1 class="hero-title">
+          <span class="hero-title-gradient">Lightweight UI Components,</span><br>
+          Completely Customizable.
+        </h1>
+        <p class="hero-subtitle">
+          Built from scratch using pure HSL variables, responsive utility grids, and clean visual layouts. Zero build steps or preprocessors required.
+        </p>
+
+        <div class="nl-flex nl-justify-center nl-gap-4 nl-mb-8">
+          <a href="docs/index.html" class="nl-btn nl-btn-primary nl-btn-lg">Read Documentation</a>
+          <a href="#showcase" class="nl-btn nl-btn-outline nl-btn-lg">Live Showcase</a>
+        </div>
+
+        <!-- Terminal Widget -->
+        <div class="hero-cli-box">
+          <span class="nl-flex nl-items-center nl-gap-2">
+            <span class="nl-text-muted">$</span>
+            <code>npm install novaui</code>
+          </span>
+          <button class="cli-copy-btn" onclick="copyCliCommand(this)" aria-label="Copy CLI Command">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- Showcase Section -->
+      <section id="showcase" class="showcase-section">
+        <div class="showcase-header">
+          <h2 class="showcase-title">Interactive Capability Grid</h2>
+          <p class="showcase-desc">Explore how interactive widgets adapt to dynamic styling states in real-time.</p>
+        </div>
+
+        <div class="showcase-grid">
+          
+          <!-- Card 1: Buttons Variant -->
+          <div class="showcase-card">
+            <div class="showcase-card-header">
+              <span class="showcase-card-title">Buttons & Badges</span>
+            </div>
+            <div class="showcase-card-content has-grid-bg">
+              <div class="nl-flex nl-flex-wrap nl-gap-3 nl-justify-center">
+                <button class="nl-btn nl-btn-primary">Primary</button>
+                <button class="nl-btn nl-btn-outline">Outline</button>
+                <button class="nl-btn nl-btn-success">Success</button>
+                <button class="nl-btn nl-btn-destructive">Warning</button>
+              </div>
+              <div class="nl-flex nl-flex-wrap nl-gap-2 nl-justify-center nl-mt-4">
+                <span class="nl-badge nl-badge-default">Badge</span>
+                <span class="nl-badge nl-badge-secondary">Secondary</span>
+                <span class="nl-badge nl-badge-outline">Outline</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Inputs & Switches -->
+          <div class="showcase-card">
+            <div class="showcase-card-header">
+              <span class="showcase-card-title">Form Controls</span>
+            </div>
+            <div class="showcase-card-content">
+              <div class="nl-flex nl-flex-col nl-gap-3 nl-w-full">
+                <input type="text" class="nl-input" placeholder="Text Input">
+                <div class="nl-flex nl-items-center nl-justify-between">
+                  <label class="nl-checkbox-label">
+                    <input type="checkbox" class="nl-checkbox" checked>
+                    <span>Accept Terms</span>
+                  </label>
+                  <label class="nl-toggle-label">
+                    <input type="checkbox" class="nl-toggle" checked>
+                    <span>Switch</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Live Customizer -->
+          <div class="showcase-card">
+            <div class="showcase-card-header">
+              <span class="showcase-card-title">Theme Customizer</span>
+            </div>
+            <div class="showcase-card-content">
+              <div class="showcase-sliders">
+                <div class="slider-row">
+                  <div class="slider-row-header">
+                    <span>Accent Hue</span>
+                    <span id="home-val-hue">221</span>
+                  </div>
+                  <input type="range" class="slider-element" id="home-slide-hue" min="0" max="360" value="221">
+                </div>
+                <div class="slider-row">
+                  <div class="slider-row-header">
+                    <span>Saturation</span>
+                    <span id="home-val-sat">83%</span>
+                  </div>
+                  <input type="range" class="slider-element" id="home-slide-sat" min="0" max="100" value="83">
+                </div>
+                <div class="slider-row">
+                  <div class="slider-row-header">
+                    <span>Border Radius</span>
+                    <span id="home-val-radius">1.3</span>
+                  </div>
+                  <input type="range" class="slider-element" id="home-slide-radius" min="0" max="30" value="13">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Dialogs & Overlays -->
+          <div class="showcase-card">
+            <div class="showcase-card-header">
+              <span class="showcase-card-title">Popups & Dialogs</span>
+            </div>
+            <div class="showcase-card-content has-grid-bg">
+              <div class="nl-flex nl-flex-col nl-gap-3 nl-w-full">
+                <button class="nl-btn nl-btn-primary nl-w-full" data-modal-trigger="home-modal">Open Modal Dialog</button>
+                <div class="nl-grid nl-grid-cols-2 nl-gap-2">
+                  <button class="nl-btn nl-btn-outline nl-btn-sm" onclick="NovaToast.show({title: 'Task Done', description: 'Showcase toast triggered.', variant: 'success'})">Success Toast</button>
+                  <button class="nl-btn nl-btn-outline nl-btn-sm" onclick="NovaToast.show({title: 'Compile Alert', description: 'Operation warning.', variant: 'destructive'})">Error Toast</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 5: Interactive Accordion -->
+          <div class="showcase-card">
+            <div class="showcase-card-header">
+              <span class="showcase-card-title">Collapsible List</span>
+            </div>
+            <div class="showcase-card-content">
+              <div class="nl-accordion" data-accordion>
+                <div class="nl-accordion-item">
+                  <button class="nl-accordion-trigger">
+                    <span>What is Nova UI?</span>
+                    <span class="nl-accordion-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </span>
+                  </button>
+                  <div class="nl-accordion-content">
+                    <div class="nl-accordion-body">
+                      A modern, lightweight design framework powered by pure CSS variables.
+                    </div>
+                  </div>
+                </div>
+                <div class="nl-accordion-item">
+                  <button class="nl-accordion-trigger">
+                    <span>Is it JS-free?</span>
+                    <span class="nl-accordion-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </span>
+                  </button>
+                  <div class="nl-accordion-content">
+                    <div class="nl-accordion-body">
+                      Yes! Core styles are pure CSS, but we provide optional micro-JS helpers for interactive elements.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 6: Skeleton Pulse state -->
+          <div class="showcase-card">
+            <div class="showcase-card-header">
+              <span class="showcase-card-title">Skeleton Loader</span>
+            </div>
+            <div class="showcase-card-content">
+              <div class="nl-flex nl-items-center nl-gap-3 nl-w-full">
+                <div class="nl-skeleton nl-skeleton-circle" style="width: 2.5rem; height: 2.5rem;"></div>
+                <div class="nl-flex-1 nl-flex nl-flex-col nl-gap-2">
+                  <div class="nl-skeleton nl-skeleton-text" style="width: 60%; height: 10px;"></div>
+                  <div class="nl-skeleton nl-skeleton-text" style="width: 40%; height: 10px;"></div>
+                </div>
+              </div>
+              <div class="nl-flex nl-flex-col nl-gap-2 nl-mt-4 nl-w-full">
+                <div class="nl-skeleton nl-skeleton-text" style="height: 10px;"></div>
+                <div class="nl-skeleton nl-skeleton-text" style="width: 85%; height: 10px;"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Core Features Grid -->
+      <section class="features-section">
+        <div class="features-grid">
+          
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.34241 19.4838 5.48512 20.2173 5.21532 20.8402C4.94552 21.463 4.31681 21.849 3.63665 21.7828C3.09503 21.7301 2.58045 21.5029 2.15857 21.1414"/></svg>
+            </div>
+            <h3 class="feature-title">Dynamic Themes</h3>
+            <p class="feature-text">Modify variables directly in CSS or JS at runtime. Shift colors or radiuses dynamically.</p>
+          </div>
+
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M21 9H3M21 15H3M12 3v18"/></svg>
+            </div>
+            <h3 class="feature-title">Layout Utilities</h3>
+            <p class="feature-text">Includes a fully responsive flex and grid system that formats perfectly for all devices.</p>
+          </div>
+
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 class="feature-title">A11y Out of Box</h3>
+            <p class="feature-text">Pre-configured keyboard navigation focus rings and ARIA support for advanced structures.</p>
+          </div>
+
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            </div>
+            <h3 class="feature-title">Minimal footprint</h3>
+            <p class="feature-text">No complex node structures, Tailwind configs, or compiling delays. Just copy and style.</p>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal dialogue structure -->
+    <div id="home-modal" class="nl-modal" aria-hidden="true" role="dialog">
+      <div class="nl-modal-backdrop" data-modal-close></div>
+      <div class="nl-modal-content">
+        <button class="nl-modal-close" data-modal-close aria-label="Close dialog">&times;</button>
+        <div class="nl-modal-header">
+          <h4 class="nl-modal-title">Live Preview Modal</h4>
+          <p class="nl-modal-description">Demonstrating overlay capabilities.</p>
+        </div>
+        <div class="nl-modal-body">
+          <p class="docs-paragraph" style="margin: 0;">Nova UI manages overlay focus trapping, background scroll locking, and Escape key listeners out of the box.</p>
+        </div>
+        <div class="nl-modal-footer">
+          <button class="nl-btn nl-btn-outline" data-modal-close>Close</button>
+          <button class="nl-btn nl-btn-primary" onclick="NovaToast.show({title: 'Settings Synced', description: 'Action complete successfully.', variant: 'success'}); NovaModal.close(document.getElementById('home-modal'))">Action Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Palette Overlay Modal -->
+    <div id="nl-command-palette" class="nl-modal nl-command-palette-modal" aria-hidden="true" role="dialog">
+      <div class="nl-modal-backdrop" data-modal-close></div>
+      <div class="nl-modal-content">
+        <div class="nl-command-wrapper">
+          <div class="nl-command-header">
+            <span class="nl-command-header-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input type="text" class="nl-command-input" placeholder="Type command name...">
+            <button class="nl-btn nl-btn-ghost nl-btn-sm" data-modal-close style="height: 2rem;">Close</button>
+          </div>
+          <div class="nl-command-results" role="listbox">
+            <!-- Searched items populated dynamically -->
+          </div>
+          <div class="nl-command-footer">
+            <div class="nl-command-key-guide"><kbd class="nl-command-shortcut">↑↓</kbd> <span>navigate</span></div>
+            <div class="nl-command-key-guide"><kbd class="nl-command-shortcut">Enter</kbd> <span>execute</span></div>
+            <div class="nl-command-key-guide"><kbd class="nl-command-shortcut">Esc</kbd> <span>close</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <div class="nl-container-xl footer-content">
+        <div class="footer-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; color: hsl(var(--primary));"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          <span>Nova UI</span>
+        </div>
+        <div class="footer-links">
+          <a href="docs/index.html" class="footer-link">Documentation</a>
+          <a href="docs/index.html#/docs/theme-generator" class="footer-link">Theme Generator</a>
+          <a href="video_editor.html" class="footer-link">Video Editor Demo</a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a>
+        </div>
+        <span class="footer-copy">&copy; 2026 Nova UI. MIT Licensed.</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Framework Javascript Scripts -->
+  <script src="js/theme.js"></script>
+  <script src="js/dropdown.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/tabs.js"></script>
+  <script src="js/accordion.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/command-palette.js"></script>
+  <script src="js/main.js"></script>
+
+  <!-- Inline Home Interactions -->
+  <script>
+    // Copy CLI widget command helper
+    function copyCliCommand(btn) {
+      navigator.clipboard.writeText('npm install novaui').then(() => {
+        const origText = btn.innerHTML;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        setTimeout(() => { btn.innerHTML = origText; }, 2000);
+      });
+    }
+
+    // Live variables color customizer binding
+    const hueSlider = document.getElementById('home-slide-hue');
+    const satSlider = document.getElementById('home-slide-sat');
+    const radSlider = document.getElementById('home-slide-radius');
+
+    function updateHomeTheme() {
+      const h = hueSlider.value;
+      const s = satSlider.value;
+      const r = radSlider.value / 10;
+
+      document.getElementById('home-val-hue').textContent = h;
+      document.getElementById('home-val-sat').textContent = s + '%';
+      document.getElementById('home-val-radius').textContent = r.toFixed(1);
+
+      // Apply dynamically to root elements
+      document.documentElement.style.setProperty('--hue', h);
+      document.documentElement.style.setProperty('--saturation', s + '%');
+      
+      // Calculate a readable primary weight: (primary accent color variable update)
+      document.documentElement.style.setProperty('--primary', `${h} ${s}% 62%`);
+      document.documentElement.style.setProperty('--primary-foreground', `${h} 60% 10%`);
+      document.documentElement.style.setProperty('--radius-factor', r);
+    }
+
+    hueSlider.addEventListener('input', updateHomeTheme);
+    satSlider.addEventListener('input', updateHomeTheme);
+    radSlider.addEventListener('input', updateHomeTheme);
+
+    // Command palette registration for homepage
+    document.addEventListener('DOMContentLoaded', () => {
+      const homeCommands = [
+        { category: 'General', title: 'Open Live Demo Modal', action: () => NovaModal.open('home-modal'), keywords: ['modal', 'dialog', 'popup'] },
+        { category: 'System Action', title: 'Switch to Dark Mode', action: () => NovaTheme.set('dark'), keywords: ['theme', 'dark'] },
+        { category: 'System Action', title: 'Switch to Light Mode', action: () => NovaTheme.set('light'), keywords: ['theme', 'light'] },
+        { category: 'General', title: 'Navigate to Documentation Page', action: () => { window.location.href = 'docs/index.html'; }, keywords: ['docs', 'routing', 'help'] }
+      ];
+      NovaCommandPalette.register(homeCommands);
+    });
+  </script>
+
+</body>
+</html>

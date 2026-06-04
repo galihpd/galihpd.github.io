@@ -1,0 +1,198 @@
+/* css/components/textarea.css */
+
+/* ─────────────────────────────────────────
+   Textarea Component — consistent with .nl-input
+   Usage: <textarea class="nl-textarea" rows="4"></textarea>
+ ───────────────────────────────────────── */
+
+.nl-textarea {
+  /* Layout */
+  display: block;
+  width: 100%;
+  min-height: 5rem; /* 80px */
+  height: auto;
+
+  /* Typography */
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: hsl(var(--foreground));
+  line-height: 1.6;
+
+  /* Spacing */
+  padding: var(--space-3);
+
+  /* Borders & Background */
+  border: 1.5px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  background-color: hsl(var(--background));
+
+  /* Resize behavior */
+  resize: vertical;
+
+  /* Transition */
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+  outline: none;
+
+  /* Prevent horizontal overflow */
+  word-break: break-word;
+  overflow-wrap: break-word;
+
+  /* Smooth resize */
+  box-sizing: border-box;
+}
+
+/* ─── Placeholder ─── */
+.nl-textarea::placeholder {
+  color: hsl(var(--muted-foreground));
+  opacity: 1;
+}
+
+/* ─── Focus Ring ─── */
+.nl-textarea:focus,
+.nl-textarea:focus-visible {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 1px hsl(var(--ring));
+  outline: none;
+}
+
+/* ─── Hover State ─── */
+.nl-textarea:not(:disabled):not(:focus):hover {
+  border-color: hsl(var(--ring) / 0.6);
+}
+
+/* ─── Disabled State ─── */
+.nl-textarea:disabled {
+  opacity: 0.5;
+  background-color: hsl(var(--muted));
+  cursor: not-allowed;
+  resize: none;
+}
+
+/* ─── Read-only State ─── */
+.nl-textarea:read-only {
+  background-color: hsl(var(--muted) / 0.5);
+  cursor: default;
+  resize: none;
+}
+
+/* ─────────────────────────────────────────
+   Color Modifiers
+   ───────────────────────────────────────── */
+
+/* Primary */
+.nl-textarea-primary {
+  border-color: hsl(var(--primary) / 0.5);
+}
+.nl-textarea-primary:focus,
+.nl-textarea-primary:focus-visible {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 1px hsl(var(--primary));
+}
+.nl-textarea-primary:not(:disabled):not(:focus):hover {
+  border-color: hsl(var(--primary) / 0.8);
+}
+
+/* Secondary */
+.nl-textarea-secondary {
+  border-color: hsl(var(--secondary-foreground) / 0.3);
+}
+.nl-textarea-secondary:focus,
+.nl-textarea-secondary:focus-visible {
+  border-color: hsl(var(--secondary-foreground));
+  box-shadow: 0 0 0 1px hsl(var(--secondary-foreground));
+}
+.nl-textarea-secondary:not(:disabled):not(:focus):hover {
+  border-color: hsl(var(--secondary-foreground) / 0.6);
+}
+
+/* Success */
+.nl-textarea-success {
+  border-color: hsl(var(--success) / 0.5);
+}
+.nl-textarea-success:focus,
+.nl-textarea-success:focus-visible {
+  border-color: hsl(var(--success));
+  box-shadow: 0 0 0 1px hsl(var(--success));
+}
+.nl-textarea-success:not(:disabled):not(:focus):hover {
+  border-color: hsl(var(--success) / 0.8);
+}
+
+/* Warning */
+.nl-textarea-warning {
+  border-color: hsl(var(--warning) / 0.5);
+}
+.nl-textarea-warning:focus,
+.nl-textarea-warning:focus-visible {
+  border-color: hsl(var(--warning));
+  box-shadow: 0 0 0 1px hsl(var(--warning));
+}
+.nl-textarea-warning:not(:disabled):not(:focus):hover {
+  border-color: hsl(var(--warning) / 0.8);
+}
+
+/* Error / Destructive */
+.nl-textarea-error,
+.nl-textarea-destructive,
+.nl-textarea[aria-invalid="true"] {
+  border-color: hsl(var(--destructive));
+}
+.nl-textarea-error:focus,
+.nl-textarea-destructive:focus,
+.nl-textarea[aria-invalid="true"]:focus,
+.nl-textarea-error:focus-visible,
+.nl-textarea-destructive:focus-visible {
+  border-color: hsl(var(--destructive));
+  box-shadow: 0 0 0 1px hsl(var(--destructive));
+}
+.nl-textarea-error:not(:disabled):not(:focus):hover,
+.nl-textarea-destructive:not(:disabled):not(:focus):hover {
+  border-color: hsl(var(--destructive) / 0.8);
+}
+
+/* Info */
+.nl-textarea-info {
+  border-color: hsl(var(--info) / 0.5);
+}
+.nl-textarea-info:focus,
+.nl-textarea-info:focus-visible {
+  border-color: hsl(var(--info));
+  box-shadow: 0 0 0 1px hsl(var(--info));
+}
+.nl-textarea-info:not(:disabled):not(:focus):hover {
+  border-color: hsl(var(--info) / 0.8);
+}
+
+/* ─── No Resize Variant ─── */
+.nl-textarea-fixed {
+  resize: none;
+}
+
+/* ─── Auto-grow hint (works with JS autosize) ─── */
+.nl-textarea-auto {
+  resize: none;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────
+   Size Modifiers
+   ───────────────────────────────────────── */
+
+/* Small */
+.nl-textarea-sm {
+  font-size: var(--text-xs);
+  padding: var(--space-2);
+  min-height: 4rem; /* 64px */
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+}
+
+/* Large */
+.nl-textarea-lg {
+  font-size: var(--text-base);
+  padding: var(--space-4);
+  min-height: 7rem; /* 112px */
+  border-radius: var(--radius-lg);
+  line-height: 1.7;
+}

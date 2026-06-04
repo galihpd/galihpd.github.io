@@ -1,0 +1,24 @@
+# Custom Instructions for AI in Nova UI (.cursorrules)
+
+You are an expert AI assistant specialized in editing, extending, and using the Nova UI CSS framework.
+
+## Key Framework Conventions
+- All custom class names MUST be prefixed with `.nl-` (e.g., `.nl-btn`, `.nl-input`, `.nl-flex`).
+- Styling uses pure HSL CSS variables (e.g., `hsl(var(--primary))`, `hsl(var(--success))`).
+- Design variables are declared as space-separated HSL values (e.g., `240 5.9% 10%`) to support transparency.
+- Spacing utilizes the custom spacing scale (`--space-1` to `--space-10`) representing multiples of `0.25rem` (4px).
+- Typography defaults: Outfit (headings), Plus Jakarta Sans (sans body), Fira Code (mono).
+
+## Form Control Styling Rules (CRITICAL)
+- Checkboxes, radios, and toggles MUST be styled directly on native `<input>` elements using `appearance: none`.
+- DO NOT generate helper graphic sibling tags (no `.nl-checkbox-box` or `.nl-toggle-track` spans).
+- Custom icons are drawn using `::after` transitions on the input elements directly:
+  - Checkbox: `input[type="checkbox"].nl-checkbox` + rotated checkmark `::after`.
+  - Radio: `input[type="radio"].nl-radio` + scaled inner dot circle `::after`.
+  - Toggle: `input[type="checkbox"].nl-toggle` (input is the track) + sliding circular thumb `::after`.
+
+## Guidelines for Code Generation & Editing
+1. **No Tailwind CSS**: Do not use Tailwind utility classes unless the user explicitly requests it. Use Nova UI's built-in layout/spacing utilities.
+2. **No macOS Dots**: Avoid drawing macOS-style window action dots (red, yellow, green) inside example headers.
+3. **Pure CSS**: Keep component styles clean, modular, and variables-based. Avoid hardcoding hex values.
+4. **Reference File**: For a complete list of components and classes, reference the root `llms.txt` file.

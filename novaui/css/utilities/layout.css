@@ -1,0 +1,203 @@
+/* css/utilities/layout.css */
+
+/* Display Utilities */
+.nl-block { display: block; }
+.nl-inline { display: inline; }
+.nl-inline-block { display: inline-block; }
+.nl-flex { display: flex; }
+.nl-inline-flex { display: inline-flex; }
+.nl-grid { display: grid; }
+.nl-inline-grid { display: inline-grid; }
+.nl-hidden { display: none; }
+
+/* Flexbox Directions & Wrapping */
+.nl-flex-row { flex-direction: row; }
+.nl-flex-row-reverse { flex-direction: row-reverse; }
+.nl-flex-col { flex-direction: column; }
+.nl-flex-col-reverse { flex-direction: column-reverse; }
+.nl-flex-wrap { flex-wrap: wrap; }
+.nl-flex-nowrap { flex-wrap: nowrap; }
+
+/* Flex Sizing */
+.nl-flex-1 { flex: 1 1 0%; }
+.nl-flex-auto { flex: 1 1 auto; }
+.nl-flex-initial { flex: 0 1 auto; }
+.nl-flex-none { flex: none; }
+.nl-flex-grow { flex-grow: 1; }
+.nl-flex-shrink { flex-shrink: 1; }
+
+/* Alignment Utilities */
+.nl-justify-start { justify-content: flex-start; }
+.nl-justify-end { justify-content: flex-end; }
+.nl-justify-center { justify-content: center; }
+.nl-justify-between { justify-content: space-between; }
+.nl-justify-around { justify-content: space-around; }
+.nl-justify-evenly { justify-content: space-evenly; }
+
+.nl-items-start { align-items: flex-start; }
+.nl-items-end { align-items: flex-end; }
+.nl-items-center { align-items: center; }
+.nl-items-baseline { align-items: baseline; }
+.nl-items-stretch { align-items: stretch; }
+
+.nl-self-start { align-self: flex-start; }
+.nl-self-end { align-self: flex-end; }
+.nl-self-center { align-self: center; }
+.nl-self-stretch { align-self: stretch; }
+
+/* Grid Template Columns (1 to 12) */
+.nl-grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.nl-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.nl-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.nl-grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.nl-grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.nl-grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.nl-grid-cols-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.nl-grid-cols-8 { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+.nl-grid-cols-9 { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+.nl-grid-cols-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+.nl-grid-cols-11 { grid-template-columns: repeat(11, minmax(0, 1fr)); }
+.nl-grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+
+/* Grid Column Spanning */
+.nl-col-span-1 { grid-column: span 1 / span 1; }
+.nl-col-span-2 { grid-column: span 2 / span 2; }
+.nl-col-span-3 { grid-column: span 3 / span 3; }
+.nl-col-span-4 { grid-column: span 4 / span 4; }
+.nl-col-span-5 { grid-column: span 5 / span 5; }
+.nl-col-span-6 { grid-column: span 6 / span 6; }
+.nl-col-span-12 { grid-column: span 12 / span 12; }
+
+/* Gap Scale */
+.nl-gap-0 { gap: var(--space-0); }
+.nl-gap-1 { gap: var(--space-1); }
+.nl-gap-2 { gap: var(--space-2); }
+.nl-gap-3 { gap: var(--space-3); }
+.nl-gap-4 { gap: var(--space-4); }
+.nl-gap-5 { gap: var(--space-5); }
+.nl-gap-6 { gap: var(--space-6); }
+.nl-gap-8 { gap: var(--space-8); }
+.nl-gap-10 { gap: var(--space-10); }
+
+/* Width Utilities */
+.nl-w-full { width: 100%; }
+.nl-w-half { width: 50%; }
+.nl-w-auto { width: auto; }
+.nl-w-screen { width: 100vw; }
+.nl-w-min { width: min-content; }
+.nl-w-max { width: max-content; }
+
+/* Height Utilities */
+.nl-h-full { height: 100%; }
+.nl-h-half { height: 50%; }
+.nl-h-auto { height: auto; }
+.nl-h-screen { height: 100vh; }
+
+/* Position Utilities */
+.nl-static { position: static; }
+.nl-fixed { position: fixed; }
+.nl-absolute { position: absolute; }
+.nl-relative { position: relative; }
+.nl-sticky { position: sticky; }
+
+/* Inset Utilities */
+.nl-top-0 { top: 0; }
+.nl-right-0 { right: 0; }
+.nl-bottom-0 { bottom: 0; }
+.nl-left-0 { left: 0; }
+.nl-inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+
+/* Z-Index mapping classes */
+.nl-z-hide { z-index: var(--z-hide); }
+.nl-z-base { z-index: var(--z-base); }
+.nl-z-dropdown { z-index: var(--z-dropdown); }
+.nl-z-sticky { z-index: var(--z-sticky); }
+.nl-z-fixed { z-index: var(--z-fixed); }
+.nl-z-modal { z-index: var(--z-modal); }
+.nl-z-popover { z-index: var(--z-popover); }
+/* Container Utility */
+.nl-container,
+.nl-container-sm,
+.nl-container-md,
+.nl-container-lg,
+.nl-container-xl {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  /* Configurable horizontal padding variable, defaulting to --space-4 (16px) */
+  padding-left: var(--container-padding, var(--space-4));
+  padding-right: var(--container-padding, var(--space-4));
+}
+
+/* Fluid Container Variant */
+.nl-container-fluid {
+  width: 100%;
+  padding-left: var(--container-padding, var(--space-4));
+  padding-right: var(--container-padding, var(--space-4));
+}
+
+/* Responsive Container Max-Widths & Paddings (Tailwind-style variable overrides) */
+@media (min-width: 640px) {
+  .nl-container,
+  .nl-container-sm {
+    max-width: var(--breakpoint-sm);
+  }
+}
+
+@media (min-width: 768px) {
+  .nl-container,
+  .nl-container-sm,
+  .nl-container-md {
+    max-width: var(--breakpoint-md);
+  }
+  :root {
+    --container-padding: var(--space-6); /* Set base padding to 24px */
+  }
+}
+
+@media (min-width: 1024px) {
+  .nl-container,
+  .nl-container-sm,
+  .nl-container-md,
+  .nl-container-lg {
+    max-width: var(--breakpoint-lg);
+  }
+  :root {
+    --container-padding: var(--space-8); /* Set base padding to 32px */
+  }
+}
+
+@media (min-width: 1280px) {
+  .nl-container,
+  .nl-container-sm,
+  .nl-container-md,
+  .nl-container-lg,
+  .nl-container-xl {
+    max-width: var(--breakpoint-xl);
+  }
+  :root {
+    --container-padding: var(--space-10); /* Set base padding to 40px */
+  }
+}
+
+/* Responsive Utility Breakpoints (applied on top of base styling) */
+@media (min-width: 768px) {
+  .nl-md-flex { display: flex; }
+  .nl-md-grid { display: grid; }
+  .nl-md-hidden { display: none; }
+  .nl-md-block { display: block; }
+  .nl-md-flex-row { flex-direction: row; }
+  .nl-md-flex-col { flex-direction: column; }
+  .nl-md-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nl-md-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .nl-md-grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .nl-lg-flex { display: flex; }
+  .nl-lg-grid { display: grid; }
+  .nl-lg-block { display: block; }
+  .nl-lg-hidden { display: none; }
+  .nl-lg-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .nl-lg-grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

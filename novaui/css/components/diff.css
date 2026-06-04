@@ -1,0 +1,156 @@
+/* css/components/diff.css */
+
+/* ─── Container ──────────────────────────────────────────────────────────── */
+.nl-diff {
+  --diff-position: 50%;             /* draggable slider position (0–100%) */
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background));
+  box-shadow: var(--shadow-sm);
+  cursor: col-resize;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ─── Both items fill the full container ─────────────────────────────────── */
+.nl-diff-item-1,
+.nl-diff-item-2 {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+}
+
+/* Images and content inside fill their pane */
+.nl-diff-item-1 > *,
+.nl-diff-item-2 > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─── Item 1 — left pane, clipped to the divider ────────────────────────── */
+.nl-diff-item-1 {
+  z-index: 1;
+  clip-path: inset(0 calc(100% - var(--diff-position)) 0 0);
+  transition: clip-path 0s;         /* instant while dragging; CSS-only fallback: 0ms */
+}
+
+/* ─── Item 2 — right pane, sits behind ───────────────────────────────────── */
+.nl-diff-item-2 {
+  z-index: 0;
+}
+
+/* ─── Resizer divider ────────────────────────────────────────────────────── */
+.nl-diff-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--diff-position);
+  transform: translateX(-50%);
+  width: 3px;
+  background-color: hsl(var(--primary));
+  z-index: 10;
+  cursor: col-resize;
+  transition: background-color var(--transition-fast);
+}
+
+.nl-diff-resizer::before,
+.nl-diff-resizer::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;          /* wider hit area */
+  height: 100%;
+  cursor: col-resize;
+}
+
+.nl-diff:hover .nl-diff-resizer {
+  background-color: hsl(var(--primary) / 0.8);
+}
+
+/* ─── Drag handle knob ───────────────────────────────────────────────────── */
+.nl-diff-resizer-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background-color: hsl(var(--primary));
+  border: 3px solid hsl(var(--background));
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  color: hsl(var(--primary-foreground));
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  z-index: 11;
+}
+
+.nl-diff-resizer-handle:hover,
+.nl-diff-resizer:active .nl-diff-resizer-handle {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.25), var(--shadow-md);
+}
+
+/* Grip icon via ::before / ::after dots */
+.nl-diff-resizer-handle::before,
+.nl-diff-resizer-handle::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 14px;
+  background-color: hsl(var(--primary-foreground));
+  border-radius: 1px;
+  margin: 0 2px;
+}
+
+/* ─── Labels (optional overlay badges) ───────────────────────────────────── */
+.nl-diff-label-1,
+.nl-diff-label-2 {
+  position: absolute;
+  top: var(--space-3);
+  z-index: 5;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  font-family: var(--font-sans);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full, 9999px);
+  background-color: hsl(var(--foreground) / 0.75);
+  color: hsl(var(--background));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+.nl-diff-label-1 {
+  left: var(--space-3);
+}
+
+.nl-diff-label-2 {
+  right: var(--space-3);
+}
+
+/* ─── CSS-only draggable via range input ─────────────────────────────────── */
+/*
+   Drop a hidden <input type="range"> inside .nl-diff and bind
+   its value to --diff-position using a small JS snippet, OR use
+   the pure JS utility provided in the Nova UI JS extras.
+
+   For CSS-only preview, the position can be controlled externally:
+   <div class="nl-diff" style="--diff-position: 40%">
+*/
+
+/* ─── Aspect-ratio helpers ───────────────────────────────────────────────── */
+.nl-diff-16-9 { aspect-ratio: 16 / 9; }
+.nl-diff-4-3  { aspect-ratio: 4 / 3; }
+.nl-diff-1-1  { aspect-ratio: 1 / 1; }
+.nl-diff-3-4  { aspect-ratio: 3 / 4; }

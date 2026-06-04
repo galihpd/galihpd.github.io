@@ -1,0 +1,17 @@
+{
+  "name": "novaui",
+  "version": "1.0.0",
+  "description": "Nova UI - A complete modern CSS framework + documentation website built from scratch with pure HSL CSS variables, utilities, and vanilla JS.",
+  "scripts": {
+    "dev": "npx -y http-server -p 3000"
+  },
+  "keywords": [
+    "css",
+    "framework",
+    "vanilla",
+    "variables",
+    "utility-classes"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}

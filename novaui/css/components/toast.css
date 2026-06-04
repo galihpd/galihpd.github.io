@@ -1,0 +1,123 @@
+/* css/components/toast.css */
+.nl-toast-container {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 26rem; /* 416px */
+  z-index: var(--z-toast);
+  pointer-events: none; /* Let clicks pass through empty areas of the container */
+}
+
+.nl-toast {
+  pointer-events: auto; /* Re-enable clicks on the toast cards themselves */
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  border-radius: var(--radius-xl);
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg);
+  gap: var(--space-4);
+  transform: translateY(0);
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), 
+              opacity var(--transition-normal), 
+              visibility var(--transition-normal);
+  animation: nl-slide-up 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.nl-toast-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.nl-toast-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  line-height: 1.2;
+}
+
+.nl-toast-description {
+  font-size: var(--text-xs);
+  color: hsl(var(--muted-foreground));
+  line-height: 1.4;
+}
+
+.nl-toast-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-sm);
+  color: hsl(var(--muted-foreground));
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  font-size: var(--text-base);
+  transition: color var(--transition-fast);
+}
+
+.nl-toast-close:hover {
+  color: hsl(var(--foreground));
+}
+
+/* Exit Transition State */
+.nl-toast.nl-toast-closing {
+  opacity: 0;
+  transform: translateY(16px) scale(0.95);
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Variants */
+/* Default */
+.nl-toast-default {
+  background-color: hsl(var(--background));
+  border-color: hsl(var(--border));
+}
+
+/* Success */
+.nl-toast-success {
+  background-color: hsl(var(--background));
+  border-color: hsla(var(--success) / 0.3);
+}
+.nl-toast-success .nl-toast-title {
+  color: hsl(var(--success));
+}
+
+/* Warning */
+.nl-toast-warning {
+  background-color: hsl(var(--background));
+  border-color: hsla(var(--warning) / 0.4);
+}
+.nl-toast-warning .nl-toast-title {
+  color: hsl(var(--warning));
+}
+
+/* Destructive */
+.nl-toast-destructive {
+  background-color: hsl(var(--background));
+  border-color: hsla(var(--destructive) / 0.3);
+}
+.nl-toast-destructive .nl-toast-title {
+  color: hsl(var(--destructive));
+}
+
+/* Info */
+.nl-toast-info {
+  background-color: hsl(var(--background));
+  border-color: hsla(var(--info) / 0.3);
+}
+.nl-toast-info .nl-toast-title {
+  color: hsl(var(--info));
+}

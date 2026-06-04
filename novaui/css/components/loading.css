@@ -1,0 +1,190 @@
+/* css/components/loading.css */
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+@keyframes nl-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes nl-bounce {
+  0%, 80%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+  40%           { transform: scaleY(1.0); opacity: 1;   }
+}
+
+@keyframes nl-dot-bounce {
+  0%, 80%, 100% { transform: translateY(0);     opacity: 0.6; }
+  40%           { transform: translateY(-50%);  opacity: 1;   }
+}
+
+@keyframes nl-pulse-ring {
+  0%   { transform: scale(0.8); opacity: 1;   }
+  100% { transform: scale(1.6); opacity: 0;   }
+}
+
+@keyframes nl-pulse-core {
+  0%, 100% { transform: scale(0.9); }
+  50%       { transform: scale(1.1); }
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+.nl-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   1. Spinner
+   ══════════════════════════════════════════════════════════════ */
+.nl-loading-spinner {
+  --nl-spinner-size: 2rem;   /* md default */
+  --nl-spinner-thickness: 3px;
+
+  display: inline-block;
+  width: var(--nl-spinner-size);
+  height: var(--nl-spinner-size);
+  border-radius: var(--radius-full);
+  border: var(--nl-spinner-thickness) solid hsl(var(--border));
+  border-top-color: hsl(var(--primary));
+  animation: nl-spin 0.75s linear infinite;
+}
+
+/* size variants */
+.nl-loading-sm .nl-loading-spinner,
+.nl-loading-spinner.nl-loading-sm {
+  --nl-spinner-size: 1.25rem;
+  --nl-spinner-thickness: 2px;
+}
+
+.nl-loading-lg .nl-loading-spinner,
+.nl-loading-spinner.nl-loading-lg {
+  --nl-spinner-size: 3rem;
+  --nl-spinner-thickness: 4px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   2. Dots
+   ══════════════════════════════════════════════════════════════ */
+.nl-loading-dots {
+  --nl-dot-size: 0.5rem;  /* md default */
+
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--nl-dot-size) * 0.75);
+}
+
+.nl-loading-dots span {
+  display: inline-block;
+  width: var(--nl-dot-size);
+  height: var(--nl-dot-size);
+  border-radius: var(--radius-full);
+  background-color: hsl(var(--primary));
+  animation: nl-dot-bounce 1.2s ease-in-out infinite both;
+}
+
+.nl-loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.nl-loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.nl-loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+/* size variants */
+.nl-loading-sm .nl-loading-dots,
+.nl-loading-dots.nl-loading-sm { --nl-dot-size: 0.35rem; }
+
+.nl-loading-lg .nl-loading-dots,
+.nl-loading-dots.nl-loading-lg { --nl-dot-size: 0.75rem; }
+
+/* ══════════════════════════════════════════════════════════════
+   3. Pulse
+   ══════════════════════════════════════════════════════════════ */
+.nl-loading-pulse {
+  --nl-pulse-size: 2rem;  /* md default */
+
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+  width: var(--nl-pulse-size);
+  height: var(--nl-pulse-size);
+}
+
+/* Expanding ring */
+.nl-loading-pulse::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background-color: hsl(var(--primary) / 0.4);
+  animation: nl-pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+/* Core circle */
+.nl-loading-pulse::after {
+  content: "";
+  position: relative;
+  z-index: 1;
+  width: 55%;
+  height: 55%;
+  border-radius: var(--radius-full);
+  background-color: hsl(var(--primary));
+  animation: nl-pulse-core 1.25s ease-in-out infinite;
+}
+
+/* size variants */
+.nl-loading-sm .nl-loading-pulse,
+.nl-loading-pulse.nl-loading-sm { --nl-pulse-size: 1.25rem; }
+
+.nl-loading-lg .nl-loading-pulse,
+.nl-loading-pulse.nl-loading-lg { --nl-pulse-size: 3rem; }
+
+/* ══════════════════════════════════════════════════════════════
+   4. Bars
+   ══════════════════════════════════════════════════════════════ */
+.nl-loading-bars {
+  --nl-bar-width: 4px;
+  --nl-bar-height: 1.75rem;  /* md default */
+  --nl-bar-gap: 3px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nl-bar-gap);
+}
+
+.nl-loading-bars span {
+  display: inline-block;
+  width: var(--nl-bar-width);
+  height: var(--nl-bar-height);
+  border-radius: var(--radius-sm);
+  background-color: hsl(var(--primary));
+  transform-origin: bottom center;
+  animation: nl-bounce 1.2s ease-in-out infinite both;
+}
+
+.nl-loading-bars span:nth-child(1) { animation-delay: -0.45s; }
+.nl-loading-bars span:nth-child(2) { animation-delay: -0.30s; }
+.nl-loading-bars span:nth-child(3) { animation-delay: -0.15s; }
+.nl-loading-bars span:nth-child(4) { animation-delay: 0s; }
+.nl-loading-bars span:nth-child(5) { animation-delay: 0.15s; }
+
+/* size variants */
+.nl-loading-sm .nl-loading-bars,
+.nl-loading-bars.nl-loading-sm {
+  --nl-bar-width: 3px;
+  --nl-bar-height: 1.1rem;
+}
+
+.nl-loading-lg .nl-loading-bars,
+.nl-loading-bars.nl-loading-lg {
+  --nl-bar-width: 5px;
+  --nl-bar-height: 2.5rem;
+}
+
+/* ── Color Variants (apply to any loading type) ──────────────── */
+.nl-loading-muted .nl-loading-spinner { border-top-color: hsl(var(--muted-foreground)); }
+.nl-loading-muted .nl-loading-dots span,
+.nl-loading-muted .nl-loading-bars  span { background-color: hsl(var(--muted-foreground)); }
+.nl-loading-muted .nl-loading-pulse::before { background-color: hsl(var(--muted-foreground) / 0.4); }
+.nl-loading-muted .nl-loading-pulse::after  { background-color: hsl(var(--muted-foreground)); }
+
+.nl-loading-destructive .nl-loading-spinner { border-top-color: hsl(var(--destructive)); }
+.nl-loading-destructive .nl-loading-dots span,
+.nl-loading-destructive .nl-loading-bars  span { background-color: hsl(var(--destructive)); }
+.nl-loading-destructive .nl-loading-pulse::before { background-color: hsl(var(--destructive) / 0.4); }
+.nl-loading-destructive .nl-loading-pulse::after  { background-color: hsl(var(--destructive)); }

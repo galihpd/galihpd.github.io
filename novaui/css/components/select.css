@@ -1,0 +1,190 @@
+/* css/components/select.css */
+
+/* ─────────────────────────────────────────
+   Native <select> Dropdown — styled to match .nl-input
+   Usage: <select class="nl-select">…</select>
+ ───────────────────────────────────────── */
+
+.nl-select {
+  /* Layout */
+  display: block;
+  width: 100%;
+  height: 2.5rem; /* 40px — same as nl-input */
+
+  /* Typography */
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: hsl(var(--foreground));
+  line-height: 1.4;
+
+  /* Spacing */
+  padding: 0 var(--space-8) 0 var(--space-3);
+
+  /* Borders & Background */
+  border: 1.5px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  background-color: hsl(var(--background));
+
+  /* Remove native appearance */
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+
+  /* Custom chevron arrow via inline SVG */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2371717a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+  background-size: 1.125rem;
+
+  /* Transition */
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+  outline: none;
+
+  /* Prevent text overlap with icon */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ─── Focus Ring ─── */
+.nl-select:focus,
+.nl-select:focus-visible {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 1px hsl(var(--ring));
+  outline: none;
+}
+
+/* ─── Hover State ─── */
+.nl-select:not(:disabled):hover {
+  border-color: hsl(var(--ring) / 0.6);
+}
+
+/* ─── Disabled State ─── */
+.nl-select:disabled {
+  opacity: 0.5;
+  background-color: hsl(var(--muted));
+  cursor: not-allowed;
+}
+
+/* ─── Placeholder / empty option ─── */
+.nl-select option[value=""][disabled] {
+  color: hsl(var(--muted-foreground));
+}
+
+/* ─────────────────────────────────────────
+   Color Modifiers
+   ───────────────────────────────────────── */
+
+/* Primary */
+.nl-select-primary {
+  border-color: hsl(var(--primary) / 0.5);
+}
+.nl-select-primary:focus,
+.nl-select-primary:focus-visible {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 1px hsl(var(--primary));
+}
+.nl-select-primary:not(:disabled):hover {
+  border-color: hsl(var(--primary) / 0.8);
+}
+
+/* Secondary */
+.nl-select-secondary {
+  border-color: hsl(var(--secondary-foreground) / 0.3);
+}
+.nl-select-secondary:focus,
+.nl-select-secondary:focus-visible {
+  border-color: hsl(var(--secondary-foreground));
+  box-shadow: 0 0 0 1px hsl(var(--secondary-foreground));
+}
+.nl-select-secondary:not(:disabled):hover {
+  border-color: hsl(var(--secondary-foreground) / 0.6);
+}
+
+/* Success */
+.nl-select-success {
+  border-color: hsl(var(--success) / 0.5);
+}
+.nl-select-success:focus,
+.nl-select-success:focus-visible {
+  border-color: hsl(var(--success));
+  box-shadow: 0 0 0 1px hsl(var(--success));
+}
+.nl-select-success:not(:disabled):hover {
+  border-color: hsl(var(--success) / 0.8);
+}
+
+/* Warning */
+.nl-select-warning {
+  border-color: hsl(var(--warning) / 0.5);
+}
+.nl-select-warning:focus,
+.nl-select-warning:focus-visible {
+  border-color: hsl(var(--warning));
+  box-shadow: 0 0 0 1px hsl(var(--warning));
+}
+.nl-select-warning:not(:disabled):hover {
+  border-color: hsl(var(--warning) / 0.8);
+}
+
+/* Error / Destructive */
+.nl-select-error,
+.nl-select-destructive,
+.nl-select[aria-invalid="true"] {
+  border-color: hsl(var(--destructive));
+}
+.nl-select-error:focus,
+.nl-select-destructive:focus,
+.nl-select[aria-invalid="true"]:focus,
+.nl-select-error:focus-visible,
+.nl-select-destructive:focus-visible {
+  border-color: hsl(var(--destructive));
+  box-shadow: 0 0 0 1px hsl(var(--destructive));
+}
+.nl-select-error:not(:disabled):hover,
+.nl-select-destructive:not(:disabled):hover {
+  border-color: hsl(var(--destructive) / 0.8);
+}
+
+/* Info */
+.nl-select-info {
+  border-color: hsl(var(--info) / 0.5);
+}
+.nl-select-info:focus,
+.nl-select-info:focus-visible {
+  border-color: hsl(var(--info));
+  box-shadow: 0 0 0 1px hsl(var(--info));
+}
+.nl-select-info:not(:disabled):hover {
+  border-color: hsl(var(--info) / 0.8);
+}
+
+/* ─────────────────────────────────────────
+   Size Modifiers
+   ───────────────────────────────────────── */
+
+/* Small */
+.nl-select-sm {
+  height: 2rem;  /* 32px */
+  font-size: var(--text-xs);
+  padding: 0 var(--space-7) 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  background-position: right var(--space-2) center;
+  background-size: 1rem;
+}
+
+/* Large */
+.nl-select-lg {
+  height: 3rem; /* 48px */
+  font-size: var(--text-base);
+  padding: 0 var(--space-9) 0 var(--space-4);
+  border-radius: var(--radius-lg);
+  background-position: right var(--space-4) center;
+  background-size: 1.25rem;
+}
+
+/* Dark Mode: darker chevron */
+[data-theme="dark"] .nl-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a1a1aa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
