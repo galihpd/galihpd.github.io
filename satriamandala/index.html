@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peta Interaktif Museum Satria Mandala 🗺️</title>
+  
+  <!-- SEO & Meta Tags -->
+  <meta name="description" content="Eksplorasi koleksi sejarah perjuangan TNI di Museum Satria Mandala melalui peta interaktif 3D yang elegan dan mendalam.">
+  <meta name="author" content="Galih Prakoso">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23111827'/><path d='M16 6L26 12V22L16 28L6 22V12Z' stroke='%23f59e0b' stroke-width='2' fill='none'/><circle cx='16' cy='17' r='3' fill='%23f59e0b'/></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- MapLibre GL JS CSS -->
+  <link href="https://unpkg.com/maplibre-gl@4.3.0/dist/maplibre-gl.css" rel="stylesheet" />
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Kiri -->
+    <aside class="sidebar" id="sidebar">
+      
+      <!-- Bagian Header Sidebar -->
+      <header class="sidebar-header">
+        <a href="../index.html" class="back-portfolio-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
+          Kembali ke Portofolio
+        </a>
+        <div class="brand">
+          <div class="logo-icon">🏛️</div>
+          <div class="brand-text">
+            <h1>SATRIAMANDALA</h1>
+            <p>3D Map Explorer</p>
+          </div>
+        </div>
+        <p class="brand-description">
+          Menyusuri sejarah militer Indonesia di kediaman bersejarah Wisma Yaso. Temukan berbagai koleksi pesawat tempur, tank baja, helikopter, senjata berat, serta diorama perjuangan TNI.
+        </p>
+      </header>
+
+      <!-- Panel Default (List & Filter) -->
+      <div class="panel-content" id="default-panel">
+        
+        <!-- Pencarian -->
+        <div class="search-box">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+          <input type="text" id="search-input" placeholder="Cari helikopter, pesawat, tank..." autocomplete="off">
+          <button id="clear-search-btn" class="clear-search-btn hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Filter Kategori (Slider Horizontal di Mobile) -->
+        <nav class="categories-filter" aria-label="Kategori Koleksi">
+          <button class="filter-tab active" data-category="all">Semua</button>
+          <button class="filter-tab" data-category="aircraft">✈️ Pesawat & Heli</button>
+          <button class="filter-tab" data-category="tank">🚜 Tank & Panser</button>
+          <button class="filter-tab" data-category="navy">⚓ Navy (KRI)</button>
+          <button class="filter-tab" data-category="diorama">🏛️ Diorama & Relik</button>
+          <button class="filter-tab" data-category="artillery">🚀 Artileri Berat</button>
+        </nav>
+
+        <!-- List Koleksi -->
+        <div class="collection-list-container">
+          <div class="list-header">
+            <span id="collection-count">Menampilkan 12 Koleksi</span>
+          </div>
+          <div class="collection-list" id="collection-list">
+            <!-- Dinamis diisi oleh JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Detail Koleksi (Slide In) -->
+      <div class="panel-content hidden" id="detail-panel">
+        <button class="back-btn" id="close-detail-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
+          Kembali ke Daftar
+        </button>
+        
+        <div class="detail-scrollable">
+          <div class="detail-image-wrapper">
+            <img src="" alt="" id="detail-image" class="detail-image">
+            <span class="detail-badge" id="detail-badge">Pesawat</span>
+          </div>
+          
+          <div class="detail-info-body">
+            <h2 id="detail-title" class="detail-title">P-51 Mustang</h2>
+            <div class="detail-meta">
+              <span class="meta-item"><strong id="detail-year">1940-an</strong></span>
+              <span class="meta-divider">|</span>
+              <span class="meta-item" id="detail-origin">Amerika Serikat</span>
+            </div>
+            
+            <p id="detail-description" class="detail-desc">
+              Pesawat tempur kawal jarak jauh yang sangat legendaris dalam Perang Dunia II. Di Indonesia dikenal dengan sebutan "Cocor Merah".
+            </p>
+
+            <div class="fact-card">
+              <h3>💡 Fakta Menarik</h3>
+              <p id="detail-fact">Digunakan TNI AU dalam menumpas berbagai pemberontakan PRRI/Permesta dan pembebasan Irian Barat.</p>
+            </div>
+
+            <button class="locate-btn" id="locate-on-map-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+              </svg>
+              Fokuskan pada Peta (3D)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer / Credits -->
+      <footer class="sidebar-footer">
+        <p>&copy; 2026 Museum Satria Mandala. Map Project by <a href="../index.html" class="footer-link">Galih Prakoso</a>.</p>
+      </footer>
+    </aside>
+
+    <!-- Map Container -->
+    <main class="map-container">
+      <div id="map"></div>
+      
+      <!-- Peta Info Overlay (Indikator Status & Panduan) -->
+      <div class="map-overlay-info">
+        <div class="info-tag">Isometric 3D View</div>
+        <div class="info-text">Sudut Pandang: Jl. Gatot Subroto</div>
+      </div>
+
+      <!-- Mobile Toggle Panel Button (Hanya terlihat di Mobile) -->
+      <button class="mobile-toggle-btn" id="mobile-toggle-btn" aria-label="Buka daftar koleksi">
+        <svg class="toggle-icon-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+        <svg class="toggle-icon-close hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+        Daftar Koleksi
+      </button>
+    </main>
+
+  </div>
+
+  <!-- MapLibre GL JS -->
+  <script src="https://unpkg.com/maplibre-gl@4.3.0/dist/maplibre-gl.js"></script>
+  
+  <!-- App JS -->
+  <script src="app.js"></script>
+</body>
+</html>
