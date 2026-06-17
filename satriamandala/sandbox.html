@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sandbox Editor — Museum Satria Mandala</title>
+  <link rel="stylesheet" href="sandbox.css" />
+</head>
+<body>
+
+<!-- ── TOP TOOLBAR ──────────────────────────────────────── -->
+<header id="sb-toolbar">
+  <div class="sb-logo">
+    <span>🏛️ Satria Mandala</span>
+    <span class="badge">Sandbox</span>
+  </div>
+  <div class="sb-divider"></div>
+
+  <button class="sb-btn" id="btn-load-json" title="Load JSON config">
+    <span class="icon">📂</span> Load JSON
+  </button>
+  <button class="sb-btn primary" id="btn-save-json" title="Save/download JSON config">
+    <span class="icon">💾</span> Save JSON
+  </button>
+  <button class="sb-btn danger" id="btn-reset-server" title="Reset to server config (scene-config.json)" style="margin-left: 6px;">
+    <span class="icon">🔄</span> Reset to Server
+  </button>
+
+  <div class="sb-divider"></div>
+  <button class="sb-btn" id="btn-preview" title="Open viewer in new tab">
+    <span class="icon">👁️</span> Preview Viewer
+  </button>
+
+  <div class="sb-spacer"></div>
+
+  <span style="font-size:11px;color:var(--text-muted);" id="autosave-status">Auto-saved just now</span>
+</header>
+
+<!-- ── MAIN LAYOUT ──────────────────────────────────────── -->
+<div id="sb-layout">
+
+  <!-- LEFT TOOLBOX -->
+  <div id="sb-toolbox">
+    <button class="tool-btn active" id="tool-select" data-tool="select" title="Select">
+      <span>↖</span>
+      <span class="tool-label">Select</span>
+      <div class="tool-tooltip">Select &amp; Move (V)</div>
+    </button>
+
+    <div class="tool-separator"></div>
+
+    <button class="tool-btn" id="tool-box" data-tool="box" title="Add Box">
+      <span>⬜</span>
+      <span class="tool-label">Box</span>
+      <div class="tool-tooltip">Add Box (B)</div>
+    </button>
+    <button class="tool-btn" id="tool-cylinder" data-tool="cylinder" title="Add Cylinder">
+      <span>⭕</span>
+      <span class="tool-label">Cyl</span>
+      <div class="tool-tooltip">Add Cylinder (C)</div>
+    </button>
+
+    <div class="tool-separator"></div>
+
+    <button class="tool-btn" id="tool-marker" data-tool="marker" title="Add Marker">
+      <span>📍</span>
+      <span class="tool-label">Marker</span>
+      <div class="tool-tooltip">Add Marker (M)</div>
+    </button>
+
+    <div class="tool-separator"></div>
+
+    <button class="tool-btn" id="tool-bounds" data-tool="bounds" title="Museum Bounds">
+      <span>⬛</span>
+      <span class="tool-label">Bounds</span>
+      <div class="tool-tooltip">Edit Bounds (X)</div>
+    </button>
+  </div>
+
+  <!-- VIEWPORT -->
+  <div id="sb-viewport" class="mode-select">
+    <div id="sb-canvas-wrap"></div>
+    <div id="sb-mode-indicator"><span class="mode-dot"></span><span id="mode-text">SELECT</span></div>
+    <div id="sb-place-hint">Click on the map to place object • Esc to cancel</div>
+  </div>
+
+  <!-- RIGHT PROPERTIES PANEL -->
+  <div id="sb-props">
+    <div class="props-header">
+      <h3>Properties</h3>
+      <button class="sb-btn danger" id="btn-delete-sel" style="display:none;padding:3px 8px;font-size:11px;">🗑 Delete</button>
+    </div>
+    <div class="props-body" id="props-body">
+      <div class="props-empty">
+        <span class="empty-icon">🎯</span>
+        <span>Select an object or marker<br>to edit its properties</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── STATUS BAR ────────────────────────────────────────── -->
+<div id="sb-status">
+  <div class="status-item">
+    <div class="status-dot"></div>
+    <span>Ready</span>
+  </div>
+  <div class="status-sep"></div>
+  <div class="status-item">Mode: <span class="status-highlight" id="status-mode">SELECT</span></div>
+  <div class="status-sep"></div>
+  <div class="status-item">3D Objects: <span class="status-highlight" id="status-objects">0</span></div>
+  <div class="status-sep"></div>
+  <div class="status-item">Markers: <span class="status-highlight" id="status-markers">0</span></div>
+  <div class="status-sep"></div>
+  <div class="status-item" id="status-coords" style="margin-left:auto;">Hover over map</div>
+</div>
+
+<!-- ── MARKER DIALOG MODAL ──────────────────────────────── -->
+<div id="sb-modal-overlay">
+  <div class="sb-modal">
+    <div class="modal-header">
+      <h2 id="modal-title">Add New Marker</h2>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="prop-row">
+        <label>ID (unik, tanpa spasi)</label>
+        <input type="text" id="m-id" placeholder="contoh: tank_sherman" />
+      </div>
+      <div class="prop-row">
+        <label>Judul</label>
+        <input type="text" id="m-title" placeholder="Nama koleksi" />
+      </div>
+      <div class="prop-row">
+        <label>Subtitle</label>
+        <input type="text" id="m-subtitle" placeholder="Deskripsi singkat" />
+      </div>
+      <div class="prop-row-2col">
+        <div class="prop-row">
+          <label>Kategori</label>
+          <select id="m-category">
+            <option value="aircraft">Pesawat</option>
+            <option value="tank">Tank &amp; Panser</option>
+            <option value="navy">Navy (KRI)</option>
+            <option value="artillery">Artileri Berat</option>
+            <option value="diorama">Diorama &amp; Relik</option>
+            <option value="other">Lainnya</option>
+          </select>
+        </div>
+        <div class="prop-row">
+          <label>Tahun</label>
+          <input type="text" id="m-year" placeholder="1960-an" />
+        </div>
+      </div>
+      <div class="prop-row">
+        <label>Asal Negara</label>
+        <input type="text" id="m-origin" placeholder="Amerika Serikat" />
+      </div>
+      <div class="prop-row">
+        <label>Gambar</label>
+        <div class="prop-img-placeholder" id="m-img-drop" onclick="document.getElementById('sb-img-input').click()">
+          📷 Klik untuk upload gambar
+        </div>
+        <img id="m-img-preview" class="prop-img-preview" style="display:none;" />
+        <input type="hidden" id="m-image-data" />
+      </div>
+      <div class="prop-row">
+        <label>Deskripsi</label>
+        <textarea id="m-description" rows="4" placeholder="Deskripsi lengkap koleksi..."></textarea>
+      </div>
+      <div class="prop-row">
+        <label>Fakta Menarik</label>
+        <textarea id="m-fact" rows="3" placeholder="Fakta unik atau informasi teknis..."></textarea>
+      </div>
+      <div class="prop-toggle">
+        <label>🔒 Terkunci (tidak bisa dibuka user)</label>
+        <div class="toggle-switch" id="m-locked-toggle"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="sb-btn" id="modal-cancel">Batal</button>
+      <button class="sb-btn primary" id="modal-confirm">✓ Simpan Marker</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden inputs -->
+<input type="file" id="sb-file-input" accept=".json" />
+<input type="file" id="sb-img-input-modal" accept="image/*" />
+<input type="file" id="sb-img-input-prop" accept="image/*" />
+
+<!-- ── THREE.JS & DEPS ───────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
+<script src="editor.js"></script>
+</body>
+</html>

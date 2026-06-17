@@ -1236,6 +1236,7 @@
     <a href="#" class="logo">Galih Prakoso</a>
     <ul class="nav-center">
       <li><a href="#work">Work</a></li>
+      <li><a href="#blog">Blog</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#experience">Experience</a></li>
       <li><a href="#skills">Skills</a></li>
@@ -1251,6 +1252,7 @@
   <!-- MOBILE MENU -->
   <div class="mobile-menu" id="mobileMenu">
     <a href="#work" onclick="closeMenu()">Work</a>
+    <a href="#blog" onclick="closeMenu()">Blog</a>
     <a href="#about" onclick="closeMenu()">About</a>
     <a href="#experience" onclick="closeMenu()">Experience</a>
     <a href="#skills" onclick="closeMenu()">Skills</a>
@@ -1728,6 +1730,102 @@
       </div>
 
     </section>
+
+    <!-- BLOG -->
+    <section id="blog">
+      <div class="section-header">
+        <span class="section-title">Blog</span>
+        <span class="section-count">03 Posts</span>
+      </div>
+      <div class="projects-grid">
+
+        <!-- Post 1 -->
+        <div class="project-card">
+          <div class="project-thumb">
+            <img src="blog/3d/ao/last.jpg" alt="Ambient Occlusion">
+          </div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">3D Art</span>
+              <span class="project-tag">Cycles</span>
+              <span class="project-tag">Post-Pro</span>
+            </div>
+            <div class="project-name">Fast Ambient Occlusion in Cycles with Post-Pro Method</div>
+            <div class="project-case">
+              <div class="case-row">
+                <span class="case-label">Published</span>
+                <span class="case-text">Nov 21, 2022</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Summary</span>
+                <span class="case-text">A technique to speed up Cycles rendering by separating rendering passes and combining Eevee-rendered AO maps in post-production.</span>
+              </div>
+            </div>
+            <div class="project-links">
+              <a href="blog/3d/ao/ao.html" class="project-link primary" target="_blank">Read Post &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post 2 -->
+        <div class="project-card">
+          <div class="project-thumb">
+            <img src="https://upload.wikimedia.org/wikipedia/id/8/8e/Windows_8_Start_Screen.png" alt="Metro Design">
+          </div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">Design</span>
+              <span class="project-tag">Microsoft</span>
+              <span class="project-tag">Metro Style</span>
+            </div>
+            <div class="project-name">Metro, the most mysterious design style</div>
+            <div class="project-case">
+              <div class="case-row">
+                <span class="case-label">Published</span>
+                <span class="case-text">Nov 23, 2022</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Summary</span>
+                <span class="case-text">Exploring the origins, principles, and applications of Microsoft's Metro design language, inspired by the 1950s Swiss Design.</span>
+              </div>
+            </div>
+            <div class="project-links">
+              <a href="blog/design/metro.html" class="project-link primary" target="_blank">Read Post &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post 3 -->
+        <div class="project-card">
+          <div class="project-thumb">
+            <img src="blog/net/tlwr840n/tplinknya.jpg" alt="TPLink TL-WR840N">
+          </div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">Network</span>
+              <span class="project-tag">Security</span>
+              <span class="project-tag">CVE PoC</span>
+            </div>
+            <div class="project-name">TPLink TL-WR840N CVE-2018-11714 Proof Of Concept</div>
+            <div class="project-case">
+              <div class="case-row">
+                <span class="case-label">Published</span>
+                <span class="case-text">Nov 23, 2022</span>
+              </div>
+              <div class="case-row">
+                <span class="case-label">Summary</span>
+                <span class="case-text">A security write-up demonstrating session handling vulnerability (CVE-2018-11714) in TPLink TL-WR840N routers using a Bash setup script.</span>
+              </div>
+            </div>
+            <div class="project-links">
+              <a href="blog/net/tlwr840n/tlwr840n.html" class="project-link primary" target="_blank">Read Post &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- ABOUT -->
     <section id="about">
       <div class="section-header">
@@ -2144,7 +2242,7 @@
       });
     }, { threshold: 0.06 });
 
-    document.querySelectorAll('.gallery-item, .exp-item, .vol-item, .edu-item, .client-item, .cert-item, .course-item').forEach(el => {
+    document.querySelectorAll('.gallery-item, .exp-item, .vol-item, .edu-item, .client-item, .cert-item, .course-item, .project-card').forEach(el => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(14px)';
       el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
