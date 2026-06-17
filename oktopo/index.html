@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OkTopo Web - 3D Face Retopology & Shrinkwrap Tool</title>
+  <meta name="description" content="A web-based 3D face retopology and shrinkwrap tool. Align, project, and relax quad-mesh face bases on high-poly sculpts inside your browser.">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- 3D Canvas Viewport -->
+  <div id="canvas-container"></div>
+
+  <!-- Sidebar Control Panel -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <div class="logo-icon">O</div>
+        <h1>OkTopo Web</h1>
+      </div>
+      <span class="version-badge">v1.0.0</span>
+    </div>
+
+    <div class="sidebar-content">
+      
+      <!-- Section 1: Upload Mesh -->
+      <div class="section">
+        <div class="section-title">1. Upload Target Face</div>
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <div class="upload-text">Drag & Drop Face Model</div>
+          <div class="upload-subtext">Supports .obj, .gltf, .glb</div>
+          <input type="file" id="file-input" accept=".obj,.gltf,.glb" style="display: none;">
+        </div>
+        <button class="btn btn-secondary btn-full" id="btn-load-demo" style="margin-top: 8px;">
+          <i class="fa-solid fa-user"></i> Load Demo Model
+        </button>
+        
+        <!-- File Info Display -->
+        <div class="file-info" id="file-info" style="display: none;">
+          <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+            <i class="fa-solid fa-file-3d" style="color: #3b82f6;"></i>
+            <span class="file-name" id="lbl-file-name">target_sculpt.obj</span>
+          </div>
+          <button class="btn-remove-file" id="btn-remove-file">Remove</button>
+        </div>
+      </div>
+
+      <!-- Section 2: Base Mesh Proportions -->
+      <div class="section">
+        <div class="section-title">2. Align Base Mask</div>
+        
+        <div class="control-group">
+          <div class="control-label">
+            <span>Uniform Scale</span>
+            <span class="control-val" id="scale-all-val">1.00</span>
+          </div>
+          <input type="range" class="range-slider" id="scale-all" min="0.1" max="3.0" step="0.05" value="1.0">
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Translate Z (Depth)</span>
+            <span class="control-val" id="pos-z-val">0.20</span>
+          </div>
+          <input type="range" class="range-slider" id="pos-z" min="-2.0" max="2.0" step="0.02" value="0.2">
+        </div>
+
+        <!-- Collapsible Advanced Transforms -->
+        <details style="margin-top: 4px;">
+          <summary style="font-size: 0.75rem; color: var(--text-secondary); cursor: pointer; outline: none; margin-bottom: 8px; font-weight: 500;">
+            Advanced Alignment (Translate/Rotate)
+          </summary>
+          <div style="display: flex; flex-direction: column; gap: 10px; padding-left: 8px; border-left: 1px solid var(--panel-border);">
+            <div class="control-group">
+              <div class="control-label"><span>Translate X</span><span class="control-val" id="pos-x-val">0.00</span></div>
+              <input type="range" class="range-slider" id="pos-x" min="-1.5" max="1.5" step="0.02" value="0">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Translate Y</span><span class="control-val" id="pos-y-val">0.00</span></div>
+              <input type="range" class="range-slider" id="pos-y" min="-1.5" max="1.5" step="0.02" value="0">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Rotate X (Tilt)</span><span class="control-val" id="rot-x-val">0.00</span></div>
+              <input type="range" class="range-slider" id="rot-x" min="-90" max="90" step="1" value="0">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Rotate Y (Pan)</span><span class="control-val" id="rot-y-val">0.00</span></div>
+              <input type="range" class="range-slider" id="rot-y" min="-90" max="90" step="1" value="0">
+            </div>
+            <div class="control-group">
+              <div class="control-label"><span>Rotate Z (Roll)</span><span class="control-val" id="rot-z-val">0.00</span></div>
+              <input type="range" class="range-slider" id="rot-z" min="-90" max="90" step="1" value="0">
+            </div>
+          </div>
+        </details>
+
+        <div class="btn-group">
+          <button class="btn btn-secondary" id="btn-reset-align">
+            <i class="fa-solid fa-arrows-rotate"></i> Reset Align
+          </button>
+          <button class="btn btn-secondary" id="btn-reset-mesh">
+            <i class="fa-solid fa-rotate-left"></i> Reset Mesh
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 3: Mesh Resolution -->
+      <div class="section">
+        <div class="section-title">3. Topology Resolution</div>
+        <div class="control-group">
+          <select class="select-input" id="grid-res">
+            <option value="12">Low Density (12 x 12 Quads)</option>
+            <option value="24" selected>Medium Density (24 x 24 Quads)</option>
+            <option value="36">High Density (36 x 36 Quads)</option>
+            <option value="48">Extreme Density (48 x 48 Quads)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Section 4: Shrinkwrap Settings -->
+      <div class="section">
+        <div class="section-title">4. Shrinkwrap / Projection</div>
+        
+        <div class="control-group">
+          <label class="control-label" style="margin-bottom: 2px;">Projection Mode</label>
+          <select class="select-input" id="proj-mode">
+            <option value="closest">Closest Point (Stable / Recommended)</option>
+            <option value="z-axis">Z-Axis Projection</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Surface Offset</span>
+            <span class="control-val" id="proj-offset-val">0.005</span>
+          </div>
+          <input type="range" class="range-slider" id="proj-offset" min="-0.05" max="0.05" step="0.001" value="0.005">
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Max Snap Distance</span>
+            <span class="control-val" id="max-dist-val">0.25</span>
+          </div>
+          <input type="range" class="range-slider" id="max-dist" min="0.05" max="1.0" step="0.05" value="0.25">
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Normal Alignment Filter</span>
+            <span class="control-val" id="normal-thresh-val">0.25</span>
+          </div>
+          <input type="range" class="range-slider" id="normal-thresh" min="0.0" max="0.9" step="0.05" value="0.25">
+        </div>
+
+        <button class="btn btn-full" id="btn-project">
+          <i class="fa-solid fa-compress"></i> Project / Shrinkwrap
+        </button>
+      </div>
+
+      <!-- Section 5: Subdivision Surface -->
+      <div class="section">
+        <div class="section-title">5. Subdivision Surface</div>
+        <div class="control-group">
+          <div class="control-label">
+            <span>Subdivision Level</span>
+            <span class="control-val" id="subdiv-level-val">0</span>
+          </div>
+          <input type="range" class="range-slider" id="subdiv-level" min="0" max="2" step="1" value="0">
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-secondary); line-height: 1.3; text-align: center; margin-top: -4px;">
+          Smooths and increases polygon density (Loop Subdivision)
+        </div>
+      </div>
+
+      <!-- Section 6: Relaxation / Smoothing -->
+      <div class="section">
+        <div class="section-title">6. Relaxation & Smoothing</div>
+        
+        <div class="control-group">
+          <div class="control-label">
+            <span>Smoothing Iterations</span>
+            <span class="control-val" id="smooth-iter-val">10</span>
+          </div>
+          <input type="range" class="range-slider" id="smooth-iter" min="1" max="50" step="1" value="10">
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Damping Factor</span>
+            <span class="control-val" id="smooth-damp-val">0.30</span>
+          </div>
+          <input type="range" class="range-slider" id="smooth-damp" min="0.05" max="0.8" step="0.05" value="0.3">
+        </div>
+
+        <div class="toggle-group">
+          <span style="font-size: 0.8rem; font-weight: 500;">Snap to Surface after Smooth</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-reproject" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button class="btn btn-secondary btn-full" id="btn-smooth">
+          <i class="fa-solid fa-spray-can"></i> Relax Geometry
+        </button>
+      </div>
+
+      <!-- Section 7: Manual Controller Edit -->
+      <div class="section">
+        <div class="section-title">7. Manual Controller Edit</div>
+        <button class="btn btn-secondary btn-full" id="btn-toggle-vertex-edit">
+          <i class="fa-solid fa-up-down-left-right"></i> Enable Controller Edit
+        </button>
+        
+        <div class="control-group" style="margin-top: 4px;">
+          <div class="control-label">
+            <span>Deform Radius (Influence)</span>
+            <span class="control-val" id="deform-radius-val">0.25</span>
+          </div>
+          <input type="range" class="range-slider" id="deform-radius" min="0.05" max="0.6" step="0.01" value="0.25">
+        </div>
+        
+        <div style="font-size: 0.72rem; color: var(--text-secondary); line-height: 1.3; text-align: center; margin-top: -2px;">
+          Click on any pink pin to drag & deform the surrounding face area
+        </div>
+      </div>
+
+      <!-- Section 8: Display / Visualizer Mode -->
+      <div class="section">
+        <div class="section-title">8. Viewport Mode</div>
+        <div class="view-modes">
+          <button class="view-mode-btn active" data-mode="overlay">Overlay</button>
+          <button class="view-mode-btn" data-mode="solid-base">Base Only</button>
+          <button class="view-mode-btn" data-mode="wire-target">Wireframe</button>
+        </div>
+      </div>
+
+      <!-- Export Panel -->
+      <button class="btn btn-full btn-danger" id="btn-export" style="margin-top: 10px;">
+        <i class="fa-solid fa-file-export"></i> Export Quad OBJ
+      </button>
+
+    </div>
+
+    <!-- Stats Panel Footer -->
+    <div class="stats-panel">
+      <div class="stat-item">
+        <span>Target Vertices</span>
+        <span class="stat-val" id="target-verts">-</span>
+      </div>
+      <div class="stat-item">
+        <span>Target Faces</span>
+        <span class="stat-val" id="target-faces">-</span>
+      </div>
+      <div class="stat-item">
+        <span>Base Vertices</span>
+        <span class="stat-val" id="base-verts">0</span>
+      </div>
+      <div class="stat-item">
+        <span>Base Faces</span>
+        <span class="stat-val" id="base-faces">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Viewport Helpers / Keyboard Shortcuts Overlay -->
+  <div class="helper-overlay">
+    <div class="helper-title"><i class="fa-solid fa-circle-info" style="color: #3b82f6;"></i> Controls</div>
+    <div class="helper-shortcut">
+      <span>Rotate Camera</span>
+      <span class="key-badge">LMB Drag</span>
+    </div>
+    <div class="helper-shortcut">
+      <span>Pan Camera</span>
+      <span class="key-badge">RMB Drag</span>
+    </div>
+    <div class="helper-shortcut">
+      <span>Zoom</span>
+      <span class="key-badge">Scroll</span>
+    </div>
+    <div class="helper-shortcut">
+      <span>Move Gizmo</span>
+      <span class="key-badge">Drag arrows</span>
+    </div>
+    <div class="helper-shortcut" style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4px; padding-top: 4px;">
+      <span>Select Pin</span>
+      <span class="key-badge">LMB Click Pin</span>
+    </div>
+    <div class="helper-shortcut">
+      <span>Snap Pin</span>
+      <span class="key-badge">LMB Click Target</span>
+    </div>
+    <div class="helper-shortcut">
+      <span>Drag Pin</span>
+      <span class="key-badge">Drag Gizmo</span>
+    </div>
+    <div class="helper-shortcut">
+      <span>Deselect Pin</span>
+      <span class="key-badge">Escape</span>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast" id="toast">Mesh loaded successfully!</div>
+
+  <!-- Loader Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loading-text">Loading mesh...</div>
+  </div>
+
+  <!-- Import map for modern ES modules resolution -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+        "three/examples/jsm/controls/OrbitControls": "https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js",
+        "three/examples/jsm/controls/TransformControls": "https://unpkg.com/three@0.128.0/examples/jsm/controls/TransformControls.js",
+        "three/examples/jsm/loaders/OBJLoader": "https://unpkg.com/three@0.128.0/examples/jsm/loaders/OBJLoader.js",
+        "three/examples/jsm/loaders/GLTFLoader": "https://unpkg.com/three@0.128.0/examples/jsm/loaders/GLTFLoader.js"
+      }
+    }
+  </script>
+
+  <!-- Application Modules -->
+  <script src="face-base.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

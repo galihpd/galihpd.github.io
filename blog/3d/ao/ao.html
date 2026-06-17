@@ -1,182 +1,178 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/flowbite@1.5.4/dist/flowbite.min.css" />
-  <link rel="icon" type="image/x-icon" href="../../../content/etc/pavicon.ico">
-  <title>Galih Prakoso</title>
-  <script>
-    document.documentElement.classList.add('dark');
-  </script>
-  <script src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"></script>
+  <title>How To Get Fast Ambient Occlusion On Your Cycles With Post-Pro Method — Galih Prakoso</title>
+  <link class="icon" type="image/x-icon" href="../../../content/etc/pavicon.ico">
+  <link rel="stylesheet" href="../../blog.css">
 </head>
-<body bgcolor="#111827">
+<body>
 
-  <header>
-    <nav class="bg-white px-4 lg:px-6 py-2.5 dark:bg-gray-800">
-      <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
-        <a href="../../../index.html" class="flex items-center">
-          <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Galih Prakoso</span>
-        </a>
-        <div class="flex items-center lg:order-2">
-          <button data-collapse-toggle="mobile-menu-2" type="button" class="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="mobile-menu-2" aria-expanded="false">
-            <span class="sr-only">Open main menu</span>
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-            </svg>
-            <svg class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-            </svg>
-          </button>
-        </div>
-        <div class="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
-          <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
-            <li>
-              <a href="../../../index.html" class="block py-2 pr-4 pl-3 text-gray-700 lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:text-white dark:border-gray-700">Home</a>
-            </li>
-            <li>
-              <a href="../../../index.html#work" class="block py-2 pr-4 pl-3 text-gray-700 lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:text-white dark:border-gray-700">Work</a>
-            </li>
-            <li>
-              <a href="../../../index.html#blog" class="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white">Blog</a>
-            </li>
-            <li>
-              <a href="../../../index.html#about" class="block py-2 pr-4 pl-3 text-gray-700 lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:text-white dark:border-gray-700">About</a>
-            </li>
-            <li>
-              <a href="../../../index.html#contact" class="block py-2 pr-4 pl-3 text-gray-700 lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:text-white dark:border-gray-700">Contact</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </header>
-  
-  <div id="banner" tabindex="-1" class="flex fixed z-50 gap-8 justify-between items-start py-3 px-4 w-full bg-gray-50 border border-b border-gray-200 sm:items-center dark:border-gray-700 lg:py-4 dark:bg-gray-800">
-      <p class="text-sm font-light text-gray-500 dark:text-gray-400">Mari bantu korban gempa Cianjur, Jawa Barat <a class="font-medium underline text-primary-600 dark:text-primary-500 hover:no-underline" href="https://kitabisa.com/campaign/jqruntukcianjur">Melalui Kitabisa.com</a></p>
-      <button data-collapse-toggle="banner" type="button" class="flex items-center text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 dark:hover:bg-gray-600 dark:hover:text-white">
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>  
-      </button>
+  <!-- BANNER -->
+  <div id="banner" class="banner">
+    <span class="banner-text">
+      Mari bantu korban gempa Cianjur, Jawa Barat 
+      <a class="banner-link" href="https://kitabisa.com/campaign/jqruntukcianjur" target="_blank" rel="noopener">Melalui Kitabisa.com</a>
+    </span>
+    <button id="closeBanner" class="banner-close" aria-label="Tutup">&times;</button>
   </div>
 
-  <section class="bg-white dark:bg-gray-900 items-center">
-    <div class="max-w-2xl px-4 py-4 mx-auto items-center">
-      <h2 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">How To Get Fast Ambient Occlusion On Your Cycles With Post-Pro Method</h2>
+  <!-- NAV -->
+  <nav>
+    <a href="../../../index.html" class="logo">Galih Prakoso</a>
+    <ul class="nav-center">
+      <li><a href="../../../index.html">Home</a></li>
+      <li><a href="../../../index.html#work">Work</a></li>
+      <li><a href="../../../index.html#blog">Blog</a></li>
+      <li><a href="../../../index.html#about">About</a></li>
+      <li><a href="../../../index.html#contact">Contact</a></li>
+    </ul>
+    <a href="mailto:galihpr@aol.com" class="nav-hire">Hire Me</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="../../../index.html" onclick="closeMenu()">Home</a>
+    <a href="../../../index.html#work" onclick="closeMenu()">Work</a>
+    <a href="../../../index.html#blog" onclick="closeMenu()">Blog</a>
+    <a href="../../../index.html#about" onclick="closeMenu()">About</a>
+    <a href="../../../index.html#contact" onclick="closeMenu()">Contact</a>
+    <a href="mailto:galihpr@aol.com" onclick="closeMenu()">Hire Me →</a>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <div class="blog-container">
+    <article>
+      <h1 class="blog-title">How To Get Fast Ambient Occlusion On Your Cycles With Post-Pro Method</h1>
       
-      <div class="flex items-center space-x-4 py-4">
-        <img class="w-10 h-10 rounded-full" src="../../../content/img/gue.png" alt="">
-        <div class="font-medium dark:text-white">
-            <div>By Galih Prakoso</div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">November 21 2022</div>
+      <div class="blog-meta">
+        <img class="blog-avatar" src="../../../content/img/gue.png" alt="Galih Prakoso">
+        <div class="blog-meta-info">
+          <span class="blog-author">By Galih Prakoso</span>
+          <span class="blog-date">November 21, 2022 &middot; 3D Art</span>
         </div>
       </div>
 
-      <img class="rounded-lg max-w-full h-auto" src="last.jpg">
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-500 py-2 text-center text-sm">AO Off Vs AO On</p>
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 py-2 text-justify">
-        Ambient occlusion is graphic feature that make shadow more visible and bold. This feature
-        available on eevee engine by go to render settings and you'll find ambient occlusion.   
-        But Getting ambient occlusion in cycles engine is different, you must add ambient occlusion node on shader editor.
-        And the bitter fact is getting ambient occlusion on your cycles engine will slowing your render time.
-      </p>
+      <div class="blog-content">
+        <div class="blog-image-wrapper">
+          <img class="blog-img" src="last.jpg" alt="AO Off vs AO On comparison">
+          <p class="blog-caption">AO Off Vs AO On</p>
+        </div>
 
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 text-justify">
-        So why dont we separate the render result and the ambient occlusion render result?
-        Here is the thing. In eevee engine you can only showing the ambient occlusion then
-        you can render it.
-      </p>
-      <img class="rounded-lg max-w-full h-auto" src="gueao.jpg">
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-500 py-2 text-center text-sm">AO Maps</p>
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 py-2 text-justify">
-        After separating the render result and AO maps you can combine those 2 images with 3rd software
-        like Adobe Photoshop even Figma. Here the steps:
-      </p>
-
-      <p class="mb-3 font-bold text-gray-700 dark:text-gray-400 text-justify text-2xl">
-        1. Render Your Main Scene
-      </p>
-      <img class="rounded-lg max-w-full h-auto" src="step1.jpg">
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-500 py-2 text-center text-sm">Main Scene Render Result</p>
-
-        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 py-2 text-justify">
-        Firstly render your main scene with cycles engine. If your scene is complex, my receomendation is save your
-        image with jpeg format to make smaller file size.       
+        <p>
+          Ambient occlusion is a graphics feature that makes shadows more visible and bold. This feature is readily available in the Eevee engine by simply navigating to the render settings and turning on Ambient Occlusion. However, getting ambient occlusion in the Cycles engine is different: you must add an Ambient Occlusion node in the Shader Editor. The bitter fact is that calculating ambient occlusion directly inside your Cycles engine will slow down your render times significantly.
         </p>
 
-      <p class="mb-3 font-bold text-gray-700 dark:text-gray-400 text-justify text-2xl">
-        2. Switch To Eevee Engine
-      </p>
-      <img class="rounded-lg max-w-full h-auto" src="step2.jpg">
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-500 py-2 text-center text-sm">Turn On AO Only</p>
-
-        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 py-2 text-justify">
-        Go to eevee engine and turn on render viewport, then set the render pass to Ambient Occlusion    
+        <p>
+          So, why don't we separate the main render result and the ambient occlusion render result? Here is the trick: in the Eevee engine, you can isolate and display only the ambient occlusion, which allows you to render it separately in a fraction of a second.
         </p>
 
-        <p class="mb-3 font-bold text-gray-700 dark:text-gray-400 text-justify text-2xl">
-          3. Setting Up The Ambient Occlusion
-        </p>
-        <img class="rounded-lg max-w-full h-auto" src="step3.jpg">
-        <p class="mb-3 font-normal text-gray-700 dark:text-gray-500 py-2 text-center text-sm">Adjusting AO</p>
-  
-          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 py-2 text-justify">
-            Setting up the ambient occlusion according to your taste. If you want better result, set the trace precision to 1000
-        </p>
+        <div class="blog-image-wrapper">
+          <img class="blog-img" src="gueao.jpg" alt="Ambient Occlusion Map">
+          <p class="blog-caption">AO Maps</p>
+        </div>
 
-        <p class="mb-3 font-bold text-gray-700 dark:text-gray-400 text-justify text-2xl">
-          4. Render The AO Maps
-        </p>
-        <img class="rounded-lg max-w-full h-auto" src="step4.jpg">
-        <p class="mb-3 font-normal text-gray-700 dark:text-gray-500 py-2 text-center text-sm">Render AO</p>
-  
-          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 py-2 text-justify">
-            Render the viewport view by going to view > viewport render image  
+        <p>
+          After separating the main render result and the AO maps, you can combine these two images using third-party software like Adobe Photoshop or even Figma. Here are the exact steps:
         </p>
 
-      <p class="mb-3 font-bold text-gray-700 dark:text-gray-400 text-justify text-2xl">
-        4. Combine Those 2 images
-      </p>
-      <img class="rounded-lg max-w-full h-auto" src="step5.jpg">
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-500 py-2 text-center text-sm">Combine 2 Image Using Photoshop</p>
-
-        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 py-2 text-justify">
-          After render the main scene and the AO maps, now time to combine it. Im use adobe photoshop to combine those image.
-          Put the AO maps in top and change the blending mode to overlay
+        <h2>1. Render Your Main Scene</h2>
+        <div class="blog-image-wrapper">
+          <img class="blog-img" src="step1.jpg" alt="Main Scene Render Result">
+          <p class="blog-caption">Main Scene Render Result</p>
+        </div>
+        <p>
+          Firstly, render your main scene using the Cycles engine. If your scene is highly complex, my recommendation is to save your image in JPEG format to keep the file size smaller.
         </p>
 
-      <p class="mb-3 font-bold text-gray-700 dark:text-gray-400 text-justify text-2xl">
-        5. Little Adjust
-      </p>
-      <img class="rounded-lg max-w-full h-auto" src="step6.jpg">
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-500 py-2 text-center text-sm">Brigtness Adjust</p>
-
-        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 py-2 text-justify">
-        Because of the overbright image, we must tune the brigtness by using Brightnes/Contrast Adjustment filter.
-        And you done getting ambient occlusion in cheap method.
+        <h2>2. Switch To Eevee Engine</h2>
+        <div class="blog-image-wrapper">
+          <img class="blog-img" src="step2.jpg" alt="Switching to Eevee and Turning On Ambient Occlusion">
+          <p class="blog-caption">Turn On AO Only</p>
+        </div>
+        <p>
+          Go to the Eevee engine render settings and turn on the render viewport. Then, set the Render Pass to Ambient Occlusion to view only the AO pass.
         </p>
 
-      <p class="mb-3 font-bold text-gray-700 dark:text-gray-400 text-justify text-2xl">
-        The Difference
-      </p>
-      <img class="rounded-lg max-w-full h-auto" src="last.jpg">
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-500 py-2 text-center text-sm">The Difference</p>
-
-        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 py-2 text-justify">
-          You can actually using these method for animation too, but its to complicated because of my computer didnt afford that.
+        <h2>3. Setting Up The Ambient Occlusion</h2>
+        <div class="blog-image-wrapper">
+          <img class="blog-img" src="step3.jpg" alt="Adjusting Ambient Occlusion settings">
+          <p class="blog-caption">Adjusting AO</p>
+        </div>
+        <p>
+          Adjust the ambient occlusion settings according to your preference. If you want a cleaner, high-quality result, set the Trace Precision to 1.000.
         </p>
-      
 
-    </div>
-        </section>
+        <h2>4. Render The AO Maps</h2>
+        <div class="blog-image-wrapper">
+          <img class="blog-img" src="step4.jpg" alt="Rendering the AO Maps viewport">
+          <p class="blog-caption">Render AO</p>
+        </div>
+        <p>
+          Render the viewport view by going to the top menu and selecting <strong>View &gt; Viewport Render Image</strong>.
+        </p>
 
-        <footer class="p-4 bg-white md:p-8 lg:p-10 dark:bg-gray-800">
-          <div class="mx-auto max-w-screen-xl text-center">
-            <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2022 <a href="#" class="hover:underline">Galih Prakoso Damar Aji</a>
-            </span>
-          </div>
-        </footer>
-  
+        <h2>5. Combine Those Two Images</h2>
+        <div class="blog-image-wrapper">
+          <img class="blog-img" src="step5.jpg" alt="Combining the main render and the AO map in Photoshop">
+          <p class="blog-caption">Combine 2 Images Using Photoshop</p>
+        </div>
+        <p>
+          After rendering both the main scene and the AO maps, it is time to combine them. I use Adobe Photoshop for this step. Put the AO map layer on top of your main Cycles render and change the layer blending mode to <strong>Multiply</strong> (or Overlay/Soft Light, depending on your taste).
+        </p>
+
+        <h2>6. Fine Tuning</h2>
+        <div class="blog-image-wrapper">
+          <img class="blog-img" src="step6.jpg" alt="Adjusting Brightness and Contrast in Photoshop">
+          <p class="blog-caption">Brightness Adjust</p>
+        </div>
+        <p>
+          If the image feels over-darkened, you can tune the strength of the AO by adjusting the layer's Opacity or by using a Brightness/Contrast Adjustment filter. With that, you have achieved high-quality ambient occlusion using a very fast, inexpensive method!
+        </p>
+
+        <h2>The Difference</h2>
+        <div class="blog-image-wrapper">
+          <img class="blog-img" src="last.jpg" alt="Side by side comparison of AO off vs AO on">
+          <p class="blog-caption">Final Comparison</p>
+        </div>
+        <p>
+          You can actually use this method for animations as well, although it requires setting up a compositing node tree or batch post-processing which can be slightly more complex.
+        </p>
+      </div>
+    </article>
+
+    <footer>
+      <p class="footer-text">&copy; 2022 Galih Prakoso Damar Aji &middot; Generalist 3D Artist</p>
+    </footer>
+  </div>
+
+  <script>
+    // Hamburger menu toggle logic
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+    function closeMenu() {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Banner close logic
+    const banner = document.getElementById('banner');
+    const closeBannerBtn = document.getElementById('closeBanner');
+    if (banner && closeBannerBtn) {
+      closeBannerBtn.addEventListener('click', () => {
+        banner.style.display = 'none';
+      });
+    }
+  </script>
 </body>
 </html>
